@@ -5,3 +5,5 @@ client/.env
 # Ignore node_modules in both
 server/node_modules/
 client/node_modules/
+
+node_modules

@@ -1,0 +1,28 @@
+{
+  "name": "online-judge-platform",
+  "version": "1.0.0",
+  "description": "A MERN stack online judge platform",
+  "main": "server/server.js",
+  "scripts": {
+    "client": "npm --prefix client start",
+    "server": "npm --prefix server start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client-install": "npm --prefix client install",
+    "server-install": "npm --prefix server install",
+    "install-all": "npm run client-install && npm run server-install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suryareddy0907/Online-Judge-Platform.git"
+  },
+  "keywords": [],
+  "author": "Padala Suryanarayana Reddy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suryareddy0907/Online-Judge-Platform/issues"
+  },
+  "homepage": "https://github.com/suryareddy0907/Online-Judge-Platform#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
