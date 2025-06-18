@@ -1,5 +1,7 @@
-# .gitignore
+# Ignore .env in server and client
+server/.env
+client/.env
 
-# Node
-node_modules
-.env
+# Ignore node_modules in both
+server/node_modules/
+client/node_modules/
