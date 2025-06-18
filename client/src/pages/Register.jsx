@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import FormInput from "../components/FormInput";
-import { register } from "../services/authService";
+import { registerUser } from "../services/authService";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -39,7 +39,7 @@ function Register() {
     };
 
     try {
-      await register(payload);
+      await registerUser(payload);
       navigate("/home"); // ✅ Navigate to home after registration
     } catch (err) {
       console.error("Registration failed:", err);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../services/authService";
+import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
@@ -21,7 +21,7 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await login(formData);
+      const res = await loginUser(formData);
       const { token } = res;
 
       authLogin(token);           // set context user and save token
@@ -98,7 +98,7 @@ const Login = () => {
         </button>
 
         <p className="text-sm text-center text-gray-400">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-400 hover:underline">
             Register
           </Link>
