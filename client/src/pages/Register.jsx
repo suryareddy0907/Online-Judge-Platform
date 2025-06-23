@@ -43,8 +43,15 @@ function Register() {
       navigate("/home"); // ✅ Navigate to home after registration
     } catch (err) {
       console.error("Registration failed:", err);
-      const message =
+      let message =
         err?.response?.data?.message || "Registration failed. Try again.";
+      // Custom error for already existing user
+      if (
+        message === "An account already exists with this email" ||
+        message === "Username is already taken"
+      ) {
+        message = "User already exists.";
+      }
       setError(message);
     }
   };

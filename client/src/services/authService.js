@@ -95,3 +95,14 @@ export const updateUserProfile = async (profileData) => {
   });
   return handleResponse(response);
 };
+
+// Public: Get published problems
+export const getPublicProblems = async (params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`http://localhost:5000/api/problems?${queryParams}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Something went wrong');
+  }
+  return response.json();
+};

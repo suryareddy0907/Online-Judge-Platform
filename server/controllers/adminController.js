@@ -181,23 +181,29 @@ export const createProblem = async (req, res) => {
     const {
       title,
       statement,
+      input,
+      output,
       constraints,
       tags,
       difficulty,
       timeLimit,
       memoryLimit,
-      testCases
+      testCases,
+      exampleTestCases
     } = req.body;
 
     const problem = new Problem({
       title,
       statement,
+      input: input || '',
+      output: output || '',
       constraints,
       tags: tags || [],
       difficulty: difficulty || 'Easy',
       timeLimit: timeLimit || 1000,
       memoryLimit: memoryLimit || 256,
       testCases: testCases || [],
+      exampleTestCases: exampleTestCases || [],
       createdBy: req.user._id
     });
 

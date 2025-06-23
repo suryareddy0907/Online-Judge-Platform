@@ -12,6 +12,8 @@ import AdminContests from "./pages/AdminContests";
 import AdminSettings from "./pages/AdminSettings";
 import PrivateRoute from "./routes/PrivateRoute";
 import AdminRoute from "./routes/AdminRoute";
+import BrowseProblems from "./pages/BrowseProblems";
+import ProblemDetails from "./pages/ProblemDetails";
 
 const App = () => {
   return (
@@ -95,6 +97,9 @@ const App = () => {
           </AdminRoute>
         }
       />
+
+      <Route path="/problems" element={<BrowseProblems />} />
+      <Route path="/problems/:id" element={<ProblemDetails />} />
 
       {/* Redirect all unknown routes to login */}
       <Route path="*" element={<Navigate to="/login" replace />} />

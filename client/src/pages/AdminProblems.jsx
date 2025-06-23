@@ -35,6 +35,31 @@ const AdminProblems = () => {
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showActions, setShowActions] = useState(null);
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    description: '',
+    input: '',
+    constraints: '',
+    output: '',
+    exampleTestCases: [{ input: '', output: '', explanation: '' }],
+    testCases: [{ input: '', output: '' }],
+    difficulty: '',
+    tags: ''
+  });
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedProblem, setSelectedProblem] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    input: '',
+    constraints: '',
+    output: '',
+    exampleTestCases: [{ input: '', output: '', explanation: '' }],
+    testCases: [{ input: '', output: '' }],
+    difficulty: '',
+    tags: ''
+  });
 
   useEffect(() => {
     fetchProblems();
@@ -308,6 +333,35 @@ const AdminProblems = () => {
                           <Trash2 className="w-3 h-3 mr-1" />
                           Delete
                         </button>
+                        <button
+                          onClick={() => {
+                            setSelectedProblem(problem);
+                            setShowViewModal(true);
+                          }}
+                          className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditForm({
+                              title: problem.title,
+                              description: problem.statement,
+                              input: problem.input || '',
+                              constraints: problem.constraints || '',
+                              output: problem.output || '',
+                              exampleTestCases: problem.exampleTestCases || [{ input: '', output: '', explanation: '' }],
+                              testCases: problem.testCases || [{ input: '', output: '' }],
+                              difficulty: problem.difficulty || '',
+                              tags: (problem.tags || []).join(', ')
+                            });
+                            setSelectedProblem(problem);
+                            setShowEditModal(true);
+                          }}
+                          className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-yellow-700 bg-yellow-100 hover:bg-yellow-200"
+                        >
+                          Edit
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -344,29 +398,541 @@ const AdminProblems = () => {
           )}
         </div>
 
-        {/* Create Problem Modal Placeholder */}
+        {/* Create Problem Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-              <div className="mt-3 text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Problem</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Problem creation form will be implemented here.
-                </p>
-                <div className="flex justify-end space-x-3">
+            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Create New Problem</h3>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    // Prepare test cases for backend
+                    const payload = {
+                      title: createForm.title,
+                      statement: createForm.description,
+                      input: createForm.input,
+                      constraints: createForm.constraints,
+                      output: createForm.output,
+                      exampleTestCases: createForm.exampleTestCases,
+                      testCases: createForm.testCases, // hidden test cases
+                      difficulty: createForm.difficulty,
+                      tags: createForm.tags.split(',').map(t => t.trim()).filter(Boolean),
+                    };
+                    try {
+                      await createProblem(payload);
+                      setShowCreateModal(false);
+                      fetchProblems();
+                    } catch (err) {
+                      alert(err.message || 'Failed to create problem');
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Problem Title</label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={createForm.title}
+                      onChange={e => setCreateForm(f => ({ ...f, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      value={createForm.description}
+                      onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Input</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={createForm.input}
+                      onChange={e => setCreateForm(f => ({ ...f, input: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Constraints</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={createForm.constraints}
+                      onChange={e => setCreateForm(f => ({ ...f, constraints: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Output</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={createForm.output}
+                      onChange={e => setCreateForm(f => ({ ...f, output: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Example Test Cases</label>
+                    {createForm.exampleTestCases.map((tc, idx) => (
+                      <div key={idx} className="flex flex-col space-y-1 mb-2 border p-2 rounded-md bg-gray-50">
+                        <div className="flex space-x-2">
+                          <textarea
+                            placeholder="Input"
+                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            value={tc.input}
+                            onChange={e => setCreateForm(f => {
+                              const arr = [...f.exampleTestCases];
+                              arr[idx].input = e.target.value;
+                              return { ...f, exampleTestCases: arr };
+                            })}
+                            required
+                            rows={2}
+                          />
+                          <textarea
+                            placeholder="Output"
+                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            value={tc.output}
+                            onChange={e => setCreateForm(f => {
+                              const arr = [...f.exampleTestCases];
+                              arr[idx].output = e.target.value;
+                              return { ...f, exampleTestCases: arr };
+                            })}
+                            required
+                            rows={2}
+                          />
+                          <button
+                            type="button"
+                            className="px-2 text-red-500"
+                            onClick={() => setCreateForm(f => ({
+                              ...f,
+                              exampleTestCases: f.exampleTestCases.filter((_, i) => i !== idx)
+                            }))}
+                            title="Remove"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <textarea
+                          placeholder="Explanation (optional)"
+                          className="border border-gray-300 rounded-md px-2 py-1 mt-1"
+                          value={tc.explanation}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.exampleTestCases];
+                            arr[idx].explanation = e.target.value;
+                            return { ...f, exampleTestCases: arr };
+                          })}
+                          rows={2}
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() => setCreateForm(f => ({
+                        ...f,
+                        exampleTestCases: [...f.exampleTestCases, { input: '', output: '', explanation: '' }]
+                      }))}
+                    >
+                      + Add Example Test Case
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hidden Test Cases</label>
+                    {createForm.testCases.map((tc, idx) => (
+                      <div key={idx} className="flex space-x-2 mb-2">
+                        <textarea
+                          placeholder="Input"
+                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                          value={tc.input}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].input = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <textarea
+                          placeholder="Output"
+                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                          value={tc.output}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].output = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <button
+                          type="button"
+                          className="px-2 text-red-500"
+                          onClick={() => setCreateForm(f => ({
+                            ...f,
+                            testCases: f.testCases.filter((_, i) => i !== idx)
+                          }))}
+                          title="Remove"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() => setCreateForm(f => ({
+                        ...f,
+                        testCases: [...f.testCases, { input: '', output: '' }]
+                      }))}
+                    >
+                      + Add Hidden Test Case
+                    </button>
+                  </div>
+                  <div className="flex space-x-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                      <select
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={createForm.difficulty}
+                        onChange={e => setCreateForm(f => ({ ...f, difficulty: e.target.value }))}
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={createForm.tags}
+                        onChange={e => setCreateForm(f => ({ ...f, tags: e.target.value }))}
+                        placeholder="e.g. arrays, dp, math"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(false)}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Create
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* View Problem Modal */}
+        {showViewModal && selectedProblem && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">View Problem Details</h3>
+                <div className="space-y-2 text-left">
+                  <div><strong>Title:</strong> {selectedProblem.title}</div>
+                  <div><strong>Description:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.statement}</pre></div>
+                  <div><strong>Input:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.input}</pre></div>
+                  <div><strong>Constraints:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.constraints}</pre></div>
+                  <div><strong>Output:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.output}</pre></div>
+                  <div><strong>Difficulty:</strong> {selectedProblem.difficulty}</div>
+                  <div><strong>Tags:</strong> {(selectedProblem.tags || []).join(', ')}</div>
+                  <div><strong>Example Test Cases:</strong>
+                    {selectedProblem.exampleTestCases && selectedProblem.exampleTestCases.length > 0 ? (
+                      <ul className="list-disc ml-6">
+                        {selectedProblem.exampleTestCases.map((tc, idx) => (
+                          <li key={idx}>
+                            <div><strong>Input:</strong> {tc.input}</div>
+                            <div><strong>Output:</strong> {tc.output}</div>
+                            {tc.explanation && <div><strong>Explanation:</strong> {tc.explanation}</div>}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : <span>None</span>}
+                  </div>
+                  <div><strong>Hidden Test Cases:</strong>
+                    {selectedProblem.testCases && selectedProblem.testCases.length > 0 ? (
+                      <ul className="list-disc ml-6">
+                        {selectedProblem.testCases.map((tc, idx) => (
+                          <li key={idx}>
+                            <div><strong>Input:</strong> {tc.input}</div>
+                            <div><strong>Output:</strong> {tc.output}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : <span>None</span>}
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4">
                   <button
-                    onClick={() => setShowCreateModal(false)}
+                    onClick={() => setShowViewModal(false)}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => setShowCreateModal(false)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Create
+                    Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Edit Problem Modal */}
+        {showEditModal && selectedProblem && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Edit Problem</h3>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const payload = {
+                      title: editForm.title,
+                      statement: editForm.description,
+                      input: editForm.input,
+                      constraints: editForm.constraints,
+                      output: editForm.output,
+                      exampleTestCases: editForm.exampleTestCases,
+                      testCases: editForm.testCases,
+                      difficulty: editForm.difficulty,
+                      tags: editForm.tags.split(',').map(t => t.trim()).filter(Boolean),
+                    };
+                    try {
+                      await updateProblem(selectedProblem._id, payload);
+                      setShowEditModal(false);
+                      fetchProblems();
+                    } catch (err) {
+                      alert(err.message || 'Failed to update problem');
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Problem Title</label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={editForm.title}
+                      onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      value={editForm.description}
+                      onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Input</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={editForm.input}
+                      onChange={e => setEditForm(f => ({ ...f, input: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Constraints</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={editForm.constraints}
+                      onChange={e => setEditForm(f => ({ ...f, constraints: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Output</label>
+                    <textarea
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      value={editForm.output}
+                      onChange={e => setEditForm(f => ({ ...f, output: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Example Test Cases</label>
+                    {editForm.exampleTestCases.map((tc, idx) => (
+                      <div key={idx} className="flex flex-col space-y-1 mb-2 border p-2 rounded-md bg-gray-50">
+                        <div className="flex space-x-2">
+                          <textarea
+                            placeholder="Input"
+                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            value={tc.input}
+                            onChange={e => setEditForm(f => {
+                              const arr = [...f.exampleTestCases];
+                              arr[idx].input = e.target.value;
+                              return { ...f, exampleTestCases: arr };
+                            })}
+                            required
+                            rows={2}
+                          />
+                          <textarea
+                            placeholder="Output"
+                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            value={tc.output}
+                            onChange={e => setEditForm(f => {
+                              const arr = [...f.exampleTestCases];
+                              arr[idx].output = e.target.value;
+                              return { ...f, exampleTestCases: arr };
+                            })}
+                            required
+                            rows={2}
+                          />
+                          <button
+                            type="button"
+                            className="px-2 text-red-500"
+                            onClick={() => setEditForm(f => ({
+                              ...f,
+                              exampleTestCases: f.exampleTestCases.filter((_, i) => i !== idx)
+                            }))}
+                            title="Remove"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <textarea
+                          placeholder="Explanation (optional)"
+                          className="border border-gray-300 rounded-md px-2 py-1 mt-1"
+                          value={tc.explanation}
+                          onChange={e => setEditForm(f => {
+                            const arr = [...f.exampleTestCases];
+                            arr[idx].explanation = e.target.value;
+                            return { ...f, exampleTestCases: arr };
+                          })}
+                          rows={2}
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() => setEditForm(f => ({
+                        ...f,
+                        exampleTestCases: [...f.exampleTestCases, { input: '', output: '', explanation: '' }]
+                      }))}
+                    >
+                      + Add Example Test Case
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hidden Test Cases</label>
+                    {editForm.testCases.map((tc, idx) => (
+                      <div key={idx} className="flex space-x-2 mb-2">
+                        <textarea
+                          placeholder="Input"
+                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                          value={tc.input}
+                          onChange={e => setEditForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].input = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <textarea
+                          placeholder="Output"
+                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                          value={tc.output}
+                          onChange={e => setEditForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].output = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <button
+                          type="button"
+                          className="px-2 text-red-500"
+                          onClick={() => setEditForm(f => ({
+                            ...f,
+                            testCases: f.testCases.filter((_, i) => i !== idx)
+                          }))}
+                          title="Remove"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() => setEditForm(f => ({
+                        ...f,
+                        testCases: [...f.testCases, { input: '', output: '' }]
+                      }))}
+                    >
+                      + Add Hidden Test Case
+                    </button>
+                  </div>
+                  <div className="flex space-x-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                      <select
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={editForm.difficulty}
+                        onChange={e => setEditForm(f => ({ ...f, difficulty: e.target.value }))}
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={editForm.tags}
+                        onChange={e => setEditForm(f => ({ ...f, tags: e.target.value }))}
+                        placeholder="e.g. arrays, dp, math"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowEditModal(false)}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

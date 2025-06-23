@@ -29,8 +29,12 @@ const Login = () => {
 
     } catch (err) {
       console.error("Login failed:", err);
-      const message =
+      let message =
         err?.response?.data?.message || "Invalid credentials. Try again.";
+      // Custom error for non-existent user
+      if (message === "Invalid credentials") {
+        message = "User does not exist.";
+      }
       setError(message);
     }
   };

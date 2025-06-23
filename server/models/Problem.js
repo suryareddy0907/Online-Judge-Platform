@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const problemSchema = new mongoose.Schema({
   title: { type: String, required: true, unique: true },
   statement: { type: String, required: true },
+  input: { type: String, default: '' },
+  output: { type: String, default: '' },
   constraints: { type: String, required: true },
   tags: [{ type: String }],
   difficulty: { 
@@ -10,6 +12,11 @@ const problemSchema = new mongoose.Schema({
     enum: ['Easy', 'Medium', 'Hard'], 
     default: 'Easy' 
   },
+  exampleTestCases: [{
+    input: { type: String, required: true },
+    output: { type: String, required: true },
+    explanation: { type: String, default: '' }
+  }],
   timeLimit: { type: Number, default: 1000 }, // in milliseconds
   memoryLimit: { type: Number, default: 256 }, // in MB
   testCases: [{
