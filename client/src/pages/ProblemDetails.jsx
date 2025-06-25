@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPublicProblems } from "../services/authService";
+import axios from "axios";
 
 const ProblemDetails = () => {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [code, setCode] = useState("");
+  const [output, setOutput] = useState("");
   const [customInput, setCustomInput] = useState("");
+  const [language, setLanguage] = useState("cpp"); // Default language is C++
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -26,6 +30,23 @@ const ProblemDetails = () => {
     };
     fetchProblem();
   }, [id]);
+
+  const handleRun = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/run", {
+        code: code,
+        language: language,
+      });
+      setOutput(response.data.output);
+    } catch (err) {
+      setOutput(
+        err.response?.data?.output ||
+        err.response?.data?.error ||
+        err.message ||
+        "An unexpected error occurred."
+      );
+    }
+  };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error || !problem) return <div className="min-h-screen flex items-center justify-center text-red-500">{error || "Problem not found"}</div>;
@@ -71,13 +92,28 @@ const ProblemDetails = () => {
       </div>
       {/* Right: Code Editor and Custom Test Case */}
       <div className="md:w-1/2 w-full flex flex-col bg-[#18181b] p-8 min-h-screen min-h-0 flex-grow">
+        {/* Language Dropdown */}
+        <div className="mb-4">
+          <label className="block text-white text-sm font-semibold mb-2">Language</label>
+          <select
+            className="w-48 bg-black text-green-200 font-mono rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={language}
+            onChange={e => setLanguage(e.target.value)}
+          >
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+            <option value="python">Python</option>
+          </select>
+        </div>
         <div className="flex-1 flex flex-col mb-6 min-h-0">
           <label className="block text-white text-sm font-semibold mb-2">Code Editor</label>
           <textarea
             className="w-full flex-1 min-h-0 bg-black text-green-200 font-mono rounded-lg p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Write your code here..."
             spellCheck={false}
-            readOnly={false}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
           />
         </div>
         <div className="bg-white rounded-lg shadow p-4 mt-auto">
@@ -90,9 +126,48 @@ const ProblemDetails = () => {
             onChange={e => setCustomInput(e.target.value)}
           />
           <div className="flex justify-end space-x-2">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" disabled>Run</button>
+            <button onClick={handleRun} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Run</button>
             <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" disabled>Submit</button>
           </div>
+          {output && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold">Output:</h3>
+              <pre
+                className="bg-gray-100 p-2 rounded"
+                style={{
+                  whiteSpace: "pre-wrap",
+                  overflowX: "hidden",
+                  overflowY: "auto",
+                  maxHeight: "300px"
+                }}
+              >{
+                (() => {
+                  if (output === null || output === undefined) return "";
+                  let err = "";
+                  if (typeof output === "object" && output !== null && "stderr" in output) {
+                    err = output.stderr;
+                  } else if (typeof output === "object" && output !== null && "error" in output) {
+                    err = output.error;
+                  } else if (typeof output === "string") {
+                    err = output;
+                  } else {
+                    err = JSON.stringify(output, null, 2);
+                  }
+                  // Filter out lines with internal paths
+                  const filtered = err
+                    .split('\n')
+                    .filter(line =>
+                      !line.includes('/codes/') &&
+                      !line.includes('outputs/') &&
+                      !line.includes('\\') && // for Windows paths
+                      !line.includes('.cpp: note:') // optional: filter out some verbose notes
+                    )
+                    .join('\n');
+                  return filtered.trim();
+                })()
+              }</pre>
+            </div>
+          )}
         </div>
       </div>
     </div>

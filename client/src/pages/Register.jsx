@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import FormInput from "../components/FormInput";
 import { registerUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,8 +41,10 @@ function Register() {
     };
 
     try {
-      await registerUser(payload);
-      navigate("/home"); // ✅ Navigate to home after registration
+      const res = await registerUser(payload);
+      const { token } = res;
+      authLogin(token); // Automatically log in after registration
+      // No need to navigate manually, authLogin does it
     } catch (err) {
       console.error("Registration failed:", err);
       let message =
