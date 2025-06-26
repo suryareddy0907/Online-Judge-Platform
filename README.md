@@ -57,7 +57,28 @@ cd ../client
 npm install
 ```
 
-### 3. Environment Configuration
+#### Online Compiler Dependencies
+```bash
+cd ../online-compiler
+npm install
+```
+
+### 3. Create Compiler Directories (Required)
+
+**This is a mandatory step.** Before running the application, you must manually create two folders inside the `online-compiler` directory:
+
+1.  `codes`: This folder temporarily stores the source code files for compilation.
+2.  `outputs`: This folder temporarily stores the compiled executables.
+
+After creating them, your `online-compiler` directory should look like this:
+```
+online-compiler/
+├── codes/
+├── outputs/
+└── ... (other files)
+```
+
+### 4. Environment Configuration
 
 #### Server Environment (.env)
 Create a `.env` file in the `server` directory:
@@ -70,7 +91,7 @@ JWT_SECRET=your-super-secret-jwt-key-here
 #### Client Environment
 The client is configured to connect to `http://localhost:5000` by default.
 
-### 4. Initialize the Default Admin User
+### 5. Initialize the Default Admin User
 
 Run the admin initialization script to create the default admin user:
 ```bash
@@ -85,7 +106,9 @@ This will create a default admin user with:
 
 **⚠️ Important**: Change the default password after first login!
 
-### 5. Start the Application
+### 6. Start the Application
+
+You must run the three services in separate terminals.
 
 #### Start the Server
 ```bash
@@ -95,13 +118,21 @@ npm run dev
 
 #### Start the Client
 ```bash
-cd client
+cd ../client
 npm run dev
+```
+
+#### Start the Online Compiler
+```bash
+cd ../online-compiler
+npm start
 ```
 
 The application will be available at:
 - **Frontend**: http://localhost:5173
 - **Backend**: http://localhost:5000
+- **Compiler Service**: http://localhost:5001
+
 
 ## 🔐 Admin Access
 
@@ -133,6 +164,15 @@ online-judge/
 │   ├── middlewares/      # Custom middlewares
 │   ├── utils/            # Utility functions
 │   └── package.json
+├── online-compiler/        # Code execution microservice
+│   ├── codes/              # Stores temporary code files (manual creation required)
+│   ├── outputs/            # Stores temporary output files (manual creation required)
+│   ├── executeC.js         # Logic to compile and run C code
+│   ├── executeCpp.js       # Logic to compile and run C++ code
+│   ├── executeJava.js      # Logic to compile and run Java code
+│   ├── executePython.js    # Logic to compile and run Python code
+│   ├── generateFile.js     # Utility to create temp code files
+│   └── index.js            # Express server for code execution
 └── README.md
 ```
 
@@ -191,25 +231,13 @@ The admin panel uses:
 2. Install dependencies: `npm install`
 3. Start the server: `npm start`
 
+### Online Compiler Deployment
+1. Install dependencies: `npm install`
+2. Start the service: `npm start`
+
 ### Frontend Deployment
 1. Build the project: `npm run build`
 2. Deploy the `dist` folder to your hosting service
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-For support and questions, please open an issue in the repository.
 
 ## 🖥️ Online Compiler Microservice
 
@@ -237,7 +265,6 @@ online-compiler/
 ├── executeCpp.js      # Logic to compile and run C++ code
 ├── package.json
 ```
-
 ### **Setup Instructions**
 
 1. **Install dependencies:**
@@ -305,10 +332,3 @@ cd ../client
 npm install
 npm run dev
 ```
-
-## 📢 Contribution
-
-- If you add support for more languages, create a new `execute<LANG>.js` in `online-compiler/` and update the logic accordingly.
-- Please open issues or pull requests for improvements!
-
-
