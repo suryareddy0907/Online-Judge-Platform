@@ -14,6 +14,7 @@ import PrivateRoute from "./routes/PrivateRoute";
 import AdminRoute from "./routes/AdminRoute";
 import BrowseProblems from "./pages/BrowseProblems";
 import ProblemDetails from "./pages/ProblemDetails";
+import MySubmissions from "./pages/MySubmissions";
 
 const App = () => {
   return (
@@ -100,6 +101,15 @@ const App = () => {
 
       <Route path="/problems" element={<BrowseProblems />} />
       <Route path="/problems/:id" element={<ProblemDetails />} />
+
+      <Route
+        path="/my-submissions"
+        element={
+          <PrivateRoute>
+            <MySubmissions />
+          </PrivateRoute>
+        }
+      />
 
       {/* Redirect all unknown routes to login */}
       <Route path="*" element={<Navigate to="/login" replace />} />

@@ -106,3 +106,31 @@ export const getPublicProblems = async (params = {}) => {
   }
   return response.json();
 };
+
+export const getMySubmissions = async (params = {}) => {
+  const token = localStorage.getItem('token');
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`http://localhost:5000/api/problems/my-submissions?${queryParams}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch submissions');
+  }
+  return response.json();
+};
+
+// Public: Get home page stats
+export const getPublicStats = async () => {
+  const token = localStorage.getItem('token');
+  const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+  const response = await fetch('http://localhost:5000/api/admin/public-stats', { headers });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch stats');
+  }
+  return response.json();
+};

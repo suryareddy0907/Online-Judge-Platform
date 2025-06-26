@@ -1,16 +1,3 @@
-/**
- * Entry point for the Express server.
- *
- * 1. Receives code + language choice from the client (`/run` endpoint).
- * 2. Persists the source code to a temporary file (`generateFile`).
- * 3. Compiles & executes the code (`executeCpp`).
- * 4. Returns the program output back to the caller as JSON.
- *
- * NOTE: Only the C++ workflow is fully wired-up right now, but because the
- *       architecture is modular you can plug in extra languages by adding
- *       another `execute<LANG>.js` implementation and a simple switch-case.
- */
-
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -32,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/run', async (req, res) => {
-    const { language = 'cpp', code } = req.body;
+    const { language = 'cpp', code, input = '' } = req.body;
 
     if (code === undefined) {
         return res.status(404).json({ success: false, error: "Empty code!" });
@@ -43,16 +30,16 @@ app.post('/run', async (req, res) => {
         let output;
         switch (language) {
             case 'cpp':
-                output = await executeCpp(filepath);
+                output = await executeCpp(filepath, input);
                 break;
             case 'c':
-                output = await executeC(filepath);
+                output = await executeC(filepath, input);
                 break;
             case 'java':
-                output = await executeJava(filepath);
+                output = await executeJava(filepath, input);
                 break;
             case 'py':
-                output = await executePython(filepath);
+                output = await executePython(filepath, input);
                 break;
             default:
                 return res.status(400).json({ success: false, error: "Unsupported language" });

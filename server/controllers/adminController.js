@@ -312,32 +312,48 @@ export const getAllSubmissions = async (req, res) => {
     } = req.query;
     
     const query = {};
-    
-    if (problem) {
-      query.problem = problem;
-    }
-    
+    // User filter: allow username/email search
     if (user) {
-      query.user = user;
+      const userDocs = await User.find({
+        $or: [
+          { username: { $regex: user, $options: 'i' } },
+          { email: { $regex: user, $options: 'i' } }
+        ]
+      }).select('_id');
+      const userIds = userDocs.map(u => u._id);
+      if (userIds.length > 0) {
+        query.user = { $in: userIds };
+      } else {
+        // No users match, return empty result
+        return res.json({ submissions: [], totalPages: 0, currentPage: page, total: 0 });
+      }
     }
-    
+    // Problem filter: allow title search
+    if (problem) {
+      const problemDocs = await Problem.find({
+        title: { $regex: problem, $options: 'i' }
+      }).select('_id');
+      const problemIds = problemDocs.map(p => p._id);
+      if (problemIds.length > 0) {
+        query.problem = { $in: problemIds };
+      } else {
+        // No problems match, return empty result
+        return res.json({ submissions: [], totalPages: 0, currentPage: page, total: 0 });
+      }
+    }
     if (language) {
       query.language = language;
     }
-    
     if (verdict) {
       query.verdict = verdict;
     }
-
     const submissions = await Submission.find(query)
       .populate('user', 'username email')
       .populate('problem', 'title')
       .sort({ submittedAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-
     const total = await Submission.countDocuments(query);
-
     res.json({
       submissions,
       totalPages: Math.ceil(total / limit),
@@ -398,6 +414,22 @@ export const rejudgeSubmission = async (req, res) => {
     });
   } catch (error) {
     console.error("Re-judge submission error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete submission
+export const deleteSubmission = async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+    const submission = await Submission.findById(submissionId);
+    if (!submission) {
+      return res.status(404).json({ message: "Submission not found" });
+    }
+    await Submission.findByIdAndDelete(submissionId);
+    res.json({ message: "Submission deleted successfully" });
+  } catch (error) {
+    console.error("Delete submission error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -537,7 +569,8 @@ export const getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalProblems = await Problem.countDocuments();
-    const totalSubmissions = await Submission.countDocuments();
+    // Only count submissions with a valid verdict
+    const totalSubmissions = await Submission.countDocuments({ verdict: { $ne: null, $exists: true, $nin: [""] } });
     const totalContests = await Contest.countDocuments();
 
     const recentUsers = await User.find()
@@ -552,12 +585,14 @@ export const getDashboardStats = async (req, res) => {
       .limit(5);
 
     const verdictStats = await Submission.aggregate([
+      { $match: { verdict: { $ne: null, $exists: true, $nin: [""] } } },
       {
         $group: {
           _id: '$verdict',
           count: { $sum: 1 }
         }
-      }
+      },
+      { $sort: { _id: 1 } }
     ]);
 
     res.json({
@@ -573,6 +608,64 @@ export const getDashboardStats = async (req, res) => {
     });
   } catch (error) {
     console.error("Get dashboard stats error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Public stats for home page
+export const getPublicStats = async (req, res) => {
+  try {
+    const totalProblems = await Problem.countDocuments({ isPublished: true });
+    let totalSubmissions = 0;
+    if (req.user && req.user.userId) {
+      totalSubmissions = await Submission.countDocuments({ user: req.user.userId });
+    }
+    const totalUsers = await User.countDocuments();
+    const now = new Date();
+    const totalContests = await Contest.countDocuments({ endTime: { $gte: now } });
+    res.json({
+      totalProblems,
+      totalSubmissions,
+      totalUsers,
+      totalContests
+    });
+  } catch (error) {
+    console.error('Get public stats error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Admin: Update user details (username, email)
+export const updateUserDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+    // Check if username or email already exists (excluding current user)
+    const existingUser = await User.findOne({
+      $and: [
+        { _id: { $ne: userId } },
+        { $or: [{ email }, { username }] }
+      ]
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        message:
+          existingUser.email === email
+            ? "An account already exists with this email"
+            : "Username is already taken",
+      });
+    }
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { username, email },
+      { new: true }
+    ).select('-passwordHash');
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ message: "User updated successfully", user });
+  } catch (error) {
+    console.error("Update user details error:", error);
     res.status(500).json({ message: "Server error" });
   }
 }; 

@@ -1,34 +1,76 @@
 # Online Judge Platform with Admin Panel
 
+## 🆕 Changelog
+
+### Recent Updates
+- **Monaco Editor Integration:**
+  - The code editor now uses Monaco Editor for a modern, feature-rich coding experience.
+- **Custom Input for Code Execution:**
+  - Users can provide custom stdin input for their code before running or submitting.
+- **Judging Logic & Verdicts:**
+  - Submissions are judged against hidden test cases. Verdicts include AC (Accepted), WA (Wrong Answer), RE (Runtime Error), TLE (Time Limit Exceeded), MLE (Memory Limit Exceeded), CE (Compilation Error), Pending.
+- **Submission Timeout & Error Handling:**
+  - All code execution is limited to 2 seconds to prevent infinite loops. Errors are reported clearly in the UI.
+- **Multiline Test Case Formatting:**
+  - Test case input/output is displayed with preserved formatting for readability.
+- **Submission Management:**
+  - Admins can view, filter, and delete submissions. Both admins and users can view submission code and verdicts in a modal.
+- **Browser Back Button & Modal UX:**
+  - Modals for viewing submissions can be closed with the browser back button or a custom back button for a seamless experience.
+- **Dynamic Search Highlighting:**
+  - Admin tables highlight matching text in search results for users and problems.
+- **Environment Variable-Driven API URLs:**
+  - All client API calls use `VITE_API_URL` from the `.env` file for easy deployment and configuration.
+- **Public Stats Endpoint:**
+  - The `/api/admin/public-stats` endpoint returns home page stats, showing user-specific data if logged in.
+- **Improved Error Reporting:**
+  - UI now displays clear error messages for network/server issues and backend validation errors.
+
+---
+
+# Online Judge Platform with Admin Panel
+
 A comprehensive online coding platform with a powerful admin panel for managing users, problems, submissions, and contests.
 
 ## 🚀 Features
 
-### Core Admin Features
-1. **User Management**
-   - View all registered users (username, email, role, join date)
-   - Ban/Delete/Disable users
-   - Promote users to admin/moderator
-   - Edit user details
+### Core Features
+- **Modern Code Editor:**
+  - Monaco Editor with syntax highlighting, autocompletion, and more.
+- **Custom Input for Code Execution:**
+  - Users can provide custom stdin for their code.
+- **Problem Solving & Judging:**
+  - Submit code for problems, judged against hidden test cases with detailed verdicts (AC, WA, RE, TLE, MLE, CE, Pending).
+- **Submission Timeout & Error Handling:**
+  - 2-second timeout for all code execution, with clear error reporting.
+- **Multiline Test Case Display:**
+  - Test case input/output is shown with preserved formatting.
+- **User Submissions:**
+  - Users can view their own submissions, filter by problem/language/verdict, and see code/verdict in a modal.
+- **Admin Panel:**
+  - User management (view, edit, ban, promote, delete)
+  - Problem management (create, edit, delete, publish/draft)
+  - Submission management (view, filter, delete, modal view)
+  - Contest management (create, edit, delete, schedule)
+  - Dynamic search highlighting in admin tables
+- **Browser Back Button & Modal UX:**
+  - Modals for viewing submissions can be closed with the browser back button or a custom back button.
+- **Dynamic Home Page Stats:**
+  - Published problems, user's submissions, registered users, and active/upcoming contests.
+- **Environment Variable-Driven API URLs:**
+  - All client API calls use `VITE_API_URL` for easy deployment.
+- **Public Stats Endpoint:**
+  - Home page stats are user-specific if logged in, general if not.
+- **Improved Error Reporting:**
+  - UI displays clear error messages for all network and backend issues.
 
-2. **Problem Management**
-   - Create new problems (title, statement, constraints, tags)
-   - Edit existing problems
-   - Delete problems
-   - Preview problems before publishing
-   - Add difficulty level (Easy/Medium/Hard)
-
-3. **Submission Management**
-   - View all submissions
-   - Filter by problem, user, language, verdict (AC, WA, TLE, etc.)
-   - Re-judge specific submissions
-   - View submitted code and test results
-
-4. **Contest Management**
-   - Create/Edit/Delete contests
-   - Set start & end time
-   - Add/remove problems to contests
-   - Manage participants and visibility
+### Security & Deployment
+- JWT-based authentication
+- Role-based access control
+- Admin middleware protection
+- Secure password hashing
+- Protected admin routes
+- Easy environment configuration for different deployments
 
 ## 🛠️ Setup Instructions
 
@@ -88,8 +130,13 @@ MONGO_URI=mongodb://localhost:27017/online-judge
 JWT_SECRET=your-super-secret-jwt-key-here
 ```
 
-#### Client Environment
-The client is configured to connect to `http://localhost:5000` by default.
+#### Client Environment (.env)
+Create a `.env` file in the `client` directory:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+- For production, set `VITE_API_URL` to your deployed backend URL (e.g., `https://your-backend.com/api`).
+- All client API calls will use this variable, so you never need to hardcode URLs.
 
 ### 5. Initialize the Default Admin User
 
@@ -133,6 +180,13 @@ The application will be available at:
 - **Backend**: http://localhost:5000
 - **Compiler Service**: http://localhost:5001
 
+## 🏠 Home Page Stats
+
+The home page displays the following dynamic stats:
+- **Published Problems:** Total number of published problems.
+- **My Submissions:** Total number of submissions made by the currently logged-in user (shows 0 if not logged in).
+- **Registered Users:** Total number of users on the platform.
+- **Active/Upcoming Contests:** Contests that are currently active or will happen in the future.
 
 ## 🔐 Admin Access
 
@@ -188,6 +242,7 @@ All admin endpoints require admin authentication.
 - `GET /api/admin/users` - Get all users with filters
 - `PATCH /api/admin/users/:userId/role` - Update user role
 - `PATCH /api/admin/users/:userId/ban` - Toggle user ban status
+- `PUT /api/admin/users/:userId` - Update user details (username/email)
 - `DELETE /api/admin/users/:userId` - Delete user
 
 #### Problem Management
@@ -201,12 +256,16 @@ All admin endpoints require admin authentication.
 - `GET /api/admin/submissions` - Get all submissions
 - `GET /api/admin/submissions/:submissionId` - Get submission details
 - `POST /api/admin/submissions/:submissionId/rejudge` - Re-judge submission
+- `DELETE /api/admin/submissions/:submissionId` - Delete submission
 
 #### Contest Management
 - `GET /api/admin/contests` - Get all contests
 - `POST /api/admin/contests` - Create new contest
 - `PUT /api/admin/contests/:contestId` - Update contest
 - `DELETE /api/admin/contests/:contestId` - Delete contest
+
+#### Public Stats Endpoint
+- `GET /api/admin/public-stats` - Returns home page stats. Uses optionalAuth middleware to show user-specific data if logged in.
 
 ## 🎨 UI Components
 

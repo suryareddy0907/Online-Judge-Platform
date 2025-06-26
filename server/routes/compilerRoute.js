@@ -5,7 +5,7 @@ const router = express.Router();
 
 // POST /api/run
 router.post("/run", async (req, res) => {
-  const { code, language = "cpp" } = req.body;
+  const { code, language = "cpp", input = "" } = req.body;
 
   if (!code) {
     return res.status(400).json({ output: "No code provided" });
@@ -16,6 +16,7 @@ router.post("/run", async (req, res) => {
     const response = await axios.post("http://localhost:5001/run", {
       code,
       language,
+      input,
     });
 
     // Return output or compiler error from microservice

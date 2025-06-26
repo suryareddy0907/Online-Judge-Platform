@@ -1,7 +1,20 @@
 import React from 'react';
 import AdminLayout from '../components/AdminLayout';
+import { useNavigate } from 'react-router-dom';
 
 const AdminSettings = () => {
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      navigate('/home', { replace: true });
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
   return (
     <AdminLayout>
       <div className="p-6">

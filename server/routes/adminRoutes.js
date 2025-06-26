@@ -6,6 +6,7 @@ import {
   updateUserRole,
   toggleUserBan,
   deleteUser,
+  updateUserDetails,
   
   // Problem Management
   getAllProblems,
@@ -18,6 +19,7 @@ import {
   getAllSubmissions,
   getSubmissionDetails,
   rejudgeSubmission,
+  deleteSubmission,
   
   // Contest Management
   getAllContests,
@@ -26,10 +28,15 @@ import {
   deleteContest,
   
   // Dashboard
-  getDashboardStats
+  getDashboardStats,
+  getPublicStats
 } from "../controllers/adminController.js";
+import { optionalAuth } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+
+// Public: Home page stats
+router.get("/public-stats", optionalAuth, getPublicStats);
 
 // Apply admin middleware to all routes
 router.use(requireAdmin);
@@ -42,6 +49,7 @@ router.get("/users", getAllUsers);
 router.patch("/users/:userId/role", updateUserRole);
 router.patch("/users/:userId/ban", toggleUserBan);
 router.delete("/users/:userId", deleteUser);
+router.put("/users/:userId", updateUserDetails);
 
 // ==================== PROBLEM MANAGEMENT ====================
 router.get("/problems", getAllProblems);
@@ -54,6 +62,7 @@ router.patch("/problems/:problemId/publish", toggleProblemPublish);
 router.get("/submissions", getAllSubmissions);
 router.get("/submissions/:submissionId", getSubmissionDetails);
 router.post("/submissions/:submissionId/rejudge", rejudgeSubmission);
+router.delete("/submissions/:submissionId", deleteSubmission);
 
 // ==================== CONTEST MANAGEMENT ====================
 router.get("/contests", getAllContests);

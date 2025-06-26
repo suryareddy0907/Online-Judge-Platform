@@ -4,6 +4,7 @@ import { getPublicProblems } from "../services/authService";
 import axios from "axios";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
+import MonacoEditor from "@monaco-editor/react";
 
 const ProblemDetails = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const ProblemDetails = () => {
   const [output, setOutput] = useState("");
   const [customInput, setCustomInput] = useState("");
   const [language, setLanguage] = useState("cpp"); // Default language is C++
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const allotmentRef = useRef(null);
 
   useEffect(() => {
@@ -45,6 +47,7 @@ const ProblemDetails = () => {
       const response = await axios.post("http://localhost:5000/api/run", {
         code: code,
         language: language,
+        input: customInput,
       });
       setOutput(response.data.output);
     } catch (err) {
@@ -54,6 +57,30 @@ const ProblemDetails = () => {
         err.message ||
         "An unexpected error occurred."
       );
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setOutput("Submitting your solution...");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `http://localhost:5000/api/problems/${id}/submit`,
+        { code, language },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setOutput(`${response.data.verdict}: ${response.data.message}`);
+    } catch (err) {
+      setOutput(
+        `Submission failed: ${err.response?.data?.message || err.message}`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,9 +117,9 @@ const ProblemDetails = () => {
                   {problem.exampleTestCases.map((tc, idx) => (
                     <div key={idx} className="bg-gray-50 border rounded p-2">
                       <div className="text-xs text-gray-500 mb-1">Example {idx + 1}</div>
-                      <div><span className="font-semibold">Input:</span> <span className="font-mono">{tc.input}</span></div>
-                      <div><span className="font-semibold">Output:</span> <span className="font-mono">{tc.output}</span></div>
-                      {tc.explanation && <div className="mt-1 text-gray-600 text-sm"><span className="font-semibold">Explanation:</span> {tc.explanation}</div>}
+                      <div><span className="font-semibold">Input:</span><br /><pre className="font-mono inline whitespace-pre-wrap">{tc.input}</pre></div>
+                      <div><span className="font-semibold">Output:</span><br /><pre className="font-mono inline whitespace-pre-wrap">{tc.output}</pre></div>
+                      {tc.explanation && <div className="mt-1 text-gray-600 text-sm"><span className="font-semibold">Explanation:</span><br /><pre className="inline whitespace-pre-wrap">{tc.explanation}</pre></div>}
                     </div>
                   ))}
                 </div>
@@ -118,18 +145,40 @@ const ProblemDetails = () => {
                     <option value="c">C</option>
                     <option value="cpp">C++</option>
                     <option value="java">Java</option>
-                    <option value="py">Python</option>
+                    <option value="python">Python</option>
                   </select>
                 </div>
                 <div className="flex-1 flex flex-col mb-6 min-h-0">
                   <label className="block text-white text-sm font-semibold mb-2">Code Editor</label>
-                  <textarea
-                    className="w-full flex-1 min-h-0 bg-black text-green-200 font-mono rounded-lg p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Write your code here..."
-                    spellCheck={false}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                  />
+                  <div className="flex-1 min-h-0">
+                    <MonacoEditor
+                      height="300px"
+                      width="100%"
+                      theme="vs-dark"
+                      language={
+                        language === "cpp" ? "cpp" :
+                        language === "c" ? "c" :
+                        language === "java" ? "java" :
+                        language === "python" ? "python" : "plaintext"
+                      }
+                      value={code}
+                      onChange={value => setCode(value || "")}
+                      options={{
+                        fontSize: 16,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        wordWrap: "on",
+                        fontFamily: "Fira Mono, monospace",
+                        automaticLayout: true,
+                        lineNumbers: "on",
+                        renderLineHighlight: "all",
+                        formatOnPaste: true,
+                        formatOnType: true,
+                        tabSize: 2,
+                        scrollbar: { vertical: "auto" },
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </Allotment.Pane>
@@ -145,8 +194,12 @@ const ProblemDetails = () => {
                   onChange={e => setCustomInput(e.target.value)}
                 />
                 <div className="flex justify-end space-x-2">
-                  <button onClick={handleRun} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Run</button>
-                  <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" disabled>Submit</button>
+                  <button onClick={handleRun} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting..." : "Run"}
+                  </button>
+                  <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </button>
                 </div>
                 {output && (
                   <div className="mt-4">

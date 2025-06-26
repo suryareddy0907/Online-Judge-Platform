@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,7 +12,7 @@ if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
 
-const executeJava = (filepath) => {
+const executeJava = (filepath, input = "") => {
   const jobId = path.basename(filepath).split(".")[0];
   const jobPath = path.resolve(outputPath, jobId);
   
@@ -37,20 +37,46 @@ const executeJava = (filepath) => {
     // Compile Java code, specifying output directory
     const compileCommand = `javac -d "${jobPath}" "${javaFilePath}"`;
 
-    exec(compileCommand, (compileErr, compileStdout, compileStderr) => {
+    exec(compileCommand, (compileErr, _, compileStderr) => {
       if (compileErr || compileStderr) {
         fs.rmSync(jobPath, { recursive: true, force: true });
-        return reject(compileErr || { stderr: compileStderr });
+        return reject({ error: "Compilation failed", stderr: compileStderr });
       }
 
-      // Run the compiled Java code
-      const runCommand = `java -cp "${jobPath}" ${className}`;
-      exec(runCommand, (runErr, runStdout, runStderr) => {
+      const isWin = process.platform === 'win32';
+      const runArgs = ['-cp', jobPath, className];
+      const runProcess = isWin
+        ? spawn('cmd.exe', ['/c', 'java', ...runArgs])
+        : spawn('java', runArgs);
+
+      const timer = setTimeout(() => {
+        runProcess.kill();
         fs.rmSync(jobPath, { recursive: true, force: true });
-        if (runErr || runStderr) {
-          return reject(runErr || { stderr: runStderr });
+        reject({ error: "Time Limit Exceeded", stderr: "Process terminated after 2 seconds" });
+      }, 2000);
+
+      let stdout = '';
+      let stderr = '';
+      const safeInput = input && !input.endsWith('\n') ? input + '\n' : input;
+      runProcess.stdin.write(safeInput);
+      runProcess.stdin.end();
+      runProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      runProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      runProcess.on('error', (err) => {
+        fs.rmSync(jobPath, { recursive: true, force: true });
+        return reject({ error: "Runtime execution failed", stderr: err.message });
+      });
+      runProcess.on('close', (code) => {
+        clearTimeout(timer);
+        fs.rmSync(jobPath, { recursive: true, force: true });
+        if (code !== 0 || stderr) {
+          return reject({ error: `Execution failed with code ${code}`, stderr });
         }
-        return resolve(runStdout);
+        return resolve(stdout);
       });
     });
   });

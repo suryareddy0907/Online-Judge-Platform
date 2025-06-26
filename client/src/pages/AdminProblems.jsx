@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   FileText
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminProblems = () => {
   const [problems, setProblems] = useState([]);
@@ -60,10 +61,21 @@ const AdminProblems = () => {
     difficulty: '',
     tags: ''
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProblems();
   }, [filters.page]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      navigate('/home', { replace: true });
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
 
   const fetchProblems = async () => {
     try {
@@ -650,10 +662,10 @@ const AdminProblems = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">View Problem Details</h3>
                 <div className="space-y-2 text-left">
                   <div><strong>Title:</strong> {selectedProblem.title}</div>
-                  <div><strong>Description:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.statement}</pre></div>
-                  <div><strong>Input:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.input}</pre></div>
-                  <div><strong>Constraints:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.constraints}</pre></div>
-                  <div><strong>Output:</strong> <pre className="whitespace-pre-wrap">{selectedProblem.output}</pre></div>
+                  <div><strong>Description:</strong><br /><pre className="whitespace-pre-wrap font-sans">{selectedProblem.statement}</pre></div>
+                  <div><strong>Input:</strong><br /><pre className="whitespace-pre-wrap font-sans">{selectedProblem.input}</pre></div>
+                  <div><strong>Constraints:</strong><br /><pre className="whitespace-pre-wrap font-sans">{selectedProblem.constraints}</pre></div>
+                  <div><strong>Output:</strong><br /><pre className="whitespace-pre-wrap font-sans">{selectedProblem.output}</pre></div>
                   <div><strong>Difficulty:</strong> {selectedProblem.difficulty}</div>
                   <div><strong>Tags:</strong> {(selectedProblem.tags || []).join(', ')}</div>
                   <div><strong>Example Test Cases:</strong>
@@ -661,9 +673,9 @@ const AdminProblems = () => {
                       <ul className="list-disc ml-6">
                         {selectedProblem.exampleTestCases.map((tc, idx) => (
                           <li key={idx}>
-                            <div><strong>Input:</strong> {tc.input}</div>
-                            <div><strong>Output:</strong> {tc.output}</div>
-                            {tc.explanation && <div><strong>Explanation:</strong> {tc.explanation}</div>}
+                            <div><strong>Input:</strong><br /><pre className="whitespace-pre-wrap font-sans inline">{tc.input}</pre></div>
+                            <div><strong>Output:</strong><br /><pre className="whitespace-pre-wrap font-sans inline">{tc.output}</pre></div>
+                            {tc.explanation && <div><strong>Explanation:</strong><br /><pre className="whitespace-pre-wrap font-sans inline">{tc.explanation}</pre></div>}
                           </li>
                         ))}
                       </ul>
@@ -674,8 +686,8 @@ const AdminProblems = () => {
                       <ul className="list-disc ml-6">
                         {selectedProblem.testCases.map((tc, idx) => (
                           <li key={idx}>
-                            <div><strong>Input:</strong> {tc.input}</div>
-                            <div><strong>Output:</strong> {tc.output}</div>
+                            <div><strong>Input:</strong><br /><pre className="whitespace-pre-wrap font-sans inline">{tc.input}</pre></div>
+                            <div><strong>Output:</strong><br /><pre className="whitespace-pre-wrap font-sans inline">{tc.output}</pre></div>
                           </li>
                         ))}
                       </ul>

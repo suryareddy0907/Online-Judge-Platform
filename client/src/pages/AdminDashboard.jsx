@@ -12,9 +12,11 @@ import {
   Clock,
   XCircle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,6 +35,16 @@ const AdminDashboard = () => {
 
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      navigate('/home', { replace: true });
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
 
   if (loading) {
     return (

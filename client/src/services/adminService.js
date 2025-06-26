@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api/admin';
+const API_BASE_URL = import.meta.env.VITE_API_URL + '/admin';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
@@ -112,4 +112,52 @@ export const toggleProblemPublish = async (problemId, isPublished) => {
     body: JSON.stringify({ isPublished })
   });
   return handleResponse(response);
+};
+
+// ==================== SUBMISSION MANAGEMENT ====================
+export const getAllSubmissions = async (params = {}) => {
+  const token = localStorage.getItem('token');
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`${API_BASE_URL}/submissions?${queryParams}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch submissions');
+  }
+  return response.json();
+};
+
+export const deleteSubmission = async (submissionId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_BASE_URL}/submissions/${submissionId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to delete submission');
+  }
+  return response.json();
+};
+
+export const getSubmissionDetails = async (submissionId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_BASE_URL}/submissions/${submissionId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch submission details');
+  }
+  return response.json();
 };

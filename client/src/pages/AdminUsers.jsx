@@ -19,6 +19,7 @@ import {
   UserX,
   AlertTriangle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -44,10 +45,21 @@ const AdminUsers = () => {
   const [editLoading, setEditLoading] = useState(false);
 
   const searchDebounceRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
   }, [filters.page]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      navigate('/home', { replace: true });
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
 
   const fetchUsers = async () => {
     try {

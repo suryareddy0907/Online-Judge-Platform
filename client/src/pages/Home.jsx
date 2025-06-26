@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChangePassword from "../components/ChangePassword";
@@ -14,11 +14,30 @@ import {
   User,
   Lock
 } from "lucide-react";
+import { getPublicStats } from '../services/authService';
 
 const Home = () => {
   const { user, logout } = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoadingStats(true);
+        const data = await getPublicStats();
+        setStats(data);
+      } catch (err) {
+        setStatsError(err.message);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -121,8 +140,10 @@ const Home = () => {
                 <Code className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Problems</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total published problems">Published Problems</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalProblems ?? 0}
+                </p>
               </div>
             </div>
           </div>
@@ -133,8 +154,10 @@ const Home = () => {
                 <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Submissions</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total submissions made by you">My Submissions</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalSubmissions ?? 0}
+                </p>
               </div>
             </div>
           </div>
@@ -145,8 +168,10 @@ const Home = () => {
                 <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Users</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total registered users">Registered Users</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalUsers ?? 0}
+                </p>
               </div>
             </div>
           </div>
@@ -157,8 +182,10 @@ const Home = () => {
                 <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Contests</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">0</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Contests that are active or upcoming">Active/Upcoming Contests</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalContests ?? 0}
+                </p>
               </div>
             </div>
           </div>
@@ -178,10 +205,10 @@ const Home = () => {
               <Calendar className="h-4 w-4 mr-2" />
               View Contests
             </button>
-            <button className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Link to="/my-submissions" className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <FileText className="h-4 w-4 mr-2" />
               My Submissions
-            </button>
+            </Link>
           </div>
         </div>
       </div>
