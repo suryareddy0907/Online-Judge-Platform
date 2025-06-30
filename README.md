@@ -3,6 +3,16 @@
 ## 🆕 Changelog
 
 ### Recent Updates
+- **Private Contests & Access Control**:
+  - Admins can now create **private** contests and assign specific users who are allowed to view and participate in them. Public contests remain open to all.
+- **Enhanced Contest Management**:
+  - A visibility toggle (`isPublic`) has been added to the admin panel, allowing contests to be drafted in private and published when ready.
+- **Live Contest Clocks & Filtering**:
+  - The home page now displays live countdown clocks for active and upcoming contests.
+  - The contests page can be filtered by status (Active, Upcoming, Ended).
+- **Leaderboard & Activity Feed**:
+  - A new leaderboard page ranks users based on their performance.
+  - The home page includes a real-time activity feed showing the latest submissions across the platform.
 - **Monaco Editor Integration:**
   - The code editor now uses Monaco Editor for a modern, feature-rich coding experience.
 - **Custom Input for Code Execution:**
@@ -25,6 +35,12 @@
   - The `/api/admin/public-stats` endpoint returns home page stats, showing user-specific data if logged in.
 - **Improved Error Reporting:**
   - UI now displays clear error messages for network/server issues and backend validation errors.
+- **Advanced Contest Controls:**
+  - **Public/Private Visibility**: Toggle contests between being visible to everyone or only to specific users.
+  - **User Access Lists**: For private contests, admins can manage a list of allowed participants.
+- **Live Leaderboard & Activity Feed:**
+  - View a platform-wide leaderboard to see top-ranked users.
+  - A real-time activity feed on the home page shows recent submissions.
 
 ---
 
