@@ -9,7 +9,7 @@ const executePython = (filepath, input = "") => {
 
     const timer = setTimeout(() => {
       runProcess.kill();
-      reject({ error: "Time Limit Exceeded", stderr: "Process terminated after 2 seconds" });
+      reject({ error: "Time Limit Exceeded", stderr: "Time Limit Exceeded" });
     }, 2000);
 
     let stdout = '';

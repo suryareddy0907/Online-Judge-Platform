@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../services/authService";
+import { Logo } from '../components/AdminNavbar';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +31,8 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen bg-[#1E2530] flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-[#2A2F3A] text-white p-8 rounded-xl shadow-md space-y-6">
-        {/* Stylish Logo */}
+        <Logo />
+
         <h1 className="text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
           &lt;/&gt; CodersToday
         </h1>

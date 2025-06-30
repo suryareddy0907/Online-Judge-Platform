@@ -25,6 +25,24 @@ app.post('/run', async (req, res) => {
         return res.status(404).json({ success: false, error: "Empty code!" });
     }
 
+    function sanitizeErrorMessage(stderr) {
+        if (!stderr) return '';
+        const lines = stderr.split('\n');
+        const filtered = [];
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+            // Remove any line that is a file path (Windows or Unix style)
+            if (/([A-Za-z]:\\|\/).*(\.cpp|\.c|\.java|\.py)/.test(trimmed)) continue;
+            // Keep all other lines (error context, code, caret, etc.)
+            filtered.push(line);
+        }
+        // If all lines were stripped, fallback to the original message
+        return filtered.length > 0
+            ? filtered.join('\n').replace(/\n{2,}/g, '\n').trim()
+            : stderr.trim();
+    }
+
     try {
         const filepath = generateFile(language, code);
         let output;
@@ -38,7 +56,7 @@ app.post('/run', async (req, res) => {
             case 'java':
                 output = await executeJava(filepath, input);
                 break;
-            case 'py':
+            case 'python':
                 output = await executePython(filepath, input);
                 break;
             default:
@@ -46,11 +64,21 @@ app.post('/run', async (req, res) => {
         }
         return res.json({ filepath, output });
     } catch (error) {
-        return res.status(500).json({ success: false, error: error.stderr || error.message });
+        // Detect compilation error
+        const errorText = (typeof error === "string")
+            ? error
+            : (error?.error || error?.stderr || error?.message || JSON.stringify(error));
+        if (errorText && errorText.includes("Compilation failed")) {
+            // Sanitize the error message before sending
+            const sanitized = sanitizeErrorMessage(error.stderr || error.error || errorText);
+            return res.status(200).json({ success: false, error: "Compilation failed", stderr: sanitized });
+        }
+        // For all other errors, return 500
+        return res.status(500).json({ success: false, error: error.stderr || error.message || errorText });
     }
 });
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+    console.log(`Online-Compiler Server listening on port ${PORT}`);
 }); 

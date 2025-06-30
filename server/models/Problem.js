@@ -30,6 +30,11 @@ const problemSchema = new mongoose.Schema({
     required: true 
   },
   isPublished: { type: Boolean, default: false },
+  contest: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Contest',
+    default: null
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

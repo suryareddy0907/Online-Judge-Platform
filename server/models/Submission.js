@@ -28,7 +28,12 @@ const submissionSchema = new mongoose.Schema({
   totalTestCases: { type: Number, default: 0 },
   errorMessage: { type: String },
   submittedAt: { type: Date, default: Date.now },
-  judgedAt: { type: Date }
+  judgedAt: { type: Date },
+  contest: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Contest',
+    default: null
+  }
 });
 
 const Submission = mongoose.model("Submission", submissionSchema);

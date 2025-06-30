@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Problem from "../models/Problem.js";
 import Submission from "../models/Submission.js";
 import Contest from "../models/Contest.js";
+import mongoose from "mongoose";
 
 // ==================== USER MANAGEMENT ====================
 
@@ -58,7 +59,7 @@ export const updateUserRole = async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
 
-    if (!["user", "moderator", "admin"].includes(role)) {
+    if (!["user", "admin"].includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
     }
 
@@ -125,6 +126,21 @@ export const deleteUser = async (req, res) => {
     // Also delete user's submissions
     await Submission.deleteMany({ user: userId });
 
+    // Emit leaderboard update after user deletion
+    const io = req.app.get('io');
+    const updatedLeaderboard = await User.find()
+      .select('username problemsSolved rating avatar createdAt')
+      .sort({ problemsSolved: -1, rating: -1 })
+      .lean();
+
+    // Add rank to each user
+    const leaderboardWithRank = updatedLeaderboard.map((user, index) => ({
+      ...user,
+      rank: index + 1
+    }));
+
+    io.emit('leaderboardUpdate', leaderboardWithRank);
+
     res.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Delete user error:", error);
@@ -137,7 +153,7 @@ export const deleteUser = async (req, res) => {
 // Get all problems
 export const getAllProblems = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "", difficulty = "", status = "" } = req.query;
+    const { page = 1, limit = 10, search = "", difficulty = "", status = "", forContest } = req.query;
     
     const query = {};
     
@@ -152,6 +168,10 @@ export const getAllProblems = async (req, res) => {
     if (status === 'published') {
       query.isPublished = true;
     } else if (status === 'draft') {
+      query.isPublished = false;
+    }
+
+    if (forContest) {
       query.isPublished = false;
     }
 
@@ -427,6 +447,32 @@ export const deleteSubmission = async (req, res) => {
       return res.status(404).json({ message: "Submission not found" });
     }
     await Submission.findByIdAndDelete(submissionId);
+
+    // Recalculate problemsSolved for the user
+    const userId = submission.user;
+    const solved = await Submission.aggregate([
+      { $match: { user: userId, verdict: 'AC' } },
+      { $group: { _id: '$problem' } },
+      { $count: 'solvedCount' }
+    ]);
+    const solvedCount = solved[0]?.solvedCount || 0;
+    await User.findByIdAndUpdate(userId, { problemsSolved: solvedCount });
+
+    // Emit leaderboard update
+    const io = req.app.get('io');
+    const updatedLeaderboard = await User.find()
+      .select('username problemsSolved rating avatar createdAt')
+      .sort({ problemsSolved: -1, rating: -1 })
+      .lean();
+
+    // Add rank to each user
+    const leaderboardWithRank = updatedLeaderboard.map((user, index) => ({
+      ...user,
+      rank: index + 1
+    }));
+
+    io.emit('leaderboardUpdate', leaderboardWithRank);
+
     res.json({ message: "Submission deleted successfully" });
   } catch (error) {
     console.error("Delete submission error:", error);
@@ -487,7 +533,8 @@ export const createContest = async (req, res) => {
       startTime,
       endTime,
       problems,
-      isPublic
+      isPublic,
+      allowedUsers
     } = req.body;
 
     const contest = new Contest({
@@ -496,8 +543,9 @@ export const createContest = async (req, res) => {
       startTime,
       endTime,
       problems: problems || [],
-      isPublic: isPublic !== undefined ? isPublic : true,
-      createdBy: req.user._id
+      createdBy: req.user._id,
+      isPublic: isPublic || false,
+      allowedUsers: isPublic ? [] : allowedUsers || []
     });
 
     await contest.save();
@@ -520,11 +568,25 @@ export const createContest = async (req, res) => {
 export const updateContest = async (req, res) => {
   try {
     const { contestId } = req.params;
-    const updateData = req.body;
+    const { isPublic, allowedUsers, ...updateData } = req.body;
+    
+    const finalUpdateData = { ...updateData };
+    if (typeof isPublic === 'boolean') {
+      finalUpdateData.isPublic = isPublic;
+      // If contest is made public, clear the allowedUsers list
+      if (isPublic) {
+        finalUpdateData.allowedUsers = [];
+      }
+    }
 
+    if (allowedUsers) {
+      finalUpdateData.allowedUsers = allowedUsers;
+    }
+
+    // Save the new problems array
     const contest = await Contest.findByIdAndUpdate(
       contestId,
-      updateData,
+      finalUpdateData,
       { new: true }
     ).populate('createdBy', 'username email')
      .populate('problems', 'title difficulty');
@@ -532,6 +594,21 @@ export const updateContest = async (req, res) => {
     if (!contest) {
       return res.status(404).json({ message: "Contest not found" });
     }
+
+    // --- Sync contest field in Problem documents ---
+    if (finalUpdateData.problems) {
+      // 1. Unset contest field for problems no longer in the contest
+      await Problem.updateMany(
+        { contest: contestId, _id: { $nin: finalUpdateData.problems } },
+        { $set: { contest: null } }
+      );
+      // 2. Set contest field for all selected problems
+      await Problem.updateMany(
+        { _id: { $in: finalUpdateData.problems } },
+        { $set: { contest: contestId } }
+      );
+    }
+    // --- End sync ---
 
     res.json({ 
       message: "Contest updated successfully", 
@@ -667,5 +744,42 @@ export const updateUserDetails = async (req, res) => {
   } catch (error) {
     console.error("Update user details error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get number of unique problems solved by a user
+export const getUserSolvedCount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const solved = await Submission.aggregate([
+      { $match: { user: typeof userId === 'string' ? new mongoose.Types.ObjectId(userId) : userId, verdict: 'AC' } },
+      { $group: { _id: '$problem' } },
+      { $count: 'solvedCount' }
+    ]);
+    res.json({ solvedCount: solved[0]?.solvedCount || 0 });
+  } catch (error) {
+    console.error('Get user solved count error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Utility: Sync contest field for all problems based on contests' problems arrays
+export const syncContestProblems = async (req, res) => {
+  try {
+    const contests = await Contest.find({});
+    let updated = 0;
+    for (const contest of contests) {
+      for (const problemId of contest.problems) {
+        await Problem.updateOne(
+          { _id: problemId },
+          { $set: { contest: contest._id } }
+        );
+        updated++;
+      }
+    }
+    res.json({ message: `Updated ${updated} problems with contest field.` });
+  } catch (err) {
+    console.error('Error syncing contest problems:', err);
+    res.status(500).json({ message: 'Failed to sync contest problems.' });
   }
 }; 

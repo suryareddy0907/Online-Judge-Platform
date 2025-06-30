@@ -53,14 +53,14 @@ const AdminNavbar = () => {
       </div>
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200">
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-          </div>
+          <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
+            <Logo />
+          </nav>
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
@@ -85,14 +85,14 @@ const AdminNavbar = () => {
           </nav>
 
           {/* Bottom section */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-medium">A</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Admin</p>
-                <p className="text-xs text-gray-500">Administrator</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Admin</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">Administrator</p>
               </div>
             </div>
             
@@ -140,5 +140,14 @@ const AdminNavbar = () => {
     </>
   );
 };
+
+export function Logo() {
+  return (
+    <span style={{ display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: '1.5rem' }}>
+      <span style={{ color: '#a259f7', fontWeight: 700, marginRight: 4 }}>&lt;/&gt;</span>
+      <span style={{ color: '#f72585', fontWeight: 700 }}>CodersToday</span>
+    </span>
+  );
+}
 
 export default AdminNavbar; 

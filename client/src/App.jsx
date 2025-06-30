@@ -15,6 +15,8 @@ import AdminRoute from "./routes/AdminRoute";
 import BrowseProblems from "./pages/BrowseProblems";
 import ProblemDetails from "./pages/ProblemDetails";
 import MySubmissions from "./pages/MySubmissions";
+import Contests from "./pages/Contests";
+import ContestDetails from "./pages/ContestDetails";
 
 const App = () => {
   return (
@@ -101,6 +103,15 @@ const App = () => {
 
       <Route path="/problems" element={<BrowseProblems />} />
       <Route path="/problems/:id" element={<ProblemDetails />} />
+      <Route path="/contests" element={<Contests />} />
+      <Route
+        path="/contests/:id"
+        element={
+          <PrivateRoute>
+            <ContestDetails />
+          </PrivateRoute>
+        }
+      />
 
       <Route
         path="/my-submissions"

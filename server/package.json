@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "init-admin": "node utils/initAdmin.js"
+    "init-admin": "node utils/initAdmin.js",
+    "populate-leaderboard": "node utils/populateLeaderboard.js",
+    "populate-activity": "node utils/populateActivity.js",
+    "sync-problems-solved": "node utils/syncProblemsSolved.js"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +25,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.0",
     "nodemailer": "^7.0.3",
-    "online-judge-platform": "file:.."
+    "online-judge-platform": "file:..",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

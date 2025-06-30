@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import AdminNavbar from './AdminNavbar';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Logo } from './AdminNavbar';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();

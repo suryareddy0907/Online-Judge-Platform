@@ -29,7 +29,9 @@ import {
   
   // Dashboard
   getDashboardStats,
-  getPublicStats
+  getPublicStats,
+  getUserSolvedCount,
+  syncContestProblems
 } from "../controllers/adminController.js";
 import { optionalAuth } from "../middlewares/authMiddleware.js";
 
@@ -69,5 +71,11 @@ router.get("/contests", getAllContests);
 router.post("/contests", createContest);
 router.put("/contests/:contestId", updateContest);
 router.delete("/contests/:contestId", deleteContest);
+
+// Get number of unique problems solved by a user
+router.get("/user/:userId/solved-count", getUserSolvedCount);
+
+// TEMPORARY: Utility route to sync contest field for all problems
+router.post('/sync-contest-problems', syncContestProblems);
 
 export default router; 

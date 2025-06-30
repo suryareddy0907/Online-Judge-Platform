@@ -30,23 +30,6 @@
   cursor: pointer;
 }
 
-.theme-toggle {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-/* Light Theme */
-.light {
-  background: #f9f9f9;
-  color: #222;
-}
-
-/* Dark Theme */
-.dark {
-  background: #121212;
-  color: #fff;
-}
-
 .message {
   margin-top: 1rem;
   font-weight: bold;

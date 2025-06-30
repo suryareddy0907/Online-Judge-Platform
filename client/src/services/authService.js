@@ -1,4 +1,5 @@
 import axios from "axios";
+import { io } from 'socket.io-client';
 
 const API_BASE_URL = 'http://localhost:5000/api/auth';
 
@@ -131,6 +132,161 @@ export const getPublicStats = async () => {
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch stats');
+  }
+  return response.json();
+};
+
+// Get leaderboard data
+export const getLeaderboard = async (params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`http://localhost:5000/api/leaderboard?${queryParams}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch leaderboard');
+  }
+  return response.json();
+};
+
+// Get recent activity feed
+export const getRecentActivity = async (params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`http://localhost:5000/api/leaderboard/activity?${queryParams}`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch recent activity');
+  }
+  return response.json();
+};
+
+// Get number of unique problems solved by a user
+export const getUserSolvedCount = async (userId) => {
+  const response = await fetch(`http://localhost:5000/api/admin/user/${userId}/solved-count`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch solved count');
+  }
+  return response.json();
+};
+
+export const getPublicContests = async (params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const token = localStorage.getItem('token');
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const response = await fetch(`http://localhost:5000/api/contests?${queryParams}`, { headers });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch contests');
+  }
+  return response.json();
+};
+
+// Only one socket instance for the whole app
+export const socket = io('http://localhost:5000');
+
+// Add socket connection debugging
+socket.on('connect', () => {
+  console.log('Socket connected with ID:', socket.id);
+});
+
+socket.on('disconnect', () => {
+  console.log('Socket disconnected');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Socket connection error:', error);
+});
+
+socket.on('test', (data) => {
+  console.log('Received test event:', data);
+});
+
+export const registerForContest = async (contestId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`/api/contests/${contestId}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    // Not JSON (probably HTML error page)
+    if (response.status === 401 || response.status === 403) {
+      throw new Error('You must be logged in to register for a contest. Please login.');
+    }
+    throw new Error('Server error. Please try again later.');
+  }
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to register for contest');
+  }
+  return data;
+};
+
+export const unregisterForContest = async (contestId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`/api/contests/${contestId}/register`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error('You must be logged in to unregister from a contest. Please login.');
+    }
+    throw new Error('Server error. Please try again later.');
+  }
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to unregister from contest');
+  }
+  return data;
+};
+
+export const getContestLeaderboard = async (contestId) => {
+  const response = await fetch(`http://localhost:5000/api/contests/${contestId}/leaderboard`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch contest leaderboard');
+  }
+  return response.json();
+};
+
+export const getProblemById = async (id) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`/api/problems/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch problem');
+  }
+  return response.json();
+};
+
+export const getContestDetails = async (contestId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:5000/api/contests/${contestId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch contest details');
   }
   return response.json();
 };

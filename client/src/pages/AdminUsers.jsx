@@ -251,7 +251,6 @@ const AdminUsers = () => {
               >
                 <option value="">All Roles</option>
                 <option value="user">User</option>
-                <option value="moderator">Moderator</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -363,7 +362,7 @@ const AdminUsers = () => {
                               <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
                                 <span className="font-medium">Change Role:</span>
                                 <div className="mt-1 space-y-1">
-                                  {['user', 'moderator', 'admin'].map((role) => (
+                                  {['user', 'admin'].map((role) => (
                                     <button
                                       key={role}
                                       onClick={() => handleRoleUpdate(user._id, role)}

@@ -5,12 +5,16 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
-  role: { type: String, default: "user", enum: ["user", "moderator", "admin"] },
+  role: { type: String, default: "user", enum: ["user", "admin"] },
   isBanned: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
+  // Leaderboard fields
+  rating: { type: Number, default: 1200 },
+  problemsSolved: { type: Number, default: 0 },
+  avatar: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

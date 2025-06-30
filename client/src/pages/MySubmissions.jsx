@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getMySubmissions } from '../services/authService';
+import { Logo } from '../components/AdminNavbar';
 
 const MySubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -67,6 +68,7 @@ const MySubmissions = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      <Logo />
       <h1 className="text-2xl font-bold text-gray-900 mb-4">My Submissions</h1>
       <div className="mb-4 flex flex-wrap gap-4 items-end">
         <input

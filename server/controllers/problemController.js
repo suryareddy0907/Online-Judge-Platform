@@ -1,6 +1,8 @@
 import Problem from "../models/Problem.js";
 import Submission from "../models/Submission.js";
+import User from "../models/User.js";
 import axios from "axios";
+import { getContestLeaderboard } from './leaderboardController.js';
 
 // GET /api/problems - public, published only
 export const getPublicProblems = async (req, res) => {
@@ -25,6 +27,7 @@ export const getPublicProblems = async (req, res) => {
 };
 
 export const submitProblem = async (req, res) => {
+  console.log("submitProblem called, req is:", typeof req, req && typeof req.app, req && req.app && typeof req.app.get);
   const { id: problemId } = req.params;
   const { language, code } = req.body;
   const userId = req.user.userId;
@@ -48,14 +51,8 @@ export const submitProblem = async (req, res) => {
 
     for (let i = 0; i < problem.testCases.length; i++) {
       const testCase = problem.testCases[i];
-      // Map language to the correct value for the compiler microservice
-      let runLanguage = language;
-      if (language === 'python') runLanguage = 'py';
-      if (language === 'cpp') runLanguage = 'cpp';
-      if (language === 'c') runLanguage = 'c';
-      if (language === 'java') runLanguage = 'java';
       const runPayload = {
-        language: runLanguage,
+        language: language,
         code,
         input: testCase.input,
       };
@@ -66,12 +63,15 @@ export const submitProblem = async (req, res) => {
         if (data.error || (data.output && data.output.error)) {
            let verdict, errorMessage;
            const errorDetails = data.output ? data.output : data;
-           if (errorDetails.error.includes("Time Limit Exceeded")) {
+           if (errorDetails.error && errorDetails.error.includes("Compilation failed")) {
+             verdict = "CE";
+             errorMessage = `Compilation Error: ${errorDetails.stderr || errorDetails.error}`;
+           } else if (errorDetails.error && errorDetails.error.includes("Time Limit Exceeded")) {
              verdict = "TLE";
              errorMessage = `Time Limit Exceeded on Test Case ${i + 1}`;
            } else {
              verdict = "RE";
-             errorMessage = `Runtime Error on Test Case ${i + 1}`;
+             errorMessage = `Runtime Error on Test Case ${i + 1}: ${errorDetails.stderr || errorDetails.error}`;
            }
            await Submission.findByIdAndUpdate(newSubmission._id, { verdict, judgedAt: new Date(), errorMessage });
            return res.status(200).json({ verdict, message: errorMessage });
@@ -87,12 +87,126 @@ export const submitProblem = async (req, res) => {
 
         await Submission.findByIdAndUpdate(newSubmission._id, { $inc: { testCasesPassed: 1 } });
       } catch (error) {
-        await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "RE", judgedAt: new Date(), errorMessage: `Error judging Test Case ${i + 1}: ${error.message}` });
-        return res.status(500).json({ verdict: "RE", message: `An error occurred during judging: ${error.message}` });
+        // Log the error for debugging
+        console.error("Error during code execution:", error);
+
+        let verdict = "RE";
+        let errorMessage = `Error judging Test Case ${i + 1}: ${error.message || error}`;
+
+        // Safely check for compilation error
+        const errorText = (typeof error === "string")
+          ? error
+          : (error?.error || error?.stderr || error?.message || JSON.stringify(error));
+
+        if (errorText && errorText.includes("Compilation failed")) {
+          verdict = "CE";
+          errorMessage = `Compilation Error: ${error.stderr || error.error || errorText}`;
+        }
+
+        await Submission.findByIdAndUpdate(newSubmission._id, { verdict, judgedAt: new Date(), errorMessage });
+        return res.status(200).json({ verdict, message: errorMessage });
       }
     }
 
-    await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "AC", judgedAt: new Date() });
+    // Check before creating new AC
+    const alreadySolved = await Submission.findOne({
+      user: userId,
+      problem: problemId,
+      verdict: "AC"
+    });
+
+    await Submission.findByIdAndUpdate(newSubmission._id, {
+      verdict: "AC",
+      judgedAt: new Date()
+    });
+
+    if (!alreadySolved) {
+      // Increment user's solved count
+      await User.findByIdAndUpdate(userId, {
+        $inc: { problemsSolved: 1 }
+      });
+
+      // Emit leaderboard update with proper format
+      const io = req.app.get("io");
+      console.log('Emitting leaderboardUpdate event...');
+      
+      try {
+        // Get updated leaderboard data
+        const users = await User.find({ 
+          isActive: true, 
+          isBanned: false 
+        })
+        .select("username problemsSolved rating avatar createdAt")
+        .sort({ problemsSolved: -1, rating: -1 })
+        .limit(10)
+        .lean();
+
+        // Add rank to each user
+        const leaderboardWithRank = users.map((user, index) => ({
+          ...user,
+          rank: index + 1
+        }));
+
+        console.log('Emitting leaderboardUpdate with data:', leaderboardWithRank);
+        io.emit("leaderboardUpdate", leaderboardWithRank);
+      } catch (error) {
+        console.error('Error updating general leaderboard:', error);
+      }
+
+      // Emit contest leaderboard update if this is a contest problem
+      if (problem.contest) {
+        console.log('Problem is part of contest:', problem.contest, '- emitting contestLeaderboardUpdate');
+        try {
+          // Get contest leaderboard data directly
+          const problems = await Problem.find({ contest: problem.contest }).select('_id');
+          const problemIds = problems.map(p => p._id);
+          
+          if (problemIds.length > 0) {
+            const acSubmissions = await Submission.find({
+              problem: { $in: problemIds },
+              verdict: 'AC'
+            }).populate('user', 'username avatar').sort({ submittedAt: 1 }).lean();
+            
+            // Map userId to set of solved problemIds and earliest AC time
+            const userSolvedMap = {};
+            for (const sub of acSubmissions) {
+              const uid = String(sub.user._id);
+              if (!userSolvedMap[uid]) {
+                userSolvedMap[uid] = { problems: new Set(), firstAC: sub.submittedAt, user: sub.user };
+              }
+              userSolvedMap[uid].problems.add(String(sub.problem));
+              if (sub.submittedAt < userSolvedMap[uid].firstAC) {
+                userSolvedMap[uid].firstAC = sub.submittedAt;
+              }
+            }
+            
+            // Prepare leaderboard array
+            let leaderboard = Object.values(userSolvedMap).map(u => ({
+              username: u.user.username,
+              avatar: u.user.avatar,
+              problemsSolved: u.problems.size,
+              firstAC: u.firstAC,
+              problems: Array.from(u.problems)
+            }));
+            
+            // Sort by problemsSolved desc, then by firstAC asc
+            leaderboard.sort((a, b) => {
+              if (b.problemsSolved !== a.problemsSolved) return b.problemsSolved - a.problemsSolved;
+              return new Date(a.firstAC) - new Date(b.firstAC);
+            });
+            
+            // Add rank
+            leaderboard = leaderboard.map((u, i) => ({ ...u, rank: i + 1 }));
+            
+            console.log('Emitting contestLeaderboardUpdate with data:', { contestId: String(problem.contest), leaderboard });
+            io.emit("contestLeaderboardUpdate", { contestId: String(problem.contest), leaderboard });
+          }
+        } catch (error) {
+          console.error('Error updating contest leaderboard:', error);
+        }
+      }
+    }
+
     return res.status(200).json({ verdict: "AC", message: "Accepted" });
 
   } catch (error) {
@@ -125,6 +239,21 @@ export const getMySubmissions = async (req, res) => {
     res.json({ submissions });
   } catch (error) {
     console.error('Get my submissions error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/problems/:id - get problem by ID (including draft) for authenticated users
+export const getProblemById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const problem = await Problem.findById(id);
+    if (!problem) {
+      return res.status(404).json({ message: 'Problem not found' });
+    }
+    res.json({ problem });
+  } catch (err) {
+    console.error('Get problem by ID error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 }; 

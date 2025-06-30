@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { getAllSubmissions, deleteSubmission, getSubmissionDetails } from '../services/adminService';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ const AdminSubmissions = () => {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
+  const modalOpenedRef = useRef(false);
 
   useEffect(() => {
     fetchSubmissions();
@@ -19,27 +20,26 @@ const AdminSubmissions = () => {
   }, [filters]);
 
   useEffect(() => {
-    if (viewModal) {
-      window.history.pushState({ modal: true }, '');
-      const handlePopState = (e) => {
+    const handlePopState = (e) => {
+      if (modalOpenedRef.current) {
         setViewModal(false);
-      };
-      window.addEventListener('popstate', handlePopState);
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-      };
-    }
-  }, [viewModal]);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      navigate('/home', { replace: true });
+        setSelectedSubmission(null);
+        modalOpenedRef.current = false;
+      }
     };
+
     window.addEventListener('popstate', handlePopState);
+
+    // Push state only once when modal opens
+    if (viewModal && !modalOpenedRef.current) {
+      window.history.pushState({ modal: true }, '');
+      modalOpenedRef.current = true;
+    }
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [navigate]);
+  }, [viewModal]);
 
   const fetchSubmissions = async () => {
     setLoading(true);
@@ -83,9 +83,10 @@ const AdminSubmissions = () => {
   };
 
   const handleCloseModal = () => {
-    setViewModal(false);
-    if (window.history.state && window.history.state.modal) {
-      window.history.back();
+    if (modalOpenedRef.current) {
+      window.history.back(); // triggers popstate
+    } else {
+      setViewModal(false); // fallback
     }
   };
 

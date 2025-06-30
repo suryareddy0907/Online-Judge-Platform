@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { getPublicProblems } from "../services/authService";
+import { getProblemById } from "../services/authService";
 import axios from "axios";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
@@ -15,7 +15,7 @@ const ProblemDetails = () => {
   const [output, setOutput] = useState("");
   const [customInput, setCustomInput] = useState("");
   const [language, setLanguage] = useState("cpp"); // Default language is C++
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const allotmentRef = useRef(null);
 
   useEffect(() => {
@@ -23,10 +23,8 @@ const ProblemDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        // getPublicProblems returns a list, so fetch by id and filter client-side for now
-        const data = await getPublicProblems({});
-        const found = data.problems.find((p) => p._id === id);
-        setProblem(found);
+        const data = await getProblemById(id);
+        setProblem(data.problem);
       } catch (err) {
         setError("Failed to load problem");
       } finally {
@@ -43,25 +41,48 @@ const ProblemDetails = () => {
   }, [output]);
 
   const handleRun = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.post("http://localhost:5000/api/run", {
         code: code,
         language: language,
         input: customInput,
       });
-      setOutput(response.data.output);
+      if (
+        response.data.output &&
+        (response.data.output.includes("Compilation failed") || response.data.output.includes("Compilation Error"))
+      ) {
+        const compilerOutput = response.data.stderr || response.data.output;
+        setOutput({ type: 'CE', message: compilerOutput });
+      } else if (
+        response.data.error === 'Time Limit Exceeded' ||
+        (response.data.output && response.data.output.includes('Process terminated after 2 seconds'))
+      ) {
+        setOutput({ type: 'TLE', message: 'Time limit exceeded' });
+      } else if (
+        response.data.output &&
+        (response.data.output.toLowerCase().includes("runtime error") || response.data.output.toLowerCase().includes("re:"))
+      ) {
+        setOutput({ type: 'RE', message: 'Runtime error' });
+      } else {
+        setOutput(response.data.output);
+      }
     } catch (err) {
-      setOutput(
-        err.response?.data?.output ||
-        err.response?.data?.error ||
-        err.message ||
-        "An unexpected error occurred."
-      );
+      const errMsg = err.response?.data?.stderr || err.response?.data?.output || err.response?.data?.error || err.message || "An unexpected error occurred.";
+      if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('time limit exceeded')) {
+        setOutput({ type: 'TLE', message: 'Time limit exceeded' });
+      } else if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('runtime error')) {
+        setOutput({ type: 'RE', message: 'Runtime error' });
+      } else {
+        setOutput(errMsg);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
+    setIsLoading(true);
     setOutput("Submitting your solution...");
     try {
       const token = localStorage.getItem("token");
@@ -74,14 +95,42 @@ const ProblemDetails = () => {
           },
         }
       );
-      setOutput(`${response.data.verdict}: ${response.data.message}`);
+      // If verdict is CE, show CE: Compilation error and actual error below
+      if (response.data.verdict === 'CE') {
+        // Remove any leading 'Compilation Error' or similar prefix from the message
+        let cleanMsg = response.data.message;
+        if (typeof cleanMsg === 'string') {
+          cleanMsg = cleanMsg.replace(/^(Compilation (Error|error|failed):?\s*)/i, '');
+        }
+        setOutput({ type: 'CE', message: cleanMsg.trim() });
+      } else {
+        setOutput(`${response.data.verdict}: ${response.data.message}`);
+      }
     } catch (err) {
       setOutput(
         `Submission failed: ${err.response?.data?.message || err.message}`
       );
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
+  };
+
+  // Optional: Clean up file paths, keep alignment
+  const formatOutputMessage = (msg) => {
+    if (typeof msg !== 'string') return String(msg);
+    return msg
+      .split('\n')
+      .map(line => {
+        if (
+          line.includes('/codes/') ||
+          line.includes('outputs/') ||
+          line.includes('\\') || // Windows paths
+          line.includes('.cpp: note:')
+        ) return null; // skip line
+        return line; // preserve indentation
+      })
+      .filter(Boolean)
+      .join('\n');
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -194,50 +243,84 @@ const ProblemDetails = () => {
                   onChange={e => setCustomInput(e.target.value)}
                 />
                 <div className="flex justify-end space-x-2">
-                  <button onClick={handleRun} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : "Run"}
+                  <button
+                    onClick={handleRun}
+                    className={`px-4 py-2 rounded flex items-center justify-center min-w-[90px] transition-colors duration-150
+                      ${isLoading ? 'bg-blue-200 text-blue-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                    ) : null}
+                    Run
                   </button>
-                  <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : "Submit"}
+                  <button
+                    onClick={handleSubmit}
+                    className={`px-4 py-2 rounded flex items-center justify-center min-w-[90px] transition-colors duration-150
+                      ${isLoading ? 'bg-green-200 text-green-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'}`}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                    ) : null}
+                    Submit
                   </button>
                 </div>
                 {output && (
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold">Output:</h3>
-                    <pre
-                      className="bg-gray-100 p-2 rounded"
-                      style={{
-                        whiteSpace: "pre-wrap",
-                        overflowX: "hidden",
-                        overflowY: "auto",
-                        maxHeight: "300px"
-                      }}
-                    >{
-                      (() => {
-                        if (output === null || output === undefined) return "";
-                        let err = "";
-                        if (typeof output === "object" && output !== null && "stderr" in output) {
-                          err = output.stderr;
-                        } else if (typeof output === "object" && output !== null && "error" in output) {
-                          err = output.error;
-                        } else if (typeof output === "string") {
-                          err = output;
-                        } else {
-                          err = JSON.stringify(output, null, 2);
-                        }
-                        // Filter out lines with internal paths
-                        const filtered = err
-                          .split('\n')
-                          .filter(line =>
-                            !line.includes('/codes/') &&
-                            !line.includes('outputs/') &&
-                            !line.includes('\\') && // for Windows paths
-                            !line.includes('.cpp: note:') // optional: filter out some verbose notes
-                          )
-                          .join('\n');
-                        return filtered.trim();
-                      })()
-                    }</pre>
+                    {typeof output === 'object' && output.type === 'TLE' && (
+                      <pre className="bg-gray-100 p-2 rounded text-orange-600 font-semibold">TLE: Time limit exceeded</pre>
+                    )}
+                    {typeof output === 'object' && output.type === 'RE' && (
+                      <pre className="bg-gray-100 p-2 rounded text-red-600 font-semibold">RE: {output.message}</pre>
+                    )}
+                    {typeof output === 'object' && output.type === 'CE' && (
+                      <div className="bg-gray-100 p-2 rounded">
+                        <div className="text-yellow-700 font-semibold mb-1">CE: Compilation error</div>
+                        <pre className="text-gray-800 whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                          {formatOutputMessage(output.message)}
+                        </pre>
+                      </div>
+                    )}
+                    {!(typeof output === 'object' && (output.type === 'RE' || output.type === 'CE' || output.type === 'TLE')) && (
+                      <pre
+                        className="bg-gray-100 p-2 rounded font-mono text-sm leading-relaxed"
+                        style={{
+                          whiteSpace: "pre-wrap",
+                          overflowX: "auto",
+                          overflowY: "auto",
+                          maxHeight: "300px",
+                          wordBreak: "break-word",
+                          tabSize: 2
+                        }}
+                      >
+                        {formatOutputMessage(
+                          (() => {
+                            if (output === null || output === undefined) return "";
+                            
+                            let outputText = "";
+                            if (typeof output === "object" && output !== null && "stderr" in output) {
+                              outputText = output.stderr;
+                            } else if (typeof output === "object" && output !== null && "error" in output) {
+                              outputText = output.error;
+                            } else if (typeof output === "string") {
+                              outputText = output;
+                            } else {
+                              outputText = JSON.stringify(output, null, 2);
+                            }
+                            
+                            return outputText;
+                          })()
+                        )}
+                      </pre>
+                    )}
                   </div>
                 )}
               </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getPublicProblems } from "../services/authService";
+import { getPublicProblems, getUserSolvedCount } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { Logo } from '../components/AdminNavbar';
 
 const BrowseProblems = () => {
   const [problems, setProblems] = useState([]);
@@ -10,7 +11,23 @@ const BrowseProblems = () => {
   const [difficulty, setDifficulty] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
   const [allTags, setAllTags] = useState([]);
+  const [solvedCounts, setSolvedCounts] = useState({});
   const navigate = useNavigate();
+
+  const fetchSolvedCounts = async (problems) => {
+    const counts = {};
+    for (const problem of problems) {
+      if (problem.createdBy && problem.createdBy._id) {
+        try {
+          const data = await getUserSolvedCount(problem.createdBy._id);
+          counts[problem.createdBy._id] = data.solvedCount;
+        } catch (e) {
+          counts[problem.createdBy._id] = 0;
+        }
+      }
+    }
+    setSolvedCounts(counts);
+  };
 
   const fetchProblems = async () => {
     setLoading(true);
@@ -27,6 +44,8 @@ const BrowseProblems = () => {
       const tags = new Set();
       data.problems.forEach((p) => (p.tags || []).forEach((t) => tags.add(t)));
       setAllTags(Array.from(tags));
+      // Fetch solved counts for creators
+      await fetchSolvedCounts(data.problems);
     } catch (err) {
       setError(err.message || "Failed to load problems");
     } finally {
@@ -47,6 +66,7 @@ const BrowseProblems = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        <Logo />
         <h1 className="text-3xl font-bold mb-6 text-center">Browse Problems</h1>
         <div className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 mb-6">
           <input
@@ -105,6 +125,14 @@ const BrowseProblems = () => {
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">{problem.title}</h2>
                     <p className="text-gray-600 text-sm mt-1 line-clamp-2">{problem.statement?.slice(0, 120)}{problem.statement?.length > 120 ? "..." : ""}</p>
+                    {problem.createdBy && false && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        By {problem.createdBy.username}
+                        {solvedCounts[problem.createdBy._id] !== undefined && (
+                          <span> &bull; {solvedCounts[problem.createdBy._id]} solved</span>
+                        )}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col md:items-end mt-2 md:mt-0">
                     <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-1 ${problem.difficulty === "Easy" ? "bg-green-100 text-green-800" : problem.difficulty === "Medium" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{problem.difficulty}</span>

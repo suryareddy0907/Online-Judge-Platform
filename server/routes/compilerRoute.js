@@ -15,13 +15,14 @@ router.post("/run", async (req, res) => {
     // Forward code to online-compiler microservice
     const response = await axios.post("http://localhost:5001/run", {
       code,
-      language,
+      language, // Forwarding 'python' directly
       input,
     });
 
     // Return output or compiler error from microservice
     return res.status(200).json({
-      output: response.data.output || response.data.error || "No output",
+      output: response.data.output || response.data.stderr || response.data.error || "No output",
+      stderr: response.data.stderr // Forward stderr for compilation errors
     });
   } catch (error) {
     const errData = error.response?.data;
@@ -38,7 +39,7 @@ router.post("/run", async (req, res) => {
 
     if (error.response) {
       // Microservice responded — likely a compilation error (handled gracefully)
-      return res.status(200).json({ output: errMsg });
+      return res.status(200).json({ output: errMsg, stderr: errData?.stderr });
     } else {
       // Microservice did not respond — server/microservice down
       return res.status(500).json({

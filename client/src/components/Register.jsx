@@ -11,7 +11,6 @@ const Register = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -42,14 +41,7 @@ const Register = () => {
   };
 
   return (
-    <div className={`register-container ${darkMode ? "dark" : "light"}`}>
-      <div className="theme-toggle">
-        <label>
-          <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
-          {darkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
-        </label>
-      </div>
-
+    <div className="register-container">
       <form onSubmit={handleSubmit} className="register-form">
         <h2>Register</h2>
 

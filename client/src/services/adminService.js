@@ -161,3 +161,38 @@ export const getSubmissionDetails = async (submissionId) => {
   }
   return response.json();
 };
+
+// ==================== CONTEST MANAGEMENT ====================
+export const getAllContests = async (params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`${API_BASE_URL}/contests?${queryParams}`, {
+    headers: getAuthHeaders()
+  });
+  return handleResponse(response);
+};
+
+export const createContest = async (contestData) => {
+  const response = await fetch(`${API_BASE_URL}/contests`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(contestData)
+  });
+  return handleResponse(response);
+};
+
+export const updateContest = async (contestId, contestData) => {
+  const response = await fetch(`${API_BASE_URL}/contests/${contestId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(contestData)
+  });
+  return handleResponse(response);
+};
+
+export const deleteContest = async (contestId) => {
+  const response = await fetch(`${API_BASE_URL}/contests/${contestId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  });
+  return handleResponse(response);
+};
