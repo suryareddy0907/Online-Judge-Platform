@@ -17,6 +17,12 @@ const ProblemDetails = () => {
   const [language, setLanguage] = useState("cpp"); // Default language is C++
   const [isLoading, setIsLoading] = useState(false);
   const allotmentRef = useRef(null);
+  const [hint, setHint] = useState("");
+  const [hintLoading, setHintLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(""); // "hint" | "analyze" | "boilerplate" | "explain" | ""
+  const [codeFeedback, setCodeFeedback] = useState("");
+  const [explanation, setExplanation] = useState("");
+  const [debugOutput, setDebugOutput] = useState("");
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -115,6 +121,88 @@ const ProblemDetails = () => {
     }
   };
 
+  const handleGenerateHint = async () => {
+    setAiLoading("hint");
+    setHint("");
+    try {
+      const response = await axios.post("http://localhost:5000/api/ai/generate-hint", {
+        problemStatement: problem.statement,
+        userCode: code,
+        language: language,
+      });
+      setHint(response.data.hint);
+    } catch (err) {
+      setHint("Failed to generate hint.");
+    } finally {
+      setAiLoading("");
+    }
+  };
+
+  const handleAnalyzeCode = async () => {
+    setAiLoading("analyze");
+    setCodeFeedback("");
+    try {
+      const response = await axios.post("http://localhost:5000/api/ai/analyze-code", {
+        code,
+        language,
+        problemStatement: problem.statement,
+      });
+      setCodeFeedback(response.data.feedback);
+    } catch (err) {
+      setCodeFeedback("Failed to analyze code.");
+    } finally {
+      setAiLoading("");
+    }
+  };
+
+  const handleGenerateBoilerplate = async () => {
+    setAiLoading("boilerplate");
+    try {
+      const response = await axios.post("http://localhost:5000/api/ai/generate-boilerplate", {
+        problemStatement: problem.statement,
+        language: language,
+      });
+      setCode(response.data.boilerplate);
+    } catch (err) {
+      setOutput("Failed to generate boilerplate code.");
+    } finally {
+      setAiLoading("");
+    }
+  };
+
+  const handleExplainProblem = async () => {
+    setAiLoading("explain");
+    setExplanation("");
+    try {
+      const response = await axios.post("http://localhost:5000/api/ai/explain-problem", {
+        problemStatement: problem.statement,
+        language: language,
+      });
+      setExplanation(response.data.explanation);
+    } catch (err) {
+      setExplanation("Failed to explain problem.");
+    } finally {
+      setAiLoading("");
+    }
+  };
+
+  const handleDebugCode = async () => {
+    setAiLoading("debug");
+    setDebugOutput("");
+    try {
+      const response = await axios.post("http://localhost:5000/api/ai/debug-code", {
+        code,
+        language,
+        problemStatement: problem.statement,
+      });
+      setDebugOutput(response.data.debug);
+    } catch (err) {
+      setDebugOutput("Failed to debug code.");
+    } finally {
+      setAiLoading("");
+    }
+  };
+
   // Optional: Clean up file paths, keep alignment
   const formatOutputMessage = (msg) => {
     if (typeof msg !== 'string') return String(msg);
@@ -143,6 +231,89 @@ const ProblemDetails = () => {
           {/* Left: Problem Details */}
           <div className="p-8 bg-white border-r border-gray-200 overflow-y-auto h-full">
             <h1 className="text-3xl font-bold mb-4">{problem.title}</h1>
+            {/* AI Feature Buttons */}
+            <div className="flex flex-wrap gap-4 mb-6">
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                onClick={handleGenerateHint}
+                disabled={aiLoading !== ""}
+              >
+                {aiLoading === "hint" ? (
+                  <span className="inline-flex items-center justify-center mr-2">
+                    <span className="spinner-circle"></span>
+                  </span>
+                ) : null}
+                {aiLoading === "hint" ? "Generating..." : "Generate Hints"}
+              </button>
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                onClick={handleAnalyzeCode}
+                disabled={aiLoading !== ""}
+              >
+                {aiLoading === "analyze" ? (
+                  <span className="inline-flex items-center justify-center mr-2">
+                    <span className="spinner-circle"></span>
+                  </span>
+                ) : null}
+                {aiLoading === "analyze" ? "Analyzing..." : "Analyze Code"}
+              </button>
+              <button
+                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                onClick={handleGenerateBoilerplate}
+                disabled={aiLoading !== ""}
+              >
+                {aiLoading === "boilerplate" ? (
+                  <span className="inline-flex items-center justify-center mr-2">
+                    <span className="spinner-circle"></span>
+                  </span>
+                ) : null}
+                {aiLoading === "boilerplate" ? "Generating..." : "Generate Boilerplate"}
+              </button>
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                onClick={handleExplainProblem}
+                disabled={aiLoading !== ""}
+              >
+                {aiLoading === "explain" ? (
+                  <span className="inline-flex items-center justify-center mr-2">
+                    <span className="spinner-circle"></span>
+                  </span>
+                ) : null}
+                {aiLoading === "explain" ? "Generating..." : "Explain Problem"}
+              </button>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                onClick={handleDebugCode}
+                disabled={aiLoading !== ""}
+              >
+                {aiLoading === "debug" ? (
+                  <span className="inline-flex items-center justify-center mr-2">
+                    <span className="spinner-circle"></span>
+                  </span>
+                ) : null}
+                {aiLoading === "debug" ? "Debugging..." : "Debug Code"}
+              </button>
+            </div>
+            {hint && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900">
+                <strong>Hint:</strong> {hint}
+              </div>
+            )}
+            {codeFeedback && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-900">
+                <strong>Code Feedback:</strong> {codeFeedback}
+              </div>
+            )}
+            {explanation && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900">
+                <strong>Explanation:</strong> <span dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>') }} />
+              </div>
+            )}
+            {debugOutput && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900">
+                <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: debugOutput.replace(/\n/g, '<br/>') }} />
+              </div>
+            )}
             <div className="mb-4">
               <h2 className="text-lg font-semibold mb-1">Description</h2>
               <p className="text-gray-800 whitespace-pre-line">{problem.statement}</p>
@@ -332,4 +503,23 @@ const ProblemDetails = () => {
   );
 };
 
-export default ProblemDetails; 
+export default ProblemDetails;
+
+<style>
+{`
+.spinner-circle {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+`}
+</style> 

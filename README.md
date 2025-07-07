@@ -88,6 +88,33 @@ A comprehensive online coding platform with a powerful admin panel for managing 
 - Protected admin routes
 - Easy environment configuration for different deployments
 
+## 🤖 AI-Powered Features
+
+- **Smart Hint Generation:**
+  - Uses Cohere API to generate concise, actionable hints based on the problem statement and user code.
+  - Requires `COHERE_API_KEY` in your server `.env` file.
+
+- **Code Analysis/Feedback:**
+  - Uses Cohere API to provide concise, numbered feedback on user code for a given problem.
+  - Requires `CODE_ANALYSIS_KEY` in your server `.env` file.
+
+- **Problem Statement Explanation:**
+  - Uses Cohere API to restate the problem in simpler, beginner-friendly language (no hints or solutions).
+  - Requires `PROBLEM_EXPLAIN_KEY` in your server `.env` file.
+
+- **Boilerplate Code Generation:**
+  - Uses OpenRouter API (Mistral 7B Instruct model) to generate minimal, idiomatic starter code for the selected language and problem.
+  - Requires `BOILERPLATE_KEY` (OpenRouter API key) in your server `.env` file.
+
+- **Code Debugging:**
+  - Uses OpenRouter API (Mistral 7B Instruct model) to pinpoint and concisely explain all types of errors (syntax, runtime, logic, performance, semantic/design) in user code, referencing only the problematic lines (no code output).
+  - Requires `DEBUG_KEY` (OpenRouter API key) in your server `.env` file.
+
+**Note:**
+- All AI features are accessible via dedicated buttons on the problem details page.
+- Each feature requires the corresponding API key to be set in your server `.env` file.
+- The backend will return clear error messages if an API key is missing or invalid.
+
 ## 🛠️ Setup Instructions
 
 ### Prerequisites

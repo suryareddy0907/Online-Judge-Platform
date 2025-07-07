@@ -9,6 +9,7 @@ import problemRoutes from "./routes/problemRoutes.js";
 import compilerRoutes from "./routes/compilerRoute.js";
 import leaderboardRoutes from "./routes/leaderboardRoutes.js";
 import contestRoutes from "./routes/contestRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import path from 'path';
@@ -49,6 +50,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/contests", contestRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api", compilerRoutes);
+app.use("/api/ai", aiRoutes);
 
 const __dirname = path.resolve();
 if (process.env.NODE_ENV === 'production') {
@@ -57,6 +59,17 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
+
+// 404 handler for unknown routes
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+});
 
 // MongoDB Connection
 mongoose
