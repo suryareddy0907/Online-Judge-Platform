@@ -226,7 +226,7 @@ const AdminProblems = () => {
           <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 mb-6 font-mono text-white hover:border-[#00ff99] transition-all">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-base font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                   Search
                 </label>
                 <div className="relative">
@@ -248,7 +248,7 @@ const AdminProblems = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-base font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                   Difficulty
                 </label>
                 <select
@@ -264,7 +264,7 @@ const AdminProblems = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-base font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                   Status
                 </label>
                 <select
@@ -372,245 +372,243 @@ const AdminProblems = () => {
 
           {/* Create Problem Modal */}
           {showCreateModal && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-                <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Create New Problem</h3>
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      // Prepare test cases for backend
-                      const payload = {
-                        title: createForm.title,
-                        statement: createForm.description,
-                        input: createForm.input,
-                        constraints: createForm.constraints,
-                        output: createForm.output,
-                        exampleTestCases: createForm.exampleTestCases,
-                        testCases: createForm.testCases, // hidden test cases
-                        difficulty: createForm.difficulty,
-                        tags: createForm.tags.split(',').map(t => t.trim()).filter(Boolean),
-                      };
-                      try {
-                        await createProblem(payload);
-                        setShowCreateModal(false);
-                        fetchProblems();
-                      } catch (err) {
-                        alert(err.message || 'Failed to create problem');
-                      }
-                    }}
-                    className="space-y-4"
-                  >
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Problem Title</label>
-                      <input
-                        type="text"
-                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={createForm.title}
-                        onChange={e => setCreateForm(f => ({ ...f, title: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
-                      <textarea
-                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                        value={createForm.description}
-                        onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Input</label>
-                      <textarea
-                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={2}
-                        value={createForm.input}
-                        onChange={e => setCreateForm(f => ({ ...f, input: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Constraints</label>
-                      <textarea
-                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={2}
-                        value={createForm.constraints}
-                        onChange={e => setCreateForm(f => ({ ...f, constraints: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Output</label>
-                      <textarea
-                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={2}
-                        value={createForm.output}
-                        onChange={e => setCreateForm(f => ({ ...f, output: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Example Test Cases</label>
-                      {createForm.exampleTestCases.map((tc, idx) => (
-                        <div key={idx} className="flex flex-col space-y-1 mb-2 border p-2 rounded-md bg-gray-50">
-                          <div className="flex space-x-2">
-                            <textarea
-                              placeholder="Input"
-                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
-                              value={tc.input}
-                              onChange={e => setCreateForm(f => {
-                                const arr = [...f.exampleTestCases];
-                                arr[idx].input = e.target.value;
-                                return { ...f, exampleTestCases: arr };
-                              })}
-                              required
-                              rows={2}
-                            />
-                            <textarea
-                              placeholder="Output"
-                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
-                              value={tc.output}
-                              onChange={e => setCreateForm(f => {
-                                const arr = [...f.exampleTestCases];
-                                arr[idx].output = e.target.value;
-                                return { ...f, exampleTestCases: arr };
-                              })}
-                              required
-                              rows={2}
-                            />
-                            <button
-                              type="button"
-                              className="px-2 text-red-500"
-                              onClick={() => setCreateForm(f => ({
-                                ...f,
-                                exampleTestCases: f.exampleTestCases.filter((_, i) => i !== idx)
-                              }))}
-                              title="Remove"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <textarea
-                            placeholder="Explanation (optional)"
-                            className="border border-gray-300 rounded-md px-2 py-1 mt-1"
-                            value={tc.explanation}
-                            onChange={e => setCreateForm(f => {
-                              const arr = [...f.exampleTestCases];
-                              arr[idx].explanation = e.target.value;
-                              return { ...f, exampleTestCases: arr };
-                            })}
-                            rows={2}
-                          />
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        className="text-blue-600 text-sm mt-1"
-                        onClick={() => setCreateForm(f => ({
-                          ...f,
-                          exampleTestCases: [...f.exampleTestCases, { input: '', output: '', explanation: '' }]
-                        }))}
-                      >
-                        + Add Example Test Case
-                      </button>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Hidden Test Cases</label>
-                      {createForm.testCases.map((tc, idx) => (
-                        <div key={idx} className="flex space-x-2 mb-2">
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+                <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text text-center mb-6 tracking-tight">Create New Problem</h3>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    // Prepare test cases for backend
+                    const payload = {
+                      title: createForm.title,
+                      statement: createForm.description,
+                      input: createForm.input,
+                      constraints: createForm.constraints,
+                      output: createForm.output,
+                      exampleTestCases: createForm.exampleTestCases,
+                      testCases: createForm.testCases, // hidden test cases
+                      difficulty: createForm.difficulty,
+                      tags: createForm.tags.split(',').map(t => t.trim()).filter(Boolean),
+                    };
+                    try {
+                      await createProblem(payload);
+                      setShowCreateModal(false);
+                      fetchProblems();
+                    } catch (err) {
+                      alert(err.message || 'Failed to create problem');
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Problem Title</label>
+                    <input
+                      type="text"
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      value={createForm.title}
+                      onChange={e => setCreateForm(f => ({ ...f, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00cfff] mb-1">Problem Description</label>
+                    <textarea
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      rows={3}
+                      value={createForm.description}
+                      onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Input</label>
+                    <textarea
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      rows={2}
+                      value={createForm.input}
+                      onChange={e => setCreateForm(f => ({ ...f, input: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00cfff] mb-1">Constraints</label>
+                    <textarea
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      rows={2}
+                      value={createForm.constraints}
+                      onChange={e => setCreateForm(f => ({ ...f, constraints: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Output</label>
+                    <textarea
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      rows={2}
+                      value={createForm.output}
+                      onChange={e => setCreateForm(f => ({ ...f, output: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00cfff] mb-1">Example Test Cases</label>
+                    {createForm.exampleTestCases.map((tc, idx) => (
+                      <div key={idx} className="flex flex-col space-y-1 mb-2 border-2 border-[#00cfff] p-2 rounded-md bg-[#181c24]">
+                        <div className="flex space-x-2">
                           <textarea
                             placeholder="Input"
-                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            className="flex-1 border-2 border-[#00ff99] rounded-md px-2 py-1 resize-y bg-[#232b3a] text-white font-mono"
                             value={tc.input}
                             onChange={e => setCreateForm(f => {
-                              const arr = [...f.testCases];
+                              const arr = [...f.exampleTestCases];
                               arr[idx].input = e.target.value;
-                              return { ...f, testCases: arr };
+                              return { ...f, exampleTestCases: arr };
                             })}
                             required
                             rows={2}
                           />
                           <textarea
                             placeholder="Output"
-                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 resize-y"
+                            className="flex-1 border-2 border-[#00ff99] rounded-md px-2 py-1 resize-y bg-[#232b3a] text-white font-mono"
                             value={tc.output}
                             onChange={e => setCreateForm(f => {
-                              const arr = [...f.testCases];
+                              const arr = [...f.exampleTestCases];
                               arr[idx].output = e.target.value;
-                              return { ...f, testCases: arr };
+                              return { ...f, exampleTestCases: arr };
                             })}
                             required
                             rows={2}
                           />
                           <button
                             type="button"
-                            className="px-2 text-red-500"
+                            className="px-2 text-red-400 font-extrabold hover:text-pink-400"
                             onClick={() => setCreateForm(f => ({
                               ...f,
-                              testCases: f.testCases.filter((_, i) => i !== idx)
+                              exampleTestCases: f.exampleTestCases.filter((_, i) => i !== idx)
                             }))}
                             title="Remove"
                           >
                             ×
                           </button>
                         </div>
-                      ))}
-                      <button
-                        type="button"
-                        className="text-blue-600 text-sm mt-1"
-                        onClick={() => setCreateForm(f => ({
-                          ...f,
-                          testCases: [...f.testCases, { input: '', output: '' }]
-                        }))}
-                      >
-                        + Add Hidden Test Case
-                      </button>
-                    </div>
-                    <div className="flex space-x-2">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
-                        <select
-                          className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          value={createForm.difficulty}
-                          onChange={e => setCreateForm(f => ({ ...f, difficulty: e.target.value }))}
-                          required
-                        >
-                          <option value="">Select</option>
-                          <option value="Easy">Easy</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Hard">Hard</option>
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                        <input
-                          type="text"
-                          className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          value={createForm.tags}
-                          onChange={e => setCreateForm(f => ({ ...f, tags: e.target.value }))}
-                          placeholder="e.g. arrays, dp, math"
+                        <textarea
+                          placeholder="Explanation (optional)"
+                          className="border-2 border-[#00cfff] rounded-md px-2 py-1 mt-1 bg-[#232b3a] text-white font-mono"
+                          value={tc.explanation}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.exampleTestCases];
+                            arr[idx].explanation = e.target.value;
+                            return { ...f, exampleTestCases: arr };
+                          })}
+                          rows={2}
                         />
                       </div>
-                    </div>
-                    <div className="flex justify-end space-x-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowCreateModal(false)}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    ))}
+                    <button
+                      type="button"
+                      className="text-[#00cfff] text-sm mt-1 font-bold hover:text-[#00ff99]"
+                      onClick={() => setCreateForm(f => ({
+                        ...f,
+                        exampleTestCases: [...f.exampleTestCases, { input: '', output: '', explanation: '' }]
+                      }))}
+                    >
+                      + Add Example Test Case
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Hidden Test Cases</label>
+                    {createForm.testCases.map((tc, idx) => (
+                      <div key={idx} className="flex space-x-2 mb-2">
+                        <textarea
+                          placeholder="Input"
+                          className="flex-1 border-2 border-[#00ff99] rounded-md px-2 py-1 resize-y bg-[#232b3a] text-white font-mono"
+                          value={tc.input}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].input = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <textarea
+                          placeholder="Output"
+                          className="flex-1 border-2 border-[#00ff99] rounded-md px-2 py-1 resize-y bg-[#232b3a] text-white font-mono"
+                          value={tc.output}
+                          onChange={e => setCreateForm(f => {
+                            const arr = [...f.testCases];
+                            arr[idx].output = e.target.value;
+                            return { ...f, testCases: arr };
+                          })}
+                          required
+                          rows={2}
+                        />
+                        <button
+                          type="button"
+                          className="px-2 text-red-400 font-extrabold hover:text-pink-400"
+                          onClick={() => setCreateForm(f => ({
+                            ...f,
+                            testCases: f.testCases.filter((_, i) => i !== idx)
+                          }))}
+                          title="Remove"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-[#00cfff] text-sm mt-1 font-bold hover:text-[#00ff99]"
+                      onClick={() => setCreateForm(f => ({
+                        ...f,
+                        testCases: [...f.testCases, { input: '', output: '' }]
+                      }))}
+                    >
+                      + Add Hidden Test Case
+                    </button>
+                  </div>
+                  <div className="flex space-x-2">
+                    <div className="flex-1">
+                      <label className="block text-base font-bold text-[#00ff99] mb-1">Difficulty</label>
+                      <select
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white font-mono shadow-inner"
+                        value={createForm.difficulty}
+                        onChange={e => setCreateForm(f => ({ ...f, difficulty: e.target.value }))}
+                        required
                       >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      >
-                        Create
-                      </button>
+                        <option value="">Select</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
                     </div>
-                  </form>
-                </div>
+                    <div className="flex-1">
+                      <label className="block text-base font-bold text-[#00cfff] mb-1">Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                        value={createForm.tags}
+                        onChange={e => setCreateForm(f => ({ ...f, tags: e.target.value }))}
+                        placeholder="e.g. arrays, dp, math"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(false)}
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all font-mono"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all font-mono"
+                    >
+                      Create
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

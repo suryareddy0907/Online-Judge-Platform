@@ -59,19 +59,22 @@ export const updateUserRole = async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
 
-    if (!["user", "admin"].includes(role)) {
-      return res.status(400).json({ message: "Invalid role" });
+    // Prevent demoting the default admin
+    const user = await User.findById(userId);
+    if (user && user.email === "suryareddy0907@gmail.com") {
+      return res.status(403).json({ message: "Cannot demote the default admin user" });
     }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true }
-    ).select('-passwordHash');
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    if (!["user", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    user.role = role;
+    await user.save();
 
     res.json({ message: "User role updated successfully", user });
   } catch (error) {
@@ -86,15 +89,18 @@ export const toggleUserBan = async (req, res) => {
     const { userId } = req.params;
     const { isBanned } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isBanned },
-      { new: true }
-    ).select('-passwordHash');
+    // Prevent banning the default admin
+    const user = await User.findById(userId);
+    if (user && user.email === "suryareddy0907@gmail.com") {
+      return res.status(403).json({ message: "Cannot ban the default admin user" });
+    }
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    user.isBanned = isBanned;
+    await user.save();
 
     res.json({ 
       message: `User ${isBanned ? 'banned' : 'unbanned'} successfully`, 
@@ -719,6 +725,11 @@ export const updateUserDetails = async (req, res) => {
   try {
     const { userId } = req.params;
     const { username, email } = req.body;
+    // Prevent others from editing the default admin
+    const user = await User.findById(userId);
+    if (user && user.email === "suryareddy0907@gmail.com" && req.user.email !== "suryareddy0907@gmail.com") {
+      return res.status(403).json({ message: "Cannot edit the default admin user" });
+    }
     // Check if username or email already exists (excluding current user)
     const existingUser = await User.findOne({
       $and: [
@@ -734,15 +745,15 @@ export const updateUserDetails = async (req, res) => {
             : "Username is already taken",
       });
     }
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { username, email },
       { new: true }
     ).select('-passwordHash');
-    if (!user) {
+    if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ message: "User updated successfully", user });
+    res.json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     console.error("Update user details error:", error);
     res.status(500).json({ message: "Server error" });

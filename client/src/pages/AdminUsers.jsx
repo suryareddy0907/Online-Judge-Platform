@@ -119,7 +119,11 @@ const AdminUsers = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = async (userId, userEmail) => {
+    if (userEmail === "suryareddy0907@gmail.com") {
+      setError("Cannot delete the default admin user.");
+      return;
+    }
     if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       return;
     }
@@ -245,7 +249,7 @@ const AdminUsers = () => {
           {/* Filters */}
           <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 mb-6 font-mono text-white hover:border-[#00ff99] transition-all grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-base font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                 Search
               </label>
               <div className="relative">
@@ -267,7 +271,7 @@ const AdminUsers = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-base font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                 Role
               </label>
               <select
@@ -282,7 +286,7 @@ const AdminUsers = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-base font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-wide mb-2" style={{ fontFamily: 'Fira Mono, monospace', letterSpacing: '0.08em' }}>
                 Status
               </label>
               <select
@@ -354,7 +358,7 @@ const AdminUsers = () => {
                         <button onClick={() => openEditModal(user)} className="px-2 py-1 rounded bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all">Edit</button>
                         {user._id !== (currentUser?.userId) && (
                           <>
-                            <button onClick={() => handleDeleteUser(user._id)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all">Delete</button>
+                            <button onClick={() => handleDeleteUser(user._id, user.email)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all">Delete</button>
                             <select
                               value={user.role}
                               onChange={e => handleRoleUpdate(user._id, e.target.value)}

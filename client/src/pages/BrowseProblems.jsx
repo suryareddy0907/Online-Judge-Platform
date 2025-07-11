@@ -163,9 +163,9 @@ const BrowseProblems = () => {
       setProblems(data.problems);
       // Collect all unique tags from the full problem set, not just filtered results
       if (allTags.length === 0) {
-        const tags = new Set();
-        data.problems.forEach((p) => (p.tags || []).forEach((t) => tags.add(t)));
-        setAllTags(Array.from(tags));
+      const tags = new Set();
+      data.problems.forEach((p) => (p.tags || []).forEach((t) => tags.add(t)));
+      setAllTags(Array.from(tags));
       }
       // Fetch solved counts for creators
       await fetchSolvedCounts(data.problems);
@@ -196,13 +196,13 @@ const BrowseProblems = () => {
         <div className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 mb-8">
           <div className="relative flex-1">
             <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            <input
-              type="text"
+          <input
+            type="text"
               placeholder="Search problems"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
               className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
-            />
+          />
           </div>
           <select
             value={difficulty}
@@ -247,11 +247,11 @@ const BrowseProblems = () => {
               <div className="text-center py-10 text-[#baffea] font-mono">No problems found.</div>
             ) : (
               <div className="space-y-6">
-                {filteredProblems.map((problem) => (
-                  <div
-                    key={problem._id}
+            {filteredProblems.map((problem) => (
+              <div
+                key={problem._id}
                     className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 cursor-pointer hover:border-[#00cfff] hover:shadow-2xl transition-all font-mono group relative"
-                    onClick={() => navigate(`/problems/${problem._id}`)}
+                onClick={() => navigate(`/problems/${problem._id}`)}
                     style={{ boxShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}
                   >
                     {/* Solved badge */}
@@ -265,19 +265,19 @@ const BrowseProblems = () => {
                       <div>
                         <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text group-hover:from-[#00cfff] group-hover:to-[#00ff99] tracking-tight mb-1">{problem.title}</h2>
                         <p className="text-[#baffea] text-sm mt-1 line-clamp-2 font-mono">{problem.statement?.slice(0, 120)}{problem.statement?.length > 120 ? "..." : ""}</p>
-                      </div>
-                      <div className="flex flex-col md:items-end mt-2 md:mt-0">
+                  </div>
+                  <div className="flex flex-col md:items-end mt-2 md:mt-0">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-1 tracking-widest ${problem.difficulty === "Easy" ? "bg-green-900 text-green-300" : problem.difficulty === "Medium" ? "bg-yellow-900 text-yellow-300" : "bg-red-900 text-red-300"}`}>{problem.difficulty}</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {(problem.tags || []).map((tag) => (
+                      {(problem.tags || []).map((tag) => (
                             <span key={tag} className="inline-block bg-[#181c24] border border-[#00cfff] text-[#00cfff] px-2 py-0.5 rounded-full text-xs font-mono font-bold">{tag}</span>
-                          ))}
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
+            ))}
+          </div>
             )}
           </>
         )}

@@ -78,11 +78,6 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Check if user is banned or inactive
-    if (user.isBanned || !user.isActive) {
-      return res.status(403).json({ message: "Account is banned or inactive" });
-    }
-
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
@@ -112,6 +107,8 @@ export const loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isBanned: user.isBanned,
+        isActive: user.isActive
       },
     });
   } catch (err) {

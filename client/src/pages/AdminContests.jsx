@@ -250,7 +250,7 @@ const AdminContests = () => {
               <input
                 type="text"
                 placeholder="Search contests"
-                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
+                className="w-full border-2 border-[#00cfff] rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
               />
@@ -347,270 +347,253 @@ const AdminContests = () => {
 
           {/* Create Contest Modal */}
           {showCreateModal && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-                <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Create New Contest</h3>
-                  <form onSubmit={handleCreateSubmit} className="space-y-4">
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+                <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text text-center mb-6 tracking-tight">Create New Contest</h3>
+                <form onSubmit={handleCreateSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Title</label>
+                    <input
+                      type="text"
+                      required
+                      value={createForm.title}
+                      onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00cfff] mb-1">Description</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={createForm.description}
+                      onChange={e => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                      <label className="block text-base font-bold text-[#00ff99] mb-1">Start Time</label>
                       <input
-                        type="text"
+                        type="datetime-local"
                         required
-                        value={createForm.title}
-                        onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={createForm.startTime}
+                        onChange={e => setCreateForm(prev => ({ ...prev, startTime: e.target.value }))}
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea
+                      <label className="block text-base font-bold text-[#00cfff] mb-1">End Time</label>
+                      <input
+                        type="datetime-local"
                         required
-                        rows={3}
-                        value={createForm.description}
-                        onChange={e => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={createForm.endTime}
+                        onChange={e => setCreateForm(prev => ({ ...prev, endTime: e.target.value }))}
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                        <input
-                          type="datetime-local"
-                          required
-                          value={createForm.startTime}
-                          onChange={e => setCreateForm(prev => ({ ...prev, startTime: e.target.value }))}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                        <input
-                          type="datetime-local"
-                          required
-                          value={createForm.endTime}
-                          onChange={e => setCreateForm(prev => ({ ...prev, endTime: e.target.value }))}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Problems</label>
+                    <select
+                      multiple
+                      value={createForm.problems}
+                      onChange={e => setCreateForm(prev => ({ 
+                        ...prev, 
+                        problems: Array.from(e.target.selectedOptions, option => option.value) 
+                      }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white font-mono shadow-inner"
+                    >
+                      {problems.map(problem => (
+                        <option key={problem._id} value={problem._id}>
+                          {problem.title} ({problem.difficulty})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm text-[#baffea] mt-1">Hold Ctrl/Cmd to select multiple problems</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <div className="flex items-center">
+                      <input
+                        id="isPublicCreate"
+                        type="checkbox"
+                        checked={createForm.isPublic}
+                        onChange={e => setCreateForm({ ...createForm, isPublic: e.target.checked })}
+                        className="h-4 w-4 text-[#00ff99] focus:ring-[#00cfff] border-[#00cfff] rounded"
+                      />
+                      <label htmlFor="isPublicCreate" className="ml-2 block text-base font-bold text-[#00ff99]">
+                        Make contest public
+                      </label>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
-                      <select
-                        multiple
-                        value={createForm.problems}
-                        onChange={e => setCreateForm(prev => ({ 
-                          ...prev, 
-                          problems: Array.from(e.target.selectedOptions, option => option.value) 
-                        }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {problems.map(problem => (
-                          <option key={problem._id} value={problem._id}>
-                            {problem.title} ({problem.difficulty})
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
-                    </div>
+                  </div>
+                  {!createForm.isPublic && (
                     <div className="sm:col-span-2">
-                      <div className="flex items-center">
-                        <input
-                          id="isPublicCreate"
-                          type="checkbox"
-                          checked={createForm.isPublic}
-                          onChange={e => setCreateForm({ ...createForm, isPublic: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="isPublicCreate" className="ml-2 block text-sm text-gray-900">
-                          Make contest public
-                        </label>
-                      </div>
+                      <label htmlFor="allowedUsers" className="block text-base font-bold text-[#00cfff]">Allowed Users (for private contest)</label>
+                      <select multiple id="allowedUsers" value={createForm.allowedUsers} onChange={e => setCreateForm({...createForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border-2 border-[#00cfff] rounded-md shadow-inner py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white font-mono h-32">
+                        {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
+                      </select>
+                      <p className="text-sm text-[#baffea] mt-1">Hold Ctrl/Cmd to select multiple users</p>
                     </div>
-                    {!createForm.isPublic && (
-                      <div className="sm:col-span-2">
-                        <label htmlFor="allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
-                        <select multiple id="allowedUsers" value={createForm.allowedUsers} onChange={e => setCreateForm({...createForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
-                          {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
-                        </select>
-                      </div>
-                    )}
-                    <div className="flex justify-end space-x-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowCreateModal(false)}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      >
-                        Create
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  )}
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(false)}
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all font-mono"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all font-mono"
+                    >
+                      Create
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
 
           {/* Edit Contest Modal */}
           {showEditModal && selectedContest && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-                <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Edit Contest</h3>
-                  <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00cfff, 0 0 64px #00ff99' }}>
+                <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text text-center mb-6 tracking-tight">Edit Contest</h3>
+                <form onSubmit={handleEditSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Title</label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.title}
+                      onChange={e => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00cfff] mb-1">Description</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={editForm.description}
+                      onChange={e => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                      <label className="block text-base font-bold text-[#00ff99] mb-1">Start Time</label>
                       <input
-                        type="text"
+                        type="datetime-local"
                         required
-                        value={editForm.title}
-                        onChange={e => setEditForm(prev => ({ ...prev, title: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={editForm.startTime}
+                        onChange={e => setEditForm(prev => ({ ...prev, startTime: e.target.value }))}
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea
+                      <label className="block text-base font-bold text-[#00cfff] mb-1">End Time</label>
+                      <input
+                        type="datetime-local"
                         required
-                        rows={3}
-                        value={editForm.description}
-                        onChange={e => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={editForm.endTime}
+                        onChange={e => setEditForm(prev => ({ ...prev, endTime: e.target.value }))}
+                        className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                        <input
-                          type="datetime-local"
-                          required
-                          value={editForm.startTime}
-                          onChange={e => setEditForm(prev => ({ ...prev, startTime: e.target.value }))}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                        <input
-                          type="datetime-local"
-                          required
-                          value={editForm.endTime}
-                          onChange={e => setEditForm(prev => ({ ...prev, endTime: e.target.value }))}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-[#00ff99] mb-1">Problems</label>
+                    <select
+                      multiple
+                      value={editForm.problems}
+                      onChange={e => setEditForm(prev => ({ 
+                        ...prev, 
+                        problems: Array.from(e.target.selectedOptions, option => option.value) 
+                      }))}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white font-mono shadow-inner"
+                    >
+                      {problems.map(problem => (
+                        <option key={problem._id} value={problem._id}>
+                          {problem.title} ({problem.difficulty})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm text-[#baffea] mt-1">Hold Ctrl/Cmd to select multiple problems</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <div className="flex items-center">
+                      <input
+                        id="isPublicEdit"
+                        type="checkbox"
+                        checked={editForm.isPublic}
+                        onChange={e => setEditForm({ ...editForm, isPublic: e.target.checked })}
+                        className="h-4 w-4 text-[#00ff99] focus:ring-[#00cfff] border-[#00cfff] rounded"
+                      />
+                      <label htmlFor="isPublicEdit" className="ml-2 block text-base font-bold text-[#00ff99]">
+                        Make contest public
+                      </label>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
-                      <select
-                        multiple
-                        value={editForm.problems}
-                        onChange={e => setEditForm(prev => ({ 
-                          ...prev, 
-                          problems: Array.from(e.target.selectedOptions, option => option.value) 
-                        }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {problems.map(problem => (
-                          <option key={problem._id} value={problem._id}>
-                            {problem.title} ({problem.difficulty})
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
-                    </div>
+                  </div>
+                  {!editForm.isPublic && (
                     <div className="sm:col-span-2">
-                      <div className="flex items-center">
-                        <input
-                          id="isPublicEdit"
-                          type="checkbox"
-                          checked={editForm.isPublic}
-                          onChange={e => setEditForm({ ...editForm, isPublic: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="isPublicEdit" className="ml-2 block text-sm text-gray-900">
-                          Make contest public
-                        </label>
-                      </div>
+                      <label htmlFor="edit-allowedUsers" className="block text-base font-bold text-[#00cfff]">Allowed Users (for private contest)</label>
+                      <select multiple id="edit-allowedUsers" value={editForm.allowedUsers} onChange={e => setEditForm({...editForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border-2 border-[#00cfff] rounded-md shadow-inner py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white font-mono h-32">
+                        {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
+                      </select>
+                      <p className="text-sm text-[#baffea] mt-1">Hold Ctrl/Cmd and click to select multiple users</p>
                     </div>
-                    {!editForm.isPublic && (
-                      <div className="sm:col-span-2">
-                        <label htmlFor="edit-allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
-                        <select multiple id="edit-allowedUsers" value={editForm.allowedUsers} onChange={e => setEditForm({...editForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
-                          {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
-                        </select>
-                        <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd and click to select multiple users</p>
-                      </div>
-                    )}
-                    <div className="flex justify-end space-x-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowEditModal(false)}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  )}
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowEditModal(false)}
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all font-mono"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all font-mono"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
 
           {/* View Contest Modal */}
           {showViewModal && selectedContest && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-                <div className="mt-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Contest Details</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <strong>Title:</strong> {selectedContest.title}
-                    </div>
-                    <div>
-                      <strong>Description:</strong> {selectedContest.description}
-                    </div>
-                    <div>
-                      <strong>Start Time:</strong> {formatDateTime(selectedContest.startTime)}
-                    </div>
-                    <div>
-                      <strong>End Time:</strong> {formatDateTime(selectedContest.endTime)}
-                    </div>
-                    <div>
-                      <strong>Status:</strong> {getContestStatus(selectedContest).text}
-                    </div>
-                    <div>
-                      <strong>Problems:</strong> {selectedContest.problems?.length || 0}
-                      {selectedContest.problems && selectedContest.problems.length > 0 && (
-                        <ul className="mt-2 ml-4">
-                          {selectedContest.problems.map(problem => (
-                            <li key={problem._id} className="text-sm">
-                              • {problem.title} ({problem.difficulty})
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex justify-end mt-4">
-                    <button
-                      onClick={() => setShowViewModal(false)}
-                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                    >
-                      Close
-                    </button>
-                  </div>
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00cfff] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00cfff, 0 0 64px #00ff99' }}>
+                <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text text-center mb-6 tracking-tight">Contest Details</h3>
+                <div className="space-y-4 text-left text-[#baffea]">
+                  <div><span className="font-bold text-[#00ff99]">Title:</span> <span className="text-white">{selectedContest.title}</span></div>
+                  <div><span className="font-bold text-[#00cfff]">Description:</span><br /><pre className="whitespace-pre-wrap font-mono text-white bg-[#181c24] rounded p-2">{selectedContest.description}</pre></div>
+                  <div><span className="font-bold text-[#00ff99]">Start Time:</span> <span className="text-white">{formatDateTime(selectedContest.startTime)}</span></div>
+                  <div><span className="font-bold text-[#00cfff]">End Time:</span> <span className="text-white">{formatDateTime(selectedContest.endTime)}</span></div>
+                  <div><span className="font-bold text-[#00ff99]">Status:</span> <span className="text-white">{getContestStatus(selectedContest).text}</span></div>
+                  <div><span className="font-bold text-[#00cfff]">Problems:</span> <span className="text-white">{selectedContest.problems?.length || 0}</span></div>
+                  {selectedContest.problems && selectedContest.problems.length > 0 && (
+                    <ul className="mt-2 ml-4">
+                      {selectedContest.problems.map(problem => (
+                        <li key={problem._id} className="text-sm text-[#baffea]">
+                          • <span className="text-[#00ff99] font-bold">{problem.title}</span> <span className="text-[#00cfff]">({problem.difficulty})</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="flex justify-end mt-6">
+                  <button
+                    onClick={() => setShowViewModal(false)}
+                    className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all font-mono"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>

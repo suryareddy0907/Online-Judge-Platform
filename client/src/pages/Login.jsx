@@ -90,9 +90,9 @@ const Login = () => {
 
     try {
       const res = await loginUser(formData);
-      const { token } = res;
+      const { token, user } = res;
 
-      authLogin(token);           // set context user and save token
+      authLogin(token, user); // set context user and save token, including isBanned
       navigate("/home");         // redirect to protected home
 
     } catch (err) {
