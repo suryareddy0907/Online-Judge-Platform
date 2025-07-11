@@ -20,6 +20,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -46,6 +47,7 @@ const AdminUsers = () => {
 
   const searchDebounceRef = useRef();
   const navigate = useNavigate();
+  const { logout, user: currentUser } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -95,6 +97,13 @@ const AdminUsers = () => {
       await updateUserRole(userId, newRole);
       fetchUsers(); // Refresh the list
       setShowActions(null);
+      // If the current user changed their own role, force logout
+      if (currentUser && currentUser.userId === userId) {
+        setTimeout(() => {
+          alert('Your role has changed. Please log in again.');
+          logout();
+        }, 500);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -264,7 +273,7 @@ const AdminUsers = () => {
               <select
                 value={filters.role}
                 onChange={(e) => handleFilterChange('role', e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
               >
                 <option value="">All Roles</option>
                 <option value="user">User</option>
@@ -279,7 +288,7 @@ const AdminUsers = () => {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
               >
                 <option value="">All Status</option>
                 <option value="active">Active</option>
@@ -343,7 +352,27 @@ const AdminUsers = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#baffea]">{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                         <button onClick={() => openEditModal(user)} className="px-2 py-1 rounded bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all">Edit</button>
-                        <button onClick={() => handleDeleteUser(user._id)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all">Delete</button>
+                        {user._id !== (currentUser?.userId) && (
+                          <>
+                            <button onClick={() => handleDeleteUser(user._id)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all">Delete</button>
+                            <select
+                              value={user.role}
+                              onChange={e => handleRoleUpdate(user._id, e.target.value)}
+                              className="px-2 py-1 rounded border-2 border-[#00cfff] bg-[#232b3a] text-[#00cfff] font-bold focus:outline-none focus:ring-2 focus:ring-[#00ff99] font-mono transition"
+                              style={{ minWidth: 90 }}
+                            >
+                              <option value="user">User</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                            <button
+                              onClick={() => handleBanToggle(user._id, !user.isBanned)}
+                              className={`px-2 py-1 rounded font-bold border-2 ${user.isBanned ? 'bg-gradient-to-r from-green-500 to-green-700 text-white border-green-400 hover:from-green-700 hover:to-green-500' : 'bg-gradient-to-r from-yellow-500 to-red-500 text-white border-yellow-400 hover:from-red-500 hover:to-yellow-500'} transition-all`}
+                              title={user.isBanned ? 'Unban User' : 'Ban User'}
+                            >
+                              {user.isBanned ? 'Unban' : 'Ban'}
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}

@@ -254,7 +254,7 @@ const AdminProblems = () => {
                 <select
                   value={filters.difficulty}
                   onChange={(e) => handleFilterChange('difficulty', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
                 >
                   <option value="">All Difficulties</option>
                   <option value="Easy">Easy</option>
@@ -270,7 +270,7 @@ const AdminProblems = () => {
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
                 >
                   <option value="">All Status</option>
                   <option value="published">Published</option>
@@ -405,7 +405,7 @@ const AdminProblems = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Problem Title</label>
                       <input
                         type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={createForm.title}
                         onChange={e => setCreateForm(f => ({ ...f, title: e.target.value }))}
                         required
@@ -414,7 +414,7 @@ const AdminProblems = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
                       <textarea
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={3}
                         value={createForm.description}
                         onChange={e => setCreateForm(f => ({ ...f, description: e.target.value }))}
@@ -424,7 +424,7 @@ const AdminProblems = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Input</label>
                       <textarea
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
                         value={createForm.input}
                         onChange={e => setCreateForm(f => ({ ...f, input: e.target.value }))}
@@ -434,7 +434,7 @@ const AdminProblems = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Constraints</label>
                       <textarea
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
                         value={createForm.constraints}
                         onChange={e => setCreateForm(f => ({ ...f, constraints: e.target.value }))}
@@ -444,7 +444,7 @@ const AdminProblems = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Output</label>
                       <textarea
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
                         value={createForm.output}
                         onChange={e => setCreateForm(f => ({ ...f, output: e.target.value }))}
@@ -572,7 +572,7 @@ const AdminProblems = () => {
                       <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
                         <select
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           value={createForm.difficulty}
                           onChange={e => setCreateForm(f => ({ ...f, difficulty: e.target.value }))}
                           required
@@ -587,7 +587,7 @@ const AdminProblems = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
                         <input
                           type="text"
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border-2 border-[#00cfff] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           value={createForm.tags}
                           onChange={e => setCreateForm(f => ({ ...f, tags: e.target.value }))}
                           placeholder="e.g. arrays, dp, math"

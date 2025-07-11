@@ -161,7 +161,7 @@ const AdminSubmissions = () => {
             />
             </div>
             <select
-              className="border px-3 py-2 rounded text-white bg-transparent"
+              className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
               value={filters.language}
               onChange={e => handleFilterChange('language', e.target.value)}
             >
@@ -172,7 +172,7 @@ const AdminSubmissions = () => {
               <option value="python">Python</option>
             </select>
             <select
-              className="border px-3 py-2 rounded text-white bg-transparent"
+              className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
               value={filters.verdict}
               onChange={e => handleFilterChange('verdict', e.target.value)}
             >

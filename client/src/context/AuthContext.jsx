@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { getUserProfile } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -12,25 +13,39 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-
-        // Optional: Check if token is expired
-        const currentTime = Date.now() / 1000;
-        if (decoded.exp < currentTime) {
-          console.warn("Token expired");
-          localStorage.removeItem("token");
-        } else {
-          setUser(decoded);
+    async function refreshUser() {
+      if (token) {
+        try {
+          // Try to fetch the latest user profile from backend
+          const data = await getUserProfile();
+          if (data && data.user) {
+            setUser({
+              ...data.user,
+              userId: data.user._id,
+            });
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          // If fetch fails, fallback to token decode
         }
-      } catch (error) {
-        console.error("Invalid token:", error);
-        localStorage.removeItem("token");
+        try {
+          const decoded = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+          if (decoded.exp < currentTime) {
+            console.warn("Token expired");
+            localStorage.removeItem("token");
+          } else {
+            setUser(decoded);
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          localStorage.removeItem("token");
+        }
       }
+      setLoading(false);
     }
-
-    setLoading(false);
+    refreshUser();
   }, []);
 
   const login = (token) => {

@@ -18,6 +18,7 @@ import {
 
 const AdminNavbar = () => {
   const { logout } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -92,11 +93,11 @@ const AdminNavbar = () => {
           <div className="p-4 border-t-2 border-[#00ff99] bg-[#181c24]">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-[#00ff99] to-[#00cfff] rounded-full flex items-center justify-center border-2 border-[#00cfff] shadow-lg">
-                <span className="text-[#181c24] text-lg font-extrabold">A</span>
+                <span className="text-[#181c24] text-lg font-extrabold">{user?.username ? user.username[0].toUpperCase() : 'A'}</span>
               </div>
               <div>
-                <p className="text-base font-extrabold text-[#00ff99]">Admin</p>
-                <p className="text-xs text-[#00cfff]">Administrator</p>
+                <p className="text-base font-extrabold text-[#00ff99]">{user?.username || 'Admin'}</p>
+                <p className="text-xs text-[#00cfff]">{user?.role === 'admin' ? 'Administrator' : user?.role || 'User'}</p>
               </div>
             </div>
             <div className="space-y-2">

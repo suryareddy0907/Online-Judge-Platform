@@ -250,13 +250,13 @@ const AdminContests = () => {
               <input
                 type="text"
                 placeholder="Search contests"
-                className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
+                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
                 value={filters.search}
                 onChange={e => handleFilterChange('search', e.target.value)}
               />
             </div>
             <select
-              className="border px-3 py-2 rounded text-white bg-transparent"
+              className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
               value={filters.status}
               onChange={e => handleFilterChange('status', e.target.value)}
             >

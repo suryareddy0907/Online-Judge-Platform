@@ -42,6 +42,28 @@
   - View a platform-wide leaderboard to see top-ranked users.
   - A real-time activity feed on the home page shows recent submissions.
 
+## 🆕 Latest UI/UX and Admin Portal Improvements
+
+### Vibrant UI/UX Redesign
+- All main pages (Home, Browse Problems, Contests, My Submissions) now feature a vibrant animated aurora background and Matrix code rain overlay for a modern, immersive coding platform experience.
+- Neon/cyberpunk theme applied consistently across all pages, including admin panel, tables, modals, and dropdowns.
+
+### Admin Portal Enhancements
+- **Back to Home Button:** A prominent 'Back to Home' button is now available in the admin sidebar for quick navigation.
+- **User Management:**
+  - Admins can now change user roles and ban/unban users directly from the user management table.
+  - Admins cannot ban or change their own role (except edit their own profile).
+  - All actions are disabled for the currently logged-in admin for self-protection.
+- **Role/Privilege Sync:**
+  - When a user is promoted to admin, a page reload will immediately grant admin privileges (no need to log out and log in again).
+  - The admin sidebar now displays the actual username and role of the logged-in admin.
+- **Dropdown Consistency:**
+  - All dropdowns in user, problem, contest, and submission management use a consistent neon/cyberpunk style matching the rest of the UI.
+- **Solved Problems Indicator:**
+  - In Browse Problems, problems solved by the user are visually indicated with a neon badge.
+- **Loading Spinners:**
+  - All loading spinners (e.g., Run/Submit buttons) use a prominent, modern white circular animation for clear feedback.
+
 ---
 
 # Online Judge Platform with Admin Panel
