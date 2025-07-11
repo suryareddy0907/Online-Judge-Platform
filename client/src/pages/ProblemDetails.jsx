@@ -46,6 +46,29 @@ const ProblemDetails = () => {
     }
   }, [output]);
 
+  useEffect(() => {
+    // Inject classic white spinner CSS globally
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .neon-spinner {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        animation: neon-spin 0.7s linear infinite;
+        box-shadow: 0 0 8px #fff, 0 0 16px #fff;
+      }
+      @keyframes neon-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => { document.head.removeChild(style); };
+  }, []);
+
   const handleRun = async () => {
     setIsLoading(true);
     try {
@@ -155,14 +178,21 @@ const ProblemDetails = () => {
     }
   };
 
-  const handleGenerateBoilerplate = async () => {
+  const handleGenerateBoilerplate = async (isContinue = false) => {
     setAiLoading("boilerplate");
     try {
       const response = await axios.post("http://localhost:5000/api/ai/generate-boilerplate", {
         problemStatement: problem.statement,
         language: language,
+        currentBoilerplate: isContinue ? code : undefined,
       });
-      setCode(response.data.boilerplate);
+      if (isContinue && code) {
+        // If the model says 'COMPLETE', do not append
+        if (response.data.boilerplate.trim() === 'COMPLETE') return;
+        setCode(code + "\n" + response.data.boilerplate);
+      } else {
+        setCode(response.data.boilerplate);
+      }
     } catch (err) {
       setOutput("Failed to generate boilerplate code.");
     } finally {
@@ -221,305 +251,313 @@ const ProblemDetails = () => {
       .join('\n');
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error || !problem) return <div className="min-h-screen flex items-center justify-center text-red-500">{error || "Problem not found"}</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#181c24] text-[#00ff99] font-mono animate-pulse">Loading...</div>;
+  if (error || !problem) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#181c24] font-mono">{error || "Problem not found"}</div>;
 
   return (
-    <div className="h-screen">
-      <Allotment>
-        <Allotment.Pane>
-          {/* Left: Problem Details */}
-          <div className="p-8 bg-white border-r border-gray-200 overflow-y-auto h-full">
-            <h1 className="text-3xl font-bold mb-4">{problem.title}</h1>
-            {/* AI Feature Buttons */}
-            <div className="flex flex-wrap gap-4 mb-6">
-              <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                onClick={handleGenerateHint}
-                disabled={aiLoading !== ""}
-              >
-                {aiLoading === "hint" ? (
-                  <span className="inline-flex items-center justify-center mr-2">
-                    <span className="spinner-circle"></span>
-                  </span>
-                ) : null}
-                {aiLoading === "hint" ? "Generating..." : "Generate Hints"}
-              </button>
-              <button
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                onClick={handleAnalyzeCode}
-                disabled={aiLoading !== ""}
-              >
-                {aiLoading === "analyze" ? (
-                  <span className="inline-flex items-center justify-center mr-2">
-                    <span className="spinner-circle"></span>
-                  </span>
-                ) : null}
-                {aiLoading === "analyze" ? "Analyzing..." : "Analyze Code"}
-              </button>
-              <button
-                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                onClick={handleGenerateBoilerplate}
-                disabled={aiLoading !== ""}
-              >
-                {aiLoading === "boilerplate" ? (
-                  <span className="inline-flex items-center justify-center mr-2">
-                    <span className="spinner-circle"></span>
-                  </span>
-                ) : null}
-                {aiLoading === "boilerplate" ? "Generating..." : "Generate Boilerplate"}
-              </button>
-              <button
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                onClick={handleExplainProblem}
-                disabled={aiLoading !== ""}
-              >
-                {aiLoading === "explain" ? (
-                  <span className="inline-flex items-center justify-center mr-2">
-                    <span className="spinner-circle"></span>
-                  </span>
-                ) : null}
-                {aiLoading === "explain" ? "Generating..." : "Explain Problem"}
-              </button>
-              <button
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                onClick={handleDebugCode}
-                disabled={aiLoading !== ""}
-              >
-                {aiLoading === "debug" ? (
-                  <span className="inline-flex items-center justify-center mr-2">
-                    <span className="spinner-circle"></span>
-                  </span>
-                ) : null}
-                {aiLoading === "debug" ? "Debugging..." : "Debug Code"}
-              </button>
-            </div>
-            {hint && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900">
-                <strong>Hint:</strong> {hint}
+    <>
+      <div className="h-screen bg-[#181c24] font-mono text-white">
+        <Allotment>
+          <Allotment.Pane>
+            {/* Left: Problem Details */}
+            <div className="p-8 border-r-2 border-[#00cfff] overflow-y-auto h-full modal-scrollbar bg-[#181c24]" style={{ fontFamily: 'Fira Mono, monospace' }}>
+              <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight drop-shadow-lg">{problem.title}</h1>
+              {/* AI Feature Buttons */}
+              <div className="flex flex-wrap gap-4 mb-6">
+                <button
+                  className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold py-2 px-4 rounded-lg shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all flex items-center border-2 border-[#00ff99]"
+                  onClick={handleGenerateHint}
+                  disabled={aiLoading !== ""}
+                >
+                  {aiLoading === "hint" ? (
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <span className="spinner-circle"></span>
+                    </span>
+                  ) : null}
+                  {aiLoading === "hint" ? "Generating..." : "Generate Hints"}
+                </button>
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                  onClick={handleAnalyzeCode}
+                  disabled={aiLoading !== ""}
+                >
+                  {aiLoading === "analyze" ? (
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <span className="spinner-circle"></span>
+                    </span>
+                  ) : null}
+                  {aiLoading === "analyze" ? "Analyzing..." : "Analyze Code"}
+                </button>
+                <button
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                  onClick={() => handleGenerateBoilerplate(false)}
+                  disabled={aiLoading !== ""}
+                >
+                  {aiLoading === "boilerplate" ? (
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <span className="spinner-circle"></span>
+                    </span>
+                  ) : null}
+                  {aiLoading === "boilerplate" ? "Generating..." : "Generate Boilerplate"}
+                </button>
+                {code && code.length > 0 && (
+                  <button
+                    className="bg-purple-400 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                    onClick={() => handleGenerateBoilerplate(true)}
+                    disabled={aiLoading !== ""}
+                  >
+                    {aiLoading === "boilerplate" ? "Generating..." : "Continue Boilerplate"}
+                  </button>
+                )}
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                  onClick={handleExplainProblem}
+                  disabled={aiLoading !== ""}
+                >
+                  {aiLoading === "explain" ? (
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <span className="spinner-circle"></span>
+                    </span>
+                  ) : null}
+                  {aiLoading === "explain" ? "Generating..." : "Explain Problem"}
+                </button>
+                <button
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                  onClick={handleDebugCode}
+                  disabled={aiLoading !== ""}
+                >
+                  {aiLoading === "debug" ? (
+                    <span className="inline-flex items-center justify-center mr-2">
+                      <span className="spinner-circle"></span>
+                    </span>
+                  ) : null}
+                  {aiLoading === "debug" ? "Debugging..." : "Debug Code"}
+                </button>
               </div>
-            )}
-            {codeFeedback && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-900">
-                <strong>Code Feedback:</strong> {codeFeedback}
-              </div>
-            )}
-            {explanation && (
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900">
-                <strong>Explanation:</strong> <span dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>') }} />
-              </div>
-            )}
-            {debugOutput && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900">
-                <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: debugOutput.replace(/\n/g, '<br/>') }} />
-              </div>
-            )}
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-1">Description</h2>
-              <p className="text-gray-800 whitespace-pre-line">{problem.statement}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-1">Input</h2>
-              <p className="text-gray-800 whitespace-pre-line">{problem.input || "-"}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-1">Constraints</h2>
-              <p className="text-gray-800 whitespace-pre-line">{problem.constraints || "-"}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-1">Output</h2>
-              <p className="text-gray-800 whitespace-pre-line">{problem.output || "-"}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold mb-1">Example Test Cases</h2>
-              {problem.exampleTestCases && problem.exampleTestCases.length > 0 ? (
-                <div className="space-y-2">
-                  {problem.exampleTestCases.map((tc, idx) => (
-                    <div key={idx} className="bg-gray-50 border rounded p-2">
-                      <div className="text-xs text-gray-500 mb-1">Example {idx + 1}</div>
-                      <div><span className="font-semibold">Input:</span><br /><pre className="font-mono inline whitespace-pre-wrap">{tc.input}</pre></div>
-                      <div><span className="font-semibold">Output:</span><br /><pre className="font-mono inline whitespace-pre-wrap">{tc.output}</pre></div>
-                      {tc.explanation && <div className="mt-1 text-gray-600 text-sm"><span className="font-semibold">Explanation:</span><br /><pre className="inline whitespace-pre-wrap">{tc.explanation}</pre></div>}
-                    </div>
-                  ))}
+              {hint && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900">
+                  <strong>Hint:</strong> <span style={{ whiteSpace: 'pre-line' }}>{hint.replace(/^\s*Hint:\s*/i, '').replace(/(\d+\.)/g, '\n$1').replace(/^\n/, '')}</span>
                 </div>
-              ) : (
-                <div className="text-gray-500">No example test cases.</div>
               )}
-            </div>
-          </div>
-        </Allotment.Pane>
-        <Allotment.Pane>
-          <Allotment vertical ref={allotmentRef}>
-            <Allotment.Pane>
-              {/* Right-Top: Code Editor */}
-              <div className="h-full flex flex-col bg-[#18181b] p-8">
-                {/* Language Dropdown */}
-                <div className="mb-4">
-                  <label className="block text-white text-sm font-semibold mb-2">Language</label>
-                  <select
-                    className="w-48 bg-black text-green-200 font-mono rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={language}
-                    onChange={e => setLanguage(e.target.value)}
-                  >
-                    <option value="c">C</option>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                    <option value="python">Python</option>
-                  </select>
+              {codeFeedback && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-900">
+                  <strong>Code Feedback:</strong> <span style={{ whiteSpace: 'pre-line' }}>{codeFeedback.replace(/(\d+\.)/g, '\n$1').replace(/^\n/, '')}</span>
                 </div>
-                <div className="flex-1 flex flex-col mb-6 min-h-0">
-                  <label className="block text-white text-sm font-semibold mb-2">Code Editor</label>
-                  <div className="flex-1 min-h-0">
-                    <MonacoEditor
-                      height="300px"
-                      width="100%"
-                      theme="vs-dark"
-                      language={
-                        language === "cpp" ? "cpp" :
-                        language === "c" ? "c" :
-                        language === "java" ? "java" :
-                        language === "python" ? "python" : "plaintext"
-                      }
-                      value={code}
-                      onChange={value => setCode(value || "")}
-                      options={{
-                        fontSize: 16,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        wordWrap: "on",
-                        fontFamily: "Fira Mono, monospace",
-                        automaticLayout: true,
-                        lineNumbers: "on",
-                        renderLineHighlight: "all",
-                        formatOnPaste: true,
-                        formatOnType: true,
-                        tabSize: 2,
-                        scrollbar: { vertical: "auto" },
-                      }}
-                    />
-                  </div>
+              )}
+              {explanation && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900">
+                  <strong>Explanation:</strong> <span dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>') }} />
                 </div>
+              )}
+              {debugOutput && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900">
+                  <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: debugOutput.replace(/\n/g, '<br/>') }} />
+                </div>
+              )}
+              {/* Problem Statement */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-3 text-[#00cfff]">Description</h2>
+                <p className="text-[#baffea] text-base leading-relaxed mb-4" style={{ fontSize: '1.08rem' }}>{problem.statement}</p>
               </div>
-            </Allotment.Pane>
-            <Allotment.Pane>
-              {/* Right-Bottom: Custom Test Case & Output */}
-              <div className="bg-white rounded-lg shadow p-4 overflow-y-auto h-full">
-                <label className="block text-gray-700 text-sm font-semibold mb-2">Custom Test Case</label>
-                <textarea
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                  placeholder="Enter custom input..."
-                  value={customInput}
-                  onChange={e => setCustomInput(e.target.value)}
-                />
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={handleRun}
-                    className={`px-4 py-2 rounded flex items-center justify-center min-w-[90px] transition-colors duration-150
-                      ${isLoading ? 'bg-blue-200 text-blue-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                      </svg>
-                    ) : null}
-                    Run
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    className={`px-4 py-2 rounded flex items-center justify-center min-w-[90px] transition-colors duration-150
-                      ${isLoading ? 'bg-green-200 text-green-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'}`}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                      </svg>
-                    ) : null}
-                    Submit
-                  </button>
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-3 text-[#00cfff]">Constraints</h2>
+                <p className="text-[#e0e0e0] text-base leading-relaxed mb-4" style={{ fontSize: '1.08rem' }}>{problem.constraints}</p>
+              </div>
+              {problem.input && (
+                <div className="mb-8">
+                  <h2 className="text-xl font-bold mb-3 text-[#00cfff]">Input</h2>
+                  <p className="text-[#baffea] text-base leading-relaxed mb-4" style={{ fontSize: '1.08rem' }}>{problem.input}</p>
                 </div>
-                {output && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold">Output:</h3>
-                    {typeof output === 'object' && output.type === 'TLE' && (
-                      <pre className="bg-gray-100 p-2 rounded text-orange-600 font-semibold">TLE: Time limit exceeded</pre>
-                    )}
-                    {typeof output === 'object' && output.type === 'RE' && (
-                      <pre className="bg-gray-100 p-2 rounded text-red-600 font-semibold">RE: {output.message}</pre>
-                    )}
-                    {typeof output === 'object' && output.type === 'CE' && (
-                      <div className="bg-gray-100 p-2 rounded">
-                        <div className="text-yellow-700 font-semibold mb-1">CE: Compilation error</div>
-                        <pre className="text-gray-800 whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                          {formatOutputMessage(output.message)}
-                        </pre>
-                      </div>
-                    )}
-                    {!(typeof output === 'object' && (output.type === 'RE' || output.type === 'CE' || output.type === 'TLE')) && (
-                      <pre
-                        className="bg-gray-100 p-2 rounded font-mono text-sm leading-relaxed"
-                        style={{
-                          whiteSpace: "pre-wrap",
-                          overflowX: "auto",
-                          overflowY: "auto",
-                          maxHeight: "300px",
-                          wordBreak: "break-word",
-                          tabSize: 2
-                        }}
+              )}
+              {problem.output && (
+                <div className="mb-8">
+                  <h2 className="text-xl font-bold mb-3 text-[#00cfff]">Output</h2>
+                  <p className="text-[#baffea] text-base leading-relaxed mb-4" style={{ fontSize: '1.08rem' }}>{problem.output}</p>
+                </div>
+              )}
+              <div className="mb-8">
+                <h2 className="text-lg font-extrabold mb-3 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Example Test Cases</h2>
+                {problem.exampleTestCases && problem.exampleTestCases.length > 0 ? (
+                  <div className="space-y-4">
+                    {problem.exampleTestCases.map((tc, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl p-4 modal-scrollbar overflow-x-auto shadow-lg"
+                        style={{ fontFamily: 'Fira Mono, monospace' }}
                       >
-                        {formatOutputMessage(
-                          (() => {
-                            if (output === null || output === undefined) return "";
-                            
-                            let outputText = "";
-                            if (typeof output === "object" && output !== null && "stderr" in output) {
-                              outputText = output.stderr;
-                            } else if (typeof output === "object" && output !== null && "error" in output) {
-                              outputText = output.error;
-                            } else if (typeof output === "string") {
-                              outputText = output;
-                            } else {
-                              outputText = JSON.stringify(output, null, 2);
-                            }
-                            
-                            return outputText;
-                          })()
+                        <div className="text-sm text-[#00ff99] font-bold mb-2">Example {idx + 1}</div>
+                        <div className="mb-2">
+                          <span className="font-bold text-[#00cfff]">Input:</span>
+                          <pre className="text-[#baffea] text-base leading-relaxed bg-transparent mt-1 mb-2 whitespace-pre-wrap">{tc.input}</pre>
+                        </div>
+                        <div className="mb-2">
+                          <span className="font-bold text-[#00cfff]">Output:</span>
+                          <pre className="text-[#baffea] text-base leading-relaxed bg-transparent mt-1 mb-2 whitespace-pre-wrap">{tc.output}</pre>
+                        </div>
+                        {tc.explanation && (
+                          <div className="mt-2">
+                            <span className="font-bold text-[#00cfff]">Explanation:</span>
+                            <pre className="text-[#e0e0e0] text-base leading-relaxed bg-transparent mt-1 whitespace-pre-wrap">{tc.explanation}</pre>
+                          </div>
                         )}
-                      </pre>
-                    )}
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <div className="text-[#baffea]">No example test cases.</div>
                 )}
               </div>
-            </Allotment.Pane>
-          </Allotment>
-        </Allotment.Pane>
-      </Allotment>
-    </div>
+            </div>
+          </Allotment.Pane>
+          <Allotment.Pane>
+            <Allotment vertical ref={allotmentRef}>
+              <Allotment.Pane>
+                {/* Right-Top: Code Editor */}
+                <div className="h-full flex flex-col bg-[#18181b] p-8">
+                  {/* Language Dropdown */}
+                  <div className="mb-4">
+                    <label className="block text-white text-sm font-semibold mb-2">Language</label>
+                    <select
+                      className="w-48 bg-black text-green-200 font-mono rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={language}
+                      onChange={e => setLanguage(e.target.value)}
+                    >
+                      <option value="c">C</option>
+                      <option value="cpp">C++</option>
+                      <option value="java">Java</option>
+                      <option value="python">Python</option>
+                    </select>
+                  </div>
+                  <div className="flex-1 flex flex-col mb-6 min-h-0">
+                    <label className="block text-white text-sm font-semibold mb-2">Code Editor</label>
+                    <div className="flex-1 min-h-0">
+                      <MonacoEditor
+                        height="300px"
+                        width="100%"
+                        theme="vs-dark"
+                        language={
+                          language === "cpp" ? "cpp" :
+                          language === "c" ? "c" :
+                          language === "java" ? "java" :
+                          language === "python" ? "python" : "plaintext"
+                        }
+                        value={code}
+                        onChange={value => setCode(value || "")}
+                        options={{
+                          fontSize: 16,
+                          minimap: { enabled: false },
+                          scrollBeyondLastLine: false,
+                          wordWrap: "on",
+                          fontFamily: "Fira Mono, monospace",
+                          automaticLayout: true,
+                          lineNumbers: "on",
+                          renderLineHighlight: "all",
+                          formatOnPaste: true,
+                          formatOnType: true,
+                          tabSize: 2,
+                          scrollbar: { vertical: "auto" },
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Allotment.Pane>
+              <Allotment.Pane>
+                {/* Right-Bottom: Custom Test Case & Output */}
+                <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 modal-scrollbar overflow-y-auto h-full" style={{ fontFamily: 'Fira Mono, monospace' }}>
+                  <label className="block text-[#00ff99] text-base font-bold mb-2">Custom Test Case</label>
+                  <textarea
+                    className="w-full border-2 border-[#00cfff] rounded-lg px-4 py-3 mb-4 bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99] placeholder-[#baffea] resize-y"
+                    rows={3}
+                    placeholder="Enter custom input..."
+                    value={customInput}
+                    onChange={e => setCustomInput(e.target.value)}
+                  />
+                  <div className="flex justify-end space-x-3 mt-2">
+                    <button
+                      onClick={handleRun}
+                      className={`px-6 py-2 rounded-lg font-bold text-base transition-all border-2 border-[#00cfff] bg-[#181c24] text-[#00cfff] hover:bg-[#232b3a] hover:text-[#00ff99] shadow ${isLoading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <span className="inline-flex items-center justify-center mr-2">
+                          <span className="neon-spinner"></span>
+                        </span>
+                      ) : null}
+                      Run
+                    </button>
+                    <button
+                      onClick={handleSubmit}
+                      className={`px-6 py-2 rounded-lg font-bold text-base transition-all border-2 border-[#00ff99] bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] hover:from-[#00cfff] hover:to-[#00ff99] shadow ${isLoading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <span className="inline-flex items-center justify-center mr-2">
+                          <span className="neon-spinner"></span>
+                        </span>
+                      ) : null}
+                      Submit
+                    </button>
+                  </div>
+                  {output && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-bold text-[#00cfff] mb-2">Output:</h3>
+                      {typeof output === 'object' && output.type === 'TLE' && (
+                        <pre className="bg-[#181c24] border-l-4 border-yellow-400 p-3 rounded text-yellow-300 font-bold">TLE: Time limit exceeded</pre>
+                      )}
+                      {typeof output === 'object' && output.type === 'RE' && (
+                        <pre className="bg-[#181c24] border-l-4 border-red-500 p-3 rounded text-red-300 font-bold">RE: {output.message}</pre>
+                      )}
+                      {typeof output === 'object' && output.type === 'CE' && (
+                        <div className="bg-[#181c24] border-l-4 border-yellow-400 p-3 rounded">
+                          <div className="text-yellow-300 font-bold mb-1">CE: Compilation error</div>
+                          <pre className="text-[#e0e0e0] whitespace-pre-wrap font-mono text-base leading-relaxed">
+                            {formatOutputMessage(output.message)}
+                          </pre>
+                        </div>
+                      )}
+                      {!(typeof output === 'object' && (output.type === 'RE' || output.type === 'CE' || output.type === 'TLE')) && (
+                        <pre
+                          className="bg-[#181c24] border-l-4 border-[#00cfff] p-3 rounded font-mono text-base leading-relaxed text-[#baffea]"
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            overflowX: "auto",
+                            overflowY: "auto",
+                            maxHeight: "300px",
+                            wordBreak: "break-word",
+                            tabSize: 2
+                          }}
+                        >
+                          {formatOutputMessage(
+                            (() => {
+                              if (output === null || output === undefined) return "";
+                              
+                              let outputText = "";
+                              if (typeof output === "object" && output !== null && "stderr" in output) {
+                                outputText = output.stderr;
+                              } else if (typeof output === "object" && output !== null && "error" in output) {
+                                outputText = output.error;
+                              } else if (typeof output === "string") {
+                                outputText = output;
+                              } else {
+                                outputText = JSON.stringify(output, null, 2);
+                              }
+                              
+                              return outputText;
+                            })()
+                          )}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Allotment.Pane>
+            </Allotment>
+          </Allotment.Pane>
+        </Allotment>
+      </div>
+    </>
   );
 };
 
-export default ProblemDetails;
-
-<style>
-{`
-.spinner-circle {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 3px solid #fff;
-  border-top: 3px solid #2563eb;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  vertical-align: middle;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-`}
-</style> 
+export default ProblemDetails; 

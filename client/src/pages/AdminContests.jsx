@@ -197,11 +197,27 @@ const AdminContests = () => {
     return new Date(dateString).toLocaleString();
   };
 
+  const CodeBackground = () => (
+    <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <defs>
+          <linearGradient id="contestsCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff99" />
+            <stop offset="100%" stopColor="#00cfff" />
+          </linearGradient>
+        </defs>
+        <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#contestsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Contest Management"}</text>
+        <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#contestsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"function manageContests() { }"}</text>
+      </svg>
+    </div>
+  );
+
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="flex flex-col items-center justify-center h-full bg-[#181c24]">
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+          <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Contests...</span>
         </div>
       </AdminLayout>
     );
@@ -209,375 +225,397 @@ const AdminContests = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Contest Management</h1>
-            <p className="text-gray-600">Manage coding contests and competitions</p>
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
+        <CodeBackground />
+        <div className="p-6 relative z-10">
+          {/* Header */}
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Contest Management</h1>
+              <p className="text-[#baffea] font-mono">Manage coding contests and competitions</p>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center px-4 py-2 border-2 border-[#00ff99] text-sm font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Contest
+            </button>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Contest
-          </button>
-        </div>
 
-        {/* Filters */}
-        <div className="mb-4 flex flex-wrap gap-4 items-end">
-          <input
-            type="text"
-            placeholder="Search contests..."
-            className="border px-3 py-2 rounded"
-            value={filters.search}
-            onChange={e => handleFilterChange('search', e.target.value)}
-          />
-          <select
-            className="border px-3 py-2 rounded"
-            value={filters.status}
-            onChange={e => handleFilterChange('status', e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="active">Active</option>
-            <option value="ended">Ended</option>
-          </select>
-        </div>
+          {/* Filters */}
+          <div className="mb-4 flex flex-wrap gap-4 items-end bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
+            <div className="relative w-full md:w-1/3">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input
+                type="text"
+                placeholder="Search contests"
+                className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
+                value={filters.search}
+                onChange={e => handleFilterChange('search', e.target.value)}
+              />
+            </div>
+            <select
+              className="border px-3 py-2 rounded text-white bg-transparent"
+              value={filters.status}
+              onChange={e => handleFilterChange('status', e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="active">Active</option>
+              <option value="ended">Ended</option>
+            </select>
+          </div>
 
-        {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
+          {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
 
-        {/* Contests Table */}
-        <div className="overflow-x-auto bg-white rounded shadow">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Start Time</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">End Time</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Problems</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Visibility</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {contests.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-6 text-gray-500">No contests found.</td>
-                </tr>
-              ) : (
-                contests.map(contest => {
-                  const status = getContestStatus(contest);
-                  return (
-                    <tr key={contest._id}>
-                      <td className="px-4 py-2 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">{contest.title}</div>
-                        <div className="text-sm text-gray-500">{contest.participants.length} participants</div>
-                      </td>
-                      <td className="px-4 py-2">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${status.color}-100 text-${status.color}-800`}>
-                          {status.text}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2">{formatDateTime(contest.startTime)}</td>
-                      <td className="px-4 py-2">{formatDateTime(contest.endTime)}</td>
-                      <td className="px-4 py-2">{contest.problems.length}</td>
-                      <td className="px-4 py-2">
-                        <button
-                          title={contest.isPublic ? 'Make Private' : 'Make Public'}
-                          onClick={() => handleTogglePublic(contest)}
-                          className={`p-1 rounded-full ${contest.isPublic ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}
-                        >
-                          {contest.isPublic ? <Eye size={16}/> : <EyeOff size={16} />}
-                        </button>
-                      </td>
-                      <td className="px-4 py-2 flex items-center space-x-2">
-                        <button onClick={() => handleEdit(contest)} className="text-blue-600 hover:text-blue-900"><Edit size={16} /></button>
-                        <button onClick={() => handleDelete(contest._id)} className="text-red-600 hover:text-red-900" disabled={deletingId === contest._id}>
-                          {deletingId === contest._id ? <Clock size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                        </button>
-                        <button onClick={() => handleView(contest)} className="text-gray-600 hover:text-gray-900"><Users size={16} /></button>
-                      </td>
+          {/* Contests Table */}
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-hidden font-mono">
+            <div className="px-6 py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
+              <h3 className="text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
+                Contests ({contests.length})
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-[#00cfff]">
+                <thead className="bg-[#181c24]">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Start Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider">End Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Problems</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider">Visibility</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-[#232b3a] divide-y divide-[#00cfff]">
+                  {contests.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center py-6 text-[#baffea] font-mono">No contests found.</td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Create Contest Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Create New Contest</h3>
-                <form onSubmit={handleCreateSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input
-                      type="text"
-                      required
-                      value={createForm.title}
-                      onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={createForm.description}
-                      onChange={e => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                      <input
-                        type="datetime-local"
-                        required
-                        value={createForm.startTime}
-                        onChange={e => setCreateForm(prev => ({ ...prev, startTime: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                      <input
-                        type="datetime-local"
-                        required
-                        value={createForm.endTime}
-                        onChange={e => setCreateForm(prev => ({ ...prev, endTime: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
-                    <select
-                      multiple
-                      value={createForm.problems}
-                      onChange={e => setCreateForm(prev => ({ 
-                        ...prev, 
-                        problems: Array.from(e.target.selectedOptions, option => option.value) 
-                      }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {problems.map(problem => (
-                        <option key={problem._id} value={problem._id}>
-                          {problem.title} ({problem.difficulty})
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center">
-                      <input
-                        id="isPublicCreate"
-                        type="checkbox"
-                        checked={createForm.isPublic}
-                        onChange={e => setCreateForm({ ...createForm, isPublic: e.target.checked })}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="isPublicCreate" className="ml-2 block text-sm text-gray-900">
-                        Make contest public
-                      </label>
-                    </div>
-                  </div>
-                  {!createForm.isPublic && (
-                    <div className="sm:col-span-2">
-                      <label htmlFor="allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
-                      <select multiple id="allowedUsers" value={createForm.allowedUsers} onChange={e => setCreateForm({...createForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
-                        {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
-                      </select>
-                    </div>
+                  ) : (
+                    contests.map((contest, idx) => {
+                      const status = getContestStatus(contest);
+                      const getStatusIcon = (status) => {
+                        switch (status.status) {
+                          case 'active':
+                            return '🟢';
+                          case 'upcoming':
+                            return '🟡';
+                          case 'ended':
+                            return '⚪';
+                          default:
+                            return '';
+                        }
+                      };
+                      return (
+                        <tr key={contest._id} className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24]' : 'bg-[#181c24] hover:bg-[#232b3a]'}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="font-mono text-base font-bold text-[#00ff99]">{contest.title}</div>
+                            <div className="text-sm text-[#00cfff]">{contest.participants.length} participants</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${status.status === 'active' ? 'bg-green-900 text-green-300' : status.status === 'upcoming' ? 'bg-blue-900 text-blue-300' : 'bg-gray-800 text-gray-300'}`}>{getStatusIcon(status)} {status.text}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#baffea] font-mono">{formatDateTime(contest.startTime)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#baffea] font-mono">{formatDateTime(contest.endTime)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#00cfff] font-mono">{contest.problems.length}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              title={contest.isPublic ? 'Make Private' : 'Make Public'}
+                              onClick={() => handleTogglePublic(contest)}
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${contest.isPublic ? 'bg-green-900 text-green-300' : 'bg-gray-800 text-gray-300'} transition-all`}
+                            >
+                              {contest.isPublic ? <Eye size={16} className="mr-1" /> : <EyeOff size={16} className="mr-1" />}
+                              {contest.isPublic ? 'Public' : 'Private'}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                            <button onClick={() => handleEdit(contest)} className="px-2 py-1 rounded bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all">Edit</button>
+                            <button onClick={() => handleDelete(contest._id)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all" disabled={deletingId === contest._id}>{deletingId === contest._id ? <Clock size={16} className="animate-spin" /> : <Trash2 size={16} />}</button>
+                            <button onClick={() => handleView(contest)} className="px-2 py-1 rounded bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-[#181c24] font-bold shadow hover:from-[#00ff99] hover:to-[#00cfff] transition-all"><Users size={16} /></button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
-                  <div className="flex justify-end space-x-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowCreateModal(false)}
-                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      Create
-                    </button>
-                  </div>
-                </form>
-              </div>
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
 
-        {/* Edit Contest Modal */}
-        {showEditModal && selectedContest && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Edit Contest</h3>
-                <form onSubmit={handleEditSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input
-                      type="text"
-                      required
-                      value={editForm.title}
-                      onChange={e => setEditForm(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={editForm.description}
-                      onChange={e => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+          {/* Create Contest Modal */}
+          {showCreateModal && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Create New Contest</h3>
+                  <form onSubmit={handleCreateSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                       <input
-                        type="datetime-local"
+                        type="text"
                         required
-                        value={editForm.startTime}
-                        onChange={e => setEditForm(prev => ({ ...prev, startTime: e.target.value }))}
+                        value={createForm.title}
+                        onChange={e => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                      <input
-                        type="datetime-local"
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <textarea
                         required
-                        value={editForm.endTime}
-                        onChange={e => setEditForm(prev => ({ ...prev, endTime: e.target.value }))}
+                        rows={3}
+                        value={createForm.description}
+                        onChange={e => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
-                    <select
-                      multiple
-                      value={editForm.problems}
-                      onChange={e => setEditForm(prev => ({ 
-                        ...prev, 
-                        problems: Array.from(e.target.selectedOptions, option => option.value) 
-                      }))}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {problems.map(problem => (
-                        <option key={problem._id} value={problem._id}>
-                          {problem.title} ({problem.difficulty})
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center">
-                      <input
-                        id="isPublicEdit"
-                        type="checkbox"
-                        checked={editForm.isPublic}
-                        onChange={e => setEditForm({ ...editForm, isPublic: e.target.checked })}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="isPublicEdit" className="ml-2 block text-sm text-gray-900">
-                        Make contest public
-                      </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={createForm.startTime}
+                          onChange={e => setCreateForm(prev => ({ ...prev, startTime: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={createForm.endTime}
+                          onChange={e => setCreateForm(prev => ({ ...prev, endTime: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  {!editForm.isPublic && (
-                    <div className="sm:col-span-2">
-                      <label htmlFor="edit-allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
-                      <select multiple id="edit-allowedUsers" value={editForm.allowedUsers} onChange={e => setEditForm({...editForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
-                        {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
-                      </select>
-                      <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd and click to select multiple users</p>
-                    </div>
-                  )}
-                  <div className="flex justify-end space-x-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowEditModal(false)}
-                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* View Contest Modal */}
-        {showViewModal && selectedContest && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Contest Details</h3>
-                <div className="space-y-4">
-                  <div>
-                    <strong>Title:</strong> {selectedContest.title}
-                  </div>
-                  <div>
-                    <strong>Description:</strong> {selectedContest.description}
-                  </div>
-                  <div>
-                    <strong>Start Time:</strong> {formatDateTime(selectedContest.startTime)}
-                  </div>
-                  <div>
-                    <strong>End Time:</strong> {formatDateTime(selectedContest.endTime)}
-                  </div>
-                  <div>
-                    <strong>Status:</strong> {getContestStatus(selectedContest).text}
-                  </div>
-                  <div>
-                    <strong>Problems:</strong> {selectedContest.problems?.length || 0}
-                    {selectedContest.problems && selectedContest.problems.length > 0 && (
-                      <ul className="mt-2 ml-4">
-                        {selectedContest.problems.map(problem => (
-                          <li key={problem._id} className="text-sm">
-                            • {problem.title} ({problem.difficulty})
-                          </li>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
+                      <select
+                        multiple
+                        value={createForm.problems}
+                        onChange={e => setCreateForm(prev => ({ 
+                          ...prev, 
+                          problems: Array.from(e.target.selectedOptions, option => option.value) 
+                        }))}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {problems.map(problem => (
+                          <option key={problem._id} value={problem._id}>
+                            {problem.title} ({problem.difficulty})
+                          </option>
                         ))}
-                      </ul>
+                      </select>
+                      <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center">
+                        <input
+                          id="isPublicCreate"
+                          type="checkbox"
+                          checked={createForm.isPublic}
+                          onChange={e => setCreateForm({ ...createForm, isPublic: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="isPublicCreate" className="ml-2 block text-sm text-gray-900">
+                          Make contest public
+                        </label>
+                      </div>
+                    </div>
+                    {!createForm.isPublic && (
+                      <div className="sm:col-span-2">
+                        <label htmlFor="allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
+                        <select multiple id="allowedUsers" value={createForm.allowedUsers} onChange={e => setCreateForm({...createForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
+                          {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
+                        </select>
+                      </div>
                     )}
-                  </div>
-                </div>
-                <div className="flex justify-end mt-4">
-                  <button
-                    onClick={() => setShowViewModal(false)}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                  >
-                    Close
-                  </button>
+                    <div className="flex justify-end space-x-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateModal(false)}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Create
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Edit Contest Modal */}
+          {showEditModal && selectedContest && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Edit Contest</h3>
+                  <form onSubmit={handleEditSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.title}
+                        onChange={e => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={editForm.description}
+                        onChange={e => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={editForm.startTime}
+                          onChange={e => setEditForm(prev => ({ ...prev, startTime: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={editForm.endTime}
+                          onChange={e => setEditForm(prev => ({ ...prev, endTime: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Problems</label>
+                      <select
+                        multiple
+                        value={editForm.problems}
+                        onChange={e => setEditForm(prev => ({ 
+                          ...prev, 
+                          problems: Array.from(e.target.selectedOptions, option => option.value) 
+                        }))}
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {problems.map(problem => (
+                          <option key={problem._id} value={problem._id}>
+                            {problem.title} ({problem.difficulty})
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple problems</p>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center">
+                        <input
+                          id="isPublicEdit"
+                          type="checkbox"
+                          checked={editForm.isPublic}
+                          onChange={e => setEditForm({ ...editForm, isPublic: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="isPublicEdit" className="ml-2 block text-sm text-gray-900">
+                          Make contest public
+                        </label>
+                      </div>
+                    </div>
+                    {!editForm.isPublic && (
+                      <div className="sm:col-span-2">
+                        <label htmlFor="edit-allowedUsers" className="block text-sm font-medium text-gray-700">Allowed Users (for private contest)</label>
+                        <select multiple id="edit-allowedUsers" value={editForm.allowedUsers} onChange={e => setEditForm({...editForm, allowedUsers: Array.from(e.target.selectedOptions, option => option.value)})} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 h-32">
+                          {users.map(u => <option key={u._id} value={u._id}>{u.username}</option>)}
+                        </select>
+                        <p className="text-sm text-gray-500 mt-1">Hold Ctrl/Cmd and click to select multiple users</p>
+                      </div>
+                    )}
+                    <div className="flex justify-end space-x-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowEditModal(false)}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* View Contest Modal */}
+          {showViewModal && selectedContest && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4 text-center">Contest Details</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <strong>Title:</strong> {selectedContest.title}
+                    </div>
+                    <div>
+                      <strong>Description:</strong> {selectedContest.description}
+                    </div>
+                    <div>
+                      <strong>Start Time:</strong> {formatDateTime(selectedContest.startTime)}
+                    </div>
+                    <div>
+                      <strong>End Time:</strong> {formatDateTime(selectedContest.endTime)}
+                    </div>
+                    <div>
+                      <strong>Status:</strong> {getContestStatus(selectedContest).text}
+                    </div>
+                    <div>
+                      <strong>Problems:</strong> {selectedContest.problems?.length || 0}
+                      {selectedContest.problems && selectedContest.problems.length > 0 && (
+                        <ul className="mt-2 ml-4">
+                          {selectedContest.problems.map(problem => (
+                            <li key={problem._id} className="text-sm">
+                              • {problem.title} ({problem.difficulty})
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      onClick={() => setShowViewModal(false)}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

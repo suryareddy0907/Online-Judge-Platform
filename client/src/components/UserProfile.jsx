@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUserProfile, updateUserProfile } from '../services/authService';
 import { User, Mail, Calendar, Shield, Edit, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
+import MatrixRainBackground from './MatrixRainBackground';
 
 const UserProfile = ({ onClose }) => {
   const [profile, setProfile] = useState(null);
@@ -89,118 +90,100 @@ const UserProfile = ({ onClose }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
+      <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}></div>
+          <span className="mt-6 text-[#00ff99] font-mono text-base tracking-widest animate-pulse drop-shadow-lg">Loading Profile...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
+      <MatrixRainBackground />
+      <div className="relative z-10 w-full max-w-md mx-auto p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">User Profile</h2>
+          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">User Profile</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-pink-400 text-2xl font-bold"
+            aria-label="Close"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
-
         {profile && (
           <div className="space-y-4">
             {/* Profile Picture Placeholder */}
-            <div className="flex justify-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-10 h-10 text-blue-600" />
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500 rounded-full flex items-center justify-center border-4 border-white/10 animate-pulse">
+                <User className="w-10 h-10 text-white" />
               </div>
             </div>
-
             {/* Username */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
+              <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Username</label>
               {isEditing ? (
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-base text-white placeholder-gray-500 shadow-inner"
+                  autoComplete="username"
                 />
               ) : (
-                <div className="flex items-center px-3 py-2 bg-gray-50 rounded-md">
+                <div className="flex items-center px-4 py-2 bg-[#181c24] rounded-md border border-[#2d3748]">
                   <User className="w-4 h-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">{profile.username}</span>
+                  <span className="text-white">{profile.username}</span>
                 </div>
               )}
             </div>
-
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
+              <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Email</label>
               {isEditing ? (
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-base text-white placeholder-gray-500 shadow-inner"
+                  autoComplete="email"
                 />
               ) : (
-                <div className="flex items-center px-3 py-2 bg-gray-50 rounded-md">
+                <div className="flex items-center px-4 py-2 bg-[#181c24] rounded-md border border-[#2d3748]">
                   <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">{profile.email}</span>
+                  <span className="text-white">{profile.email}</span>
                 </div>
               )}
             </div>
-
             {/* Role */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Role
-              </label>
-              <div className="px-3 py-2 bg-gray-50 rounded-md">
+              <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Role</label>
+              <div className="px-4 py-2 bg-[#181c24] rounded-md border border-[#2d3748]">
                 {getRoleBadge(profile.role)}
               </div>
             </div>
-
             {/* Join Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Member Since
-              </label>
-              <div className="flex items-center px-3 py-2 bg-gray-50 rounded-md">
+              <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Member Since</label>
+              <div className="flex items-center px-4 py-2 bg-[#181c24] rounded-md border border-[#2d3748]">
                 <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                <span className="text-gray-900">
-                  {new Date(profile.createdAt).toLocaleDateString()}
-                </span>
+                <span className="text-white">{new Date(profile.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
-
             {/* Last Login */}
             {profile.lastLogin && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Login
-                </label>
-                <div className="flex items-center px-3 py-2 bg-gray-50 rounded-md">
+                <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Last Login</label>
+                <div className="flex items-center px-4 py-2 bg-[#181c24] rounded-md border border-[#2d3748]">
                   <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">
-                    {new Date(profile.lastLogin).toLocaleDateString()}
-                  </span>
+                  <span className="text-white">{new Date(profile.lastLogin).toLocaleDateString()}</span>
                 </div>
               </div>
             )}
-
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-3">
@@ -212,7 +195,6 @@ const UserProfile = ({ onClose }) => {
                 </div>
               </div>
             )}
-
             {/* Success Message */}
             {success && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3">
@@ -224,21 +206,20 @@ const UserProfile = ({ onClose }) => {
                 </div>
               </div>
             )}
-
             {/* Action Buttons */}
             <div className="flex space-x-3 pt-4">
               {isEditing ? (
                 <>
                   <button
                     onClick={handleCancel}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -246,7 +227,7 @@ const UserProfile = ({ onClose }) => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
                 >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Profile

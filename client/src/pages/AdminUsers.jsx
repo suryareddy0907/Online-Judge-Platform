@@ -196,11 +196,27 @@ const AdminUsers = () => {
     );
   };
 
+  const CodeBackground = () => (
+    <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <defs>
+          <linearGradient id="usersCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff99" />
+            <stop offset="100%" stopColor="#00cfff" />
+          </linearGradient>
+        </defs>
+        <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#usersCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// User Management"}</text>
+        <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#usersCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"function manageUsers() { }"}</text>
+      </svg>
+    </div>
+  );
+
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="flex flex-col items-center justify-center h-full bg-[#181c24]">
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+          <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Users...</span>
         </div>
       </AdminLayout>
     );
@@ -208,25 +224,26 @@ const AdminUsers = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage all registered users</p>
-        </div>
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
+        <CodeBackground />
+        <div className="p-6 relative z-10">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">User Management</h1>
+            <p className="text-[#baffea] font-mono">Manage all registered users</p>
+          </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Filters */}
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 mb-6 font-mono text-white hover:border-[#00ff99] transition-all grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Search
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder="Search users"
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
                   onKeyDown={(e) => {
@@ -235,7 +252,7 @@ const AdminUsers = () => {
                       fetchUsers();
                     }
                   }}
-                  className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
                 />
               </div>
             </div>
@@ -280,232 +297,140 @@ const AdminUsers = () => {
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-            <div className="flex">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Users Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">
-              Users ({pagination.total})
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.username}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {user.email}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getRoleBadge(user.role)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(user)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowActions(showActions === user._id ? null : user._id)}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          <MoreVertical className="h-5 w-5" />
-                        </button>
-
-                        {showActions === user._id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                            <div className="py-1">
-                              {/* Role Update */}
-                              <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                                <span className="font-medium">Change Role:</span>
-                                <div className="mt-1 space-y-1">
-                                  {['user', 'admin'].map((role) => (
-                                    <button
-                                      key={role}
-                                      onClick={() => handleRoleUpdate(user._id, role)}
-                                      disabled={user.role === role}
-                                      className={`block w-full text-left px-2 py-1 text-xs rounded ${
-                                        user.role === role
-                                          ? 'bg-blue-100 text-blue-700 cursor-not-allowed'
-                                          : 'hover:bg-gray-100'
-                                      }`}
-                                    >
-                                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {/* Ban/Unban */}
-                              <button
-                                onClick={() => handleBanToggle(user._id, !user.isBanned)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                {user.isBanned ? (
-                                  <>
-                                    <UserCheck className="inline h-4 w-4 mr-2" />
-                                    Unban User
-                                  </>
-                                ) : (
-                                  <>
-                                    <Ban className="inline h-4 w-4 mr-2" />
-                                    Ban User
-                                  </>
-                                )}
-                              </button>
-
-                              {/* Edit User */}
-                              <button
-                                onClick={() => openEditModal(user)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                <Edit className="inline h-4 w-4 mr-2" />
-                                Edit User
-                              </button>
-
-                              {/* Delete User */}
-                              {user.email !== "suryareddy0907@gmail.com" && (
-                                <button
-                                  onClick={() => handleDeleteUser(user._id)}
-                                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                >
-                                  <Trash2 className="inline h-4 w-4 mr-2" />
-                                  Delete User
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing page {pagination.currentPage} of {pagination.totalPages}
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    Next
-                  </button>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+              <div className="flex">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error</h3>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
                 </div>
               </div>
             </div>
           )}
-        </div>
 
-        {/* Edit User Modal */}
-        {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-              <h2 className="text-xl font-semibold mb-4">Edit User</h2>
-              <form onSubmit={handleEditSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={editForm.username}
-                    onChange={handleEditChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={editForm.email}
-                    onChange={handleEditChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                    required
-                  />
-                </div>
-                {editError && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-2 text-red-700 text-sm">{editError}</div>
-                )}
-                <div className="flex space-x-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={closeEditModal}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={editLoading}
-                    className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {editLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </div>
-              </form>
+          {/* Users Table */}
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-hidden font-mono">
+            <div className="px-6 py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
+              <h3 className="text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
+                Users ({pagination.total})
+              </h3>
             </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-[#00cfff]">
+                <thead className="bg-[#181c24]">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">User</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider">Joined</th>
+                    <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-[#232b3a] divide-y divide-[#00cfff]">
+                  {users.map((user, idx) => (
+                    <tr key={user._id} className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24]' : 'bg-[#181c24] hover:bg-[#232b3a]'}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-base font-extrabold text-[#00ff99]">{user.username}</div>
+                          <div className="text-sm text-[#00cfff]">{user.email}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{getRoleBadge(user.role)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#baffea]">{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                        <button onClick={() => openEditModal(user)} className="px-2 py-1 rounded bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] transition-all">Edit</button>
+                        <button onClick={() => handleDeleteUser(user._id)} className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all">Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="px-6 py-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-700">
+                    Showing page {pagination.currentPage} of {pagination.totalPages}
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={pagination.currentPage === 1}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      disabled={pagination.currentPage === pagination.totalPages}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Edit User Modal */}
+          {showEditModal && (
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
+              <div className="relative w-full max-w-md mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+                <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 text-center tracking-tight">Edit User</h2>
+                <form onSubmit={handleEditSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-[#00ff99] mb-1">Username</label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={editForm.username}
+                      onChange={handleEditChange}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#00ff99] mb-1">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={editForm.email}
+                      onChange={handleEditChange}
+                      className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#181c24] text-white placeholder-[#baffea] font-mono shadow-inner"
+                      required
+                    />
+                  </div>
+                  {editError && (
+                    <div className="bg-red-900/80 border border-red-400 rounded-md p-2 text-red-200 text-sm font-mono">{editError}</div>
+                  )}
+                  <div className="flex space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={closeEditModal}
+                      className="flex-1 px-4 py-2 border-2 border-[#00cfff] rounded-md text-sm font-bold text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] focus:outline-none focus:ring-2 focus:ring-[#00ff99] transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={editLoading}
+                      className="flex-1 px-4 py-2 border-2 border-[#00ff99] rounded-md text-sm font-bold text-[#181c24] bg-gradient-to-r from-[#00ff99] to-[#00cfff] hover:from-[#00cfff] hover:to-[#00ff99] focus:outline-none focus:ring-2 focus:ring-[#00ff99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {editLoading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

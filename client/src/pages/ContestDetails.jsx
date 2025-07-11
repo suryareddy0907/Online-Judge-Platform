@@ -87,8 +87,8 @@ const ContestDetails = () => {
     return () => clearInterval(interval);
   }, [contest]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error || !contest) return <div className="min-h-screen flex items-center justify-center text-red-500">{error || 'Contest not found'}</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#181c24] text-[#00ff99] font-mono animate-pulse">Loading...</div>;
+  if (error || !contest) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#181c24] font-mono">{error || 'Contest not found'}</div>;
 
   const contestHasEnded = new Date() > new Date(contest.endTime);
   const isRegistered = user && contest.participants && contest.participants.includes(user.userId);
@@ -103,20 +103,13 @@ const ContestDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
-            &lt;/&gt; CodersToday
-          </span>
-        </h1>
+    <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
+      <nav className="w-full flex justify-between items-center px-8 py-6 bg-[#232b3a] border-b-2 border-[#00cfff] shadow-md">
+        <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">&lt;/&gt; CodersToday</h1>
         {user && (
           <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm sm:text-base font-medium">
-                Hi, {user.username}!
-              </p>
-            </div>
+            <span className="text-[#00ff99] font-bold">Hi, {user.username}!</span>
+            <Link to="/contests" className="px-4 py-2 border-2 border-[#00cfff] rounded-lg text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] font-bold transition-all">← Back to Contests</Link>
           </div>
         )}
       </nav>
@@ -127,39 +120,41 @@ const ContestDetails = () => {
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 1, pointerEvents: 'none' }}
         />
       )}
-      <div className="max-w-5xl mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-4">{contest.title}
-          <span className="flex items-center text-base font-normal text-blue-600 dark:text-blue-400 ml-4">
-            <Clock className="h-5 w-5 mr-1" /> {clock}
+      <div className="max-w-5xl mx-auto py-12 px-4">
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-4 tracking-tight flex items-center gap-4">{contest.title}
+          <span className="flex items-center text-lg font-bold text-[#00cfff] ml-4">
+            <Clock className="h-6 w-6 mr-2" /> {clock}
           </span>
         </h1>
         {runConfetti && winner && (
-          <div className="my-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-lg text-center">
-            <p className="font-bold text-lg">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
+          <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg">
+            <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
           </div>
         )}
-        <p className="mb-4 text-gray-600 dark:text-gray-400">{contest.description}</p>
-        <h2 className="text-xl font-semibold mb-2">Problems</h2>
-        <ul className="mb-8 space-y-2">
+        <p className="mb-8 text-[#baffea] text-lg font-mono">{contest.description}</p>
+        <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Problems</h2>
+        <ul className="mb-12 space-y-4">
           {contest.problems && contest.problems.length > 0 ? (
             contest.problems.map((problem) => (
-              <li key={problem._id} className={`bg-white dark:bg-gray-800 rounded p-4 shadow flex items-center justify-between ${problem.solved ? 'border-l-4 border-green-500' : ''}`}>
-                <Link to={`/problems/${problem._id}`} className={`font-medium ${problem.solved ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'} hover:underline`}>
+              <li key={problem._id} className={`bg-[#232b3a] border-2 rounded-xl p-4 shadow flex items-center justify-between font-mono transition-all ${problem.solved ? 'border-[#00ff99]' : 'border-[#00cfff]'}`} style={{ boxShadow: '0 0 8px #00ff99, 0 0 16px #00cfff' }}>
+                <Link to={`/problems/${problem._id}`} className={`font-bold text-lg ${problem.solved ? 'text-[#00ff99]' : 'text-[#00cfff]'} hover:underline`}>
                   {problem.title}
                 </Link>
               </li>
             ))
           ) : (
-            <li>No problems found for this contest.</li>
+            <li className="text-[#baffea]">No problems found for this contest.</li>
           )}
         </ul>
-        <h2 className="text-xl font-semibold mb-2">Leaderboard</h2>
-        <Leaderboard 
-          type="contest"
-          data={leaderboard}
-          contestName={contest.title}
-          problems={contest.problems}
-        />
+        <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Leaderboard</h2>
+        <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl p-6 shadow-lg font-mono">
+          <Leaderboard 
+            type="contest"
+            data={leaderboard}
+            contestName={contest.title}
+            problems={contest.problems}
+          />
+        </div>
       </div>
     </div>
   );

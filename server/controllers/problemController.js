@@ -16,7 +16,13 @@ export const getPublicProblems = async (req, res) => {
       query.difficulty = difficulty;
     }
     if (tag) {
-      query.tags = tag;
+      if (Array.isArray(tag)) {
+        query.tags = { $in: tag };
+      } else if (typeof tag === 'string' && tag.includes(',')) {
+        query.tags = { $in: tag.split(',') };
+      } else {
+        query.tags = tag;
+      }
     }
     const problems = await Problem.find(query).sort({ createdAt: -1 });
     res.json({ problems });

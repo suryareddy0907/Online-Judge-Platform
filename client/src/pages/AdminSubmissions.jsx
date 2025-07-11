@@ -3,6 +3,21 @@ import AdminLayout from '../components/AdminLayout';
 import { getAllSubmissions, deleteSubmission, getSubmissionDetails } from '../services/adminService';
 import { useNavigate } from 'react-router-dom';
 
+const CodeBackground = () => (
+  <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
+    <svg width="100%" height="100%" className="absolute inset-0">
+      <defs>
+        <linearGradient id="submissionsCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00ff99" />
+          <stop offset="100%" stopColor="#00cfff" />
+        </linearGradient>
+      </defs>
+      <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#submissionsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Submission Management"}</text>
+      <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#submissionsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"function manageSubmissions() { }"}</text>
+    </svg>
+  </div>
+);
+
 const AdminSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,151 +114,187 @@ const AdminSubmissions = () => {
     );
   }
 
+  const getVerdictIcon = (verdict) => {
+    switch (verdict) {
+      case "AC":
+        return "✅";
+      case "WA":
+        return "🟥";
+      case "TLE":
+        return "🟨";
+      case "RE":
+        return "🟦";
+      case "CE":
+        return "❌";
+      case "Pending":
+        return "⏳";
+      default:
+        return "❓";
+    }
+  };
+
   return (
     <AdminLayout>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Submission Management</h1>
-        <div className="mb-4 flex flex-wrap gap-4 items-end">
-          <input
-            type="text"
-            placeholder="User (username or email)"
-            className="border px-3 py-2 rounded"
-            value={filters.user}
-            onChange={e => handleFilterChange('user', e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Problem title"
-            className="border px-3 py-2 rounded"
-            value={filters.problem}
-            onChange={e => handleFilterChange('problem', e.target.value)}
-          />
-          <select
-            className="border px-3 py-2 rounded"
-            value={filters.language}
-            onChange={e => handleFilterChange('language', e.target.value)}
-          >
-            <option value="">All Languages</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="java">Java</option>
-            <option value="python">Python</option>
-          </select>
-          <select
-            className="border px-3 py-2 rounded"
-            value={filters.verdict}
-            onChange={e => handleFilterChange('verdict', e.target.value)}
-          >
-            <option value="">All Verdicts</option>
-            <option value="AC">Accepted</option>
-            <option value="WA">Wrong Answer</option>
-            <option value="TLE">Time Limit Exceeded</option>
-            <option value="RE">Runtime Error</option>
-            <option value="CE">Compilation Error</option>
-            <option value="Pending">Pending</option>
-          </select>
-        </div>
-        {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
-        {loading ? (
-          <div className="text-center py-10 text-gray-500">Loading submissions...</div>
-        ) : (
-          <div className="overflow-x-auto bg-white rounded shadow">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Problem</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Language</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Verdict</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitted At</th>
-                  <th className="px-4 py-2"></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {submissions.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-6 text-gray-500">No submissions found.</td>
-                  </tr>
-                ) : (
-                  submissions.map(sub => (
-                    <tr key={sub._id} className="hover:bg-blue-50 cursor-pointer" onClick={e => { if (e.target.tagName !== 'BUTTON') handleView(sub._id); }}>
-                      <td className="px-4 py-2">
-                        {sub.user ? (
-                          highlightMatch(sub.user.username || sub.user.email || '-', filters.user)
-                        ) : '-' }
-                      </td>
-                      <td className="px-4 py-2">
-                        {sub.problem ? (
-                          highlightMatch(sub.problem.title || '-', filters.problem)
-                        ) : '-' }
-                      </td>
-                      <td className="px-4 py-2">{sub.language}</td>
-                      <td className="px-4 py-2">{sub.verdict}</td>
-                      <td className="px-4 py-2">{new Date(sub.submittedAt).toLocaleString()}</td>
-                      <td className="px-4 py-2">
-                        <button
-                          className="text-red-600 hover:underline text-sm"
-                          onClick={e => { e.stopPropagation(); handleDelete(sub._id); }}
-                          disabled={deletingId === sub._id}
-                        >
-                          {deletingId === sub._id ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {/* View Modal */}
-        {viewModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4 relative">
-              <button
-                className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-2xl font-bold"
-                onClick={handleCloseModal}
-                aria-label="Back"
-              >
-                &#8592;
-              </button>
-              <button
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-                onClick={handleCloseModal}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              {!selectedSubmission ? (
-                <div className="text-center py-10 text-gray-500">Loading...</div>
-              ) : selectedSubmission.error ? (
-                <div className="text-center text-red-500">{selectedSubmission.error}</div>
-              ) : (
-                <>
-                  <h2 className="text-xl font-semibold mb-2">Submission Details</h2>
-                  <div className="mb-4">
-                    <strong>User:</strong> {selectedSubmission.user?.username || selectedSubmission.user?.email || '-'}<br />
-                    <strong>Problem:</strong> {selectedSubmission.problem?.title || '-'}<br />
-                    <strong>Language:</strong> {selectedSubmission.language}<br />
-                    <strong>Submitted At:</strong> {new Date(selectedSubmission.submittedAt).toLocaleString()}<br />
-                  </div>
-                  <div className="mb-4">
-                    <strong>Code:</strong>
-                    <pre className="bg-gray-100 p-3 rounded mt-2 overflow-x-auto text-sm" style={{ maxHeight: 300 }}>{selectedSubmission.code}</pre>
-                  </div>
-                  <div className="mb-2">
-                    <strong>Verdict:</strong> <span className="font-semibold">{selectedSubmission.verdict}</span>
-                  </div>
-                  {selectedSubmission.errorMessage && (
-                    <div className="bg-red-50 border border-red-200 rounded-md p-2 mt-2 text-red-700 text-sm">
-                      <strong>Error:</strong> {selectedSubmission.errorMessage}
-                    </div>
-                  )}
-                </>
-              )}
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
+        <CodeBackground />
+        <div className="p-6 relative z-10">
+          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4">Submission Management</h1>
+          <div className="mb-4 flex flex-wrap gap-4 items-end bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input
+              type="text"
+              placeholder="User (username or email)"
+                className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
+              value={filters.user}
+              onChange={e => handleFilterChange('user', e.target.value)}
+            />
             </div>
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input
+              type="text"
+              placeholder="Problem title"
+                className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
+              value={filters.problem}
+              onChange={e => handleFilterChange('problem', e.target.value)}
+            />
+            </div>
+            <select
+              className="border px-3 py-2 rounded text-white bg-transparent"
+              value={filters.language}
+              onChange={e => handleFilterChange('language', e.target.value)}
+            >
+              <option value="">All Languages</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+            </select>
+            <select
+              className="border px-3 py-2 rounded text-white bg-transparent"
+              value={filters.verdict}
+              onChange={e => handleFilterChange('verdict', e.target.value)}
+            >
+              <option value="">All Verdicts</option>
+              <option value="AC">Accepted</option>
+              <option value="WA">Wrong Answer</option>
+              <option value="TLE">Time Limit Exceeded</option>
+              <option value="RE">Runtime Error</option>
+              <option value="CE">Compilation Error</option>
+              <option value="Pending">Pending</option>
+            </select>
           </div>
-        )}
+          {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
+          {loading ? (
+            <div className="min-h-[300px] flex flex-col items-center justify-center bg-[#181c24]">
+              <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+              <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Submissions...</span>
+            </div>
+          ) : (
+            <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-hidden font-mono">
+              <div className="px-6 py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
+                <h3 className="text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
+                  Submissions ({submissions.length})
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-[#00cfff]">
+                  <thead className="bg-[#181c24]">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider font-mono"> </th>
+                      <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00cfff] uppercase tracking-wider font-mono">Submission</th>
+                      <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider font-mono">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-[#232b3a] divide-y divide-[#00cfff]">
+                    {submissions.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="text-center py-6 text-[#baffea] font-mono">No submissions found.</td>
+                      </tr>
+                    ) : (
+                      submissions.map((sub, idx) => (
+                        <tr key={sub._id} className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24]' : 'bg-[#181c24] hover:bg-[#232b3a]'}>
+                          <td className="px-6 py-4 align-top text-xl font-mono">{getVerdictIcon(sub.verdict)}</td>
+                          <td className="px-6 py-4 align-top whitespace-nowrap">
+                            <div className="font-mono text-base font-bold text-[#00ff99]">
+                              {sub.user ? (sub.user.username || sub.user.email || '-') : '-'}
+                              {" / "}
+                              {sub.problem ? (sub.problem.title || '-') : '-'}
+                            </div>
+                            <div className="font-mono text-sm text-[#00cfff] mt-1">
+                              {sub.language} &bull; {sub.verdict} &bull; {new Date(sub.submittedAt).toLocaleString()}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 align-top">
+                            <button
+                              className="px-2 py-1 rounded bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow hover:from-red-500 hover:to-pink-500 transition-all font-mono"
+                              onClick={e => { e.stopPropagation(); handleDelete(sub._id); }}
+                              disabled={deletingId === sub._id}
+                            >
+                              {deletingId === sub._id ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {/* View Modal */}
+          {viewModal && (
+            <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+                <button
+                  className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                  onClick={handleCloseModal}
+                  aria-label="Back"
+                >
+                  &#8592;
+                </button>
+                <button
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                  onClick={handleCloseModal}
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+                {!selectedSubmission ? (
+                  <div className="min-h-[200px] flex flex-col items-center justify-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+                    <span className="mt-6 text-[#00ff99] font-mono text-base tracking-widest animate-pulse drop-shadow-lg">Loading Submission...</span>
+                  </div>
+                ) : selectedSubmission.error ? (
+                  <div className="text-center text-red-500">{selectedSubmission.error}</div>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-semibold mb-2 text-white">Submission Details</h2>
+                    <div className="mb-4">
+                      <strong>User:</strong> {selectedSubmission.user?.username || selectedSubmission.user?.email || '-'}<br />
+                      <strong>Problem:</strong> {selectedSubmission.problem?.title || '-'}<br />
+                      <strong>Language:</strong> {selectedSubmission.language}<br />
+                      <strong>Submitted At:</strong> {new Date(selectedSubmission.submittedAt).toLocaleString()}<br />
+                    </div>
+                    <div className="mb-4">
+                      <strong>Code:</strong>
+                      <pre className="bg-gray-100 p-3 rounded mt-2 overflow-x-auto text-sm" style={{ maxHeight: 300 }}>{selectedSubmission.code}</pre>
+                    </div>
+                    <div className="mb-2">
+                      <strong>Verdict:</strong> <span className="font-semibold text-white">{selectedSubmission.verdict}</span>
+                    </div>
+                    {selectedSubmission.errorMessage && (
+                      <div className="bg-red-50 border border-red-200 rounded-md p-2 mt-2 text-red-700 text-sm">
+                        <strong>Error:</strong> {selectedSubmission.errorMessage}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

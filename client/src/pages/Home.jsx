@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChangePassword from "../components/ChangePassword";
@@ -19,6 +19,97 @@ import {
 } from "lucide-react";
 import { getPublicStats, getPublicContests, getLeaderboard } from '../services/authService';
 
+// Animated Gradient Aurora Background
+const AuroraBackground = () => (
+  <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
+    <svg width="100%" height="100%" className="absolute inset-0 w-full h-full" style={{ minHeight: '100vh' }}>
+      <defs>
+        <radialGradient id="aurora1" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#00ff99" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#232b3a" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="aurora2" cx="70%" cy="60%" r="60%">
+          <stop offset="0%" stopColor="#00cfff" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#232b3a" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="aurora3" cx="50%" cy="80%" r="50%">
+          <stop offset="0%" stopColor="#ff00cc" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#232b3a" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="30%" cy="30%" rx="60%" ry="30%" fill="url(#aurora1)">
+        <animate attributeName="cx" values="30%;40%;30%" dur="8s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="30%;40%;30%" dur="10s" repeatCount="indefinite" />
+      </ellipse>
+      <ellipse cx="70%" cy="60%" rx="50%" ry="25%" fill="url(#aurora2)">
+        <animate attributeName="cx" values="70%;60%;70%" dur="12s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="60%;70%;60%" dur="14s" repeatCount="indefinite" />
+      </ellipse>
+      <ellipse cx="50%" cy="80%" rx="40%" ry="20%" fill="url(#aurora3)">
+        <animate attributeName="cx" values="50%;55%;50%" dur="10s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="80%;75%;80%" dur="13s" repeatCount="indefinite" />
+      </ellipse>
+    </svg>
+  </div>
+);
+
+// Matrix Code Rain Overlay
+const MatrixRain = () => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let fontSize = 18;
+    let columns = Math.floor(width / fontSize);
+    let drops = Array(columns).fill(1);
+    const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(1);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    function draw() {
+      ctx.fillStyle = 'rgba(24,28,36,0.18)';
+      ctx.fillRect(0, 0, width, height);
+      ctx.font = `${fontSize}px Fira Mono, monospace`;
+      for (let i = 0; i < columns; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.shadowColor = '#00ff99';
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = Math.random() > 0.95 ? '#00cfff' : '#00ff99';
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        ctx.shadowBlur = 0;
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+      animationFrameId = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full z-0 pointer-events-none select-none"
+      style={{ opacity: 0.55, mixBlendMode: 'lighter' }}
+    />
+  );
+};
+
 const Home = () => {
   const { user, logout } = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -30,6 +121,8 @@ const Home = () => {
   const [countdowns, setCountdowns] = useState({});
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -53,7 +146,8 @@ const Home = () => {
         const response = await getLeaderboard({ sortBy: 'rating', limit: 10 });
         setLeaderboardData(response.data);
       } catch (err) {
-        // ignore for now
+        console.error('Failed to fetch leaderboard:', err);
+        setLeaderboardData([]);
       } finally {
         setLoadingLeaderboard(false);
       }
@@ -75,7 +169,8 @@ const Home = () => {
           setContests(activeAndUpcoming);
         }
       } catch (err) {
-        // ignore for now
+        console.error('Failed to fetch contests:', err);
+        setContests([]);
       }
     };
     fetchContests();
@@ -108,6 +203,43 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [contests]);
 
+  // Close dropdown on outside click or on Account button click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Handle browser back button for UserProfile modal
+  useEffect(() => {
+    if (!showUserProfile) return;
+    const handlePopState = () => {
+      setShowUserProfile(false);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showUserProfile]);
+
+  // Handle browser back button for ChangePassword modal
+  useEffect(() => {
+    if (!showChangePassword) return;
+    const handlePopState = () => {
+      setShowChangePassword(false);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [showChangePassword]);
+
   const formatCountdown = (ms) => {
     if (ms <= 0) return '0m';
     const days = Math.floor(ms / (1000 * 60 * 60 * 24));
@@ -133,10 +265,6 @@ const Home = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -148,68 +276,96 @@ const Home = () => {
   const activeContests = contests.filter(c => getContestStatus(c).status === 'active');
   const upcomingContests = contests.filter(c => getContestStatus(c).status === 'upcoming');
 
-  return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Navbar */}
-      <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
-            &lt;/&gt; CodersToday
-          </span>
-        </h1>
+  const openUserProfile = () => {
+    window.history.pushState({ modal: 'profile' }, '');
+    setShowUserProfile(true);
+  };
 
-        <div className="flex items-center space-x-4">
+  const closeUserProfile = () => {
+    setShowUserProfile(false);
+    if (window.history.state && window.history.state.modal === 'profile') {
+      window.history.back();
+    }
+  };
+
+  const openChangePassword = () => {
+    window.history.pushState({ modal: 'changePassword' }, '');
+    setShowChangePassword(true);
+  };
+
+  const closeChangePassword = () => {
+    setShowChangePassword(false);
+    if (window.history.state && window.history.state.modal === 'changePassword') {
+      window.history.back();
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
+      <AuroraBackground />
+      <MatrixRain />
+      {/* Animated code background */}
+      <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
+        <svg width="100%" height="100%" className="absolute inset-0">
+          <defs>
+            <linearGradient id="homeCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00ff99" />
+              <stop offset="100%" stopColor="#00cfff" />
+            </linearGradient>
+          </defs>
+          <text x="50%" y="15%" textAnchor="middle" fontSize="2.5rem" fill="url(#homeCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{`#include <bits/stdc++.h>`}</text>
+          <text x="50%" y="30%" textAnchor="middle" fontSize="2.5rem" fill="url(#homeCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{`int main() {`}</text>
+          <text x="50%" y="45%" textAnchor="middle" fontSize="2.5rem" fill="url(#homeCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{`    // Welcome to CodersToday!`}</text>
+          <text x="50%" y="60%" textAnchor="middle" fontSize="2.5rem" fill="url(#homeCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{`    cout << "Compete. Code. Conquer." << endl;`}</text>
+          <text x="50%" y="75%" textAnchor="middle" fontSize="2.5rem" fill="url(#homeCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{`}`}</text>
+        </svg>
+      </div>
+
+      {/* Navbar */}
+      <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99]" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text">
+            &lt;/&gt; CodersToday
+        </h1>
+        <div className="flex items-center space-x-6">
           <div className="text-right">
-            <p className="text-sm sm:text-base font-medium">
-              Hi, {user.username}!
-            </p>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              user.role === 'admin' ? 'bg-red-100 text-red-800' :
-              user.role === 'moderator' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-green-100 text-green-800'
+            <p className="text-sm sm:text-base font-medium text-[#00ff99]">Hi, {user.username}!</p>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold tracking-widest ${
+              user.role === 'admin' ? 'bg-red-900 text-red-300' :
+              user.role === 'moderator' ? 'bg-yellow-900 text-yellow-300' :
+              'bg-green-900 text-green-300'
             }`}>
               {user.role}
             </span>
           </div>
-          
-          {/* User Menu */}
-          <div className="relative group">
-            <button className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-              <User className="h-5 w-5" />
-              <span className="hidden sm:block">Account</span>
-            </button>
-            
-            {/* Dropdown Menu */}
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <button
-                onClick={() => setShowUserProfile(true)}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <User className="inline h-4 w-4 mr-2" />
-                View Profile
-              </button>
-              <button
-                onClick={() => setShowChangePassword(true)}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Lock className="inline h-4 w-4 mr-2" />
-                Change Password
-              </button>
-              <hr className="my-1 border-gray-200 dark:border-gray-600" />
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
-                <LogOut className="inline h-4 w-4 mr-2" />
-                Logout
-              </button>
-            </div>
-          </div>
-          
+          {/* User Actions - View Profile, Change Password, Logout */}
+          <button
+            onClick={openUserProfile}
+            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition"
+            type="button"
+          >
+            <User className="h-5 w-5 mr-1" />
+            <span className="hidden sm:block">View Profile</span>
+          </button>
+          <button
+            onClick={openChangePassword}
+            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition"
+            type="button"
+          >
+            <Lock className="h-5 w-5 mr-1" />
+            <span className="hidden sm:block">Change Password</span>
+          </button>
+          <button
+            onClick={logout}
+            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-red-900 border border-[#00ff99] text-red-400 font-mono font-bold transition"
+            type="button"
+          >
+            <LogOut className="h-5 w-5 mr-1" />
+            <span className="hidden sm:block">Logout</span>
+          </button>
           {user.role === 'admin' && (
             <Link
               to="/admin/users"
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-3 py-2 border-2 border-[#00ff99] text-sm leading-4 font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
             >
               <Shield className="h-4 w-4 mr-2" />
               Admin Panel
@@ -219,28 +375,27 @@ const Home = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Welcome to CodersToday
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4" style={{ fontFamily: 'Fira Mono, monospace', textShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}>
+            &lt;/&gt; Welcome to CodersToday
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Your online coding platform for competitive programming
-          </p>
+          <p className="text-lg text-[#baffea] font-mono mb-2">The ultimate coding arena for competitive programmers.</p>
+          <p className="text-base text-[#00ff99] font-mono italic">"Where coders become champions."</p>
         </div>
 
         {/* Contests Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Active Contests */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">Active Contests</h3>
+            <h3 className="text-2xl font-bold mb-4 font-mono text-[#00ff99]">Active Contests</h3>
             {activeContests.length > 0 ? (
               <div className="space-y-4">
                 {activeContests.map(contest => (
-                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 hover:shadow-2xl hover:border-[#00cfff] transition-all font-mono text-white">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold">{contest.title}</span>
-                      <span className="text-sm text-green-500 flex items-center">
+                      <span className="font-semibold text-[#00ff99]">{contest.title}</span>
+                      <span className="text-sm text-[#00ff99] flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         Ends in: {countdowns[contest._id] ? formatCountdown(countdowns[contest._id].timeLeft) : '...'}
                       </span>
@@ -255,14 +410,14 @@ const Home = () => {
 
           {/* Upcoming Contests */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">Upcoming Contests</h3>
+            <h3 className="text-2xl font-bold mb-4 font-mono text-[#00cfff]">Upcoming Contests</h3>
             {upcomingContests.length > 0 ? (
               <div className="space-y-4">
                 {upcomingContests.map(contest => (
-                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-4 hover:shadow-2xl hover:border-[#00ff99] transition-all font-mono text-white">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold">{contest.title}</span>
-                      <span className="text-sm text-blue-500 flex items-center">
+                      <span className="font-semibold text-[#00cfff]">{contest.title}</span>
+                      <span className="text-sm text-[#00cfff] flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         Starts in: {countdowns[contest._id] ? formatCountdown(countdowns[contest._id].timeLeft) : '...'}
                       </span>
@@ -278,56 +433,56 @@ const Home = () => {
 
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <Code className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-[#00ff99]/20 rounded-lg">
+                <Code className="h-6 w-6 text-[#00ff99]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total published problems">Published Problems</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-[#baffea]" title="Total published problems">Published Problems</p>
+                <p className="text-2xl font-semibold text-white">
                   {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalProblems ?? 0}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="p-2 bg-[#00cfff]/20 rounded-lg">
+                <FileText className="h-6 w-6 text-[#00cfff]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total submissions made by you">My Submissions</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-[#baffea]" title="Total submissions made by you">My Submissions</p>
+                <p className="text-2xl font-semibold text-white">
                   {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalSubmissions ?? 0}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 bg-[#00ff99]/20 rounded-lg">
+                <Users className="h-6 w-6 text-[#00ff99]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Total registered users">Registered Users</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalUsers ?? 0}
+                <p className="text-sm font-medium text-[#baffea]" title="Total active users (excluding banned)">Active Users</p>
+                <p className="text-2xl font-semibold text-white">
+                  {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalActiveUsers ?? 0}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
-                <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              <div className="p-2 bg-[#00cfff]/20 rounded-lg">
+                <Calendar className="h-6 w-6 text-[#00cfff]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400" title="Contests that are active or upcoming">Active/Upcoming Contests</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-[#baffea]" title="Contests that are active or upcoming">Active/Upcoming Contests</p>
+                <p className="text-2xl font-semibold text-white">
                   {loadingStats ? <span className="animate-pulse">...</span> : statsError ? '-' : stats?.totalContests ?? 0}
                 </p>
               </div>
@@ -336,20 +491,20 @@ const Home = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+        <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 mb-8 font-mono text-white hover:border-[#00cfff] transition-all">
+          <h3 className="text-lg font-bold text-[#00ff99] mb-4">
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link to="/problems" className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Link to="/problems" className="flex items-center justify-center px-4 py-2 border-2 border-[#00ff99] rounded-md text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
               <Code className="h-4 w-4 mr-2" />
               Browse Problems
             </Link>
-            <Link to="/contests" className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Link to="/contests" className="flex items-center justify-center px-4 py-2 border-2 border-[#00cfff] rounded-md text-sm font-bold text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00ff99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00cfff] font-mono transition">
               <Calendar className="h-4 w-4 mr-2" />
               View Contests
             </Link>
-            <Link to="/my-submissions" className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <Link to="/my-submissions" className="flex items-center justify-center px-4 py-2 border-2 border-[#00ff99] rounded-md text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
               <FileText className="h-4 w-4 mr-2" />
               My Submissions
             </Link>
@@ -359,21 +514,25 @@ const Home = () => {
         {/* Leaderboard and Activity Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="md:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
               <Leaderboard type="global" data={leaderboardData} />
             </div>
           </div>
+          <div className="md:col-span-1">
+            <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
           <ActivityFeed />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Modals */}
       {showChangePassword && (
-        <ChangePassword onClose={() => setShowChangePassword(false)} />
+        <ChangePassword onClose={closeChangePassword} />
       )}
       
       {showUserProfile && (
-        <UserProfile onClose={() => setShowUserProfile(false)} />
+        <UserProfile onClose={closeUserProfile} />
       )}
     </div>
   );

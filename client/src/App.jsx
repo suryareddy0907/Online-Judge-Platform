@@ -9,7 +9,6 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminProblems from "./pages/AdminProblems";
 import AdminSubmissions from "./pages/AdminSubmissions";
 import AdminContests from "./pages/AdminContests";
-import AdminSettings from "./pages/AdminSettings";
 import PrivateRoute from "./routes/PrivateRoute";
 import AdminRoute from "./routes/AdminRoute";
 import BrowseProblems from "./pages/BrowseProblems";
@@ -88,15 +87,6 @@ const App = () => {
         element={
           <AdminRoute>
             <AdminContests />
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/admin/settings"
-        element={
-          <AdminRoute>
-            <AdminSettings />
           </AdminRoute>
         }
       />

@@ -14,6 +14,22 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const CodeBackground = () => (
+  <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
+    <svg width="100%" height="100%" className="absolute inset-0">
+      <defs>
+        <linearGradient id="adminCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00ff99" />
+          <stop offset="100%" stopColor="#00cfff" />
+        </linearGradient>
+      </defs>
+      <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#adminCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Admin Panel"}</text>
+      <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#adminCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"const admin = true;"}</text>
+      <text x="50%" y="60%" textAnchor="middle" fontSize="2.5rem" fill="url(#adminCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Secure. Powerful. Efficient."}</text>
+    </svg>
+  </div>
+);
+
 const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -48,8 +64,11 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#181c24]">
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+          <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Admin Dashboard...</span>
+        </div>
       </div>
     );
   }
@@ -88,98 +107,80 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
+      <CodeBackground />
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user?.username}!</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {user?.role}
-              </span>
-            </div>
-          </div>
+      <div className="bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] px-8 py-6 flex justify-between items-center" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <div>
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Admin Dashboard</h1>
+          <p className="text-[#baffea] font-mono">Welcome back, {user?.username}!</p>
         </div>
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold tracking-widest ${user?.role === 'admin' ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}`}>{user?.role}</span>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-[#00ff99]/20 rounded-lg">
+                <Users className="h-6 w-6 text-[#00ff99]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats?.stats?.totalUsers || 0}</p>
+                <p className="text-sm font-medium text-[#baffea]">Total Users</p>
+                <p className="text-2xl font-semibold text-white">{stats?.stats?.totalUsers || 0}</p>
               </div>
             </div>
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileText className="h-6 w-6 text-green-600" />
+              <div className="p-2 bg-[#00cfff]/20 rounded-lg">
+                <FileText className="h-6 w-6 text-[#00cfff]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Problems</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats?.stats?.totalProblems || 0}</p>
+                <p className="text-sm font-medium text-[#baffea]">Total Problems</p>
+                <p className="text-2xl font-semibold text-white">{stats?.stats?.totalProblems || 0}</p>
               </div>
             </div>
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Code className="h-6 w-6 text-purple-600" />
+              <div className="p-2 bg-[#00ff99]/20 rounded-lg">
+                <Code className="h-6 w-6 text-[#00ff99]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Submissions</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats?.stats?.totalSubmissions || 0}</p>
+                <p className="text-sm font-medium text-[#baffea]">Total Submissions</p>
+                <p className="text-2xl font-semibold text-white">{stats?.stats?.totalSubmissions || 0}</p>
               </div>
             </div>
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
             <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-orange-600" />
+              <div className="p-2 bg-[#00cfff]/20 rounded-lg">
+                <Calendar className="h-6 w-6 text-[#00cfff]" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Contests</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats?.stats?.totalContests || 0}</p>
+                <p className="text-sm font-medium text-[#baffea]">Total Contests</p>
+                <p className="text-2xl font-semibold text-white">{stats?.stats?.totalContests || 0}</p>
               </div>
             </div>
           </div>
         </div>
-
+        {/* Recent Users & Submissions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Users */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Recent Users</h3>
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
+            <div className="border-b border-[#00ff99]/30 pb-2 mb-4">
+              <h3 className="text-lg font-bold text-[#00ff99]">Recent Users</h3>
             </div>
-            <div className="p-6">
+            <div>
               {stats?.recentUsers?.length > 0 ? (
                 <div className="space-y-4">
                   {stats.recentUsers.map((user) => (
                     <div key={user._id} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                        <p className="text-sm font-medium text-white">{user.username}</p>
+                        <p className="text-sm text-[#baffea]">{user.email}</p>
                       </div>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                        user.role === 'moderator' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
-                      }`}>
-                        {user.role}
-                      </span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold tracking-widest ${user.role === 'admin' ? 'bg-red-900 text-red-300' : user.role === 'moderator' ? 'bg-yellow-900 text-yellow-300' : 'bg-green-900 text-green-300'}`}>{user.role}</span>
                     </div>
                   ))}
                 </div>
@@ -188,29 +189,20 @@ const AdminDashboard = () => {
               )}
             </div>
           </div>
-
-          {/* Recent Submissions */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Recent Submissions</h3>
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
+            <div className="border-b border-[#00cfff]/30 pb-2 mb-4">
+              <h3 className="text-lg font-bold text-[#00cfff]">Recent Submissions</h3>
             </div>
-            <div className="p-6">
+            <div>
               {stats?.recentSubmissions?.length > 0 ? (
                 <div className="space-y-4">
                   {stats.recentSubmissions.map((submission) => (
                     <div key={submission._id} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {submission.user?.username}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {submission.problem?.title}
-                        </p>
+                        <p className="text-sm font-medium text-white">{submission.user?.username}</p>
+                        <p className="text-sm text-[#baffea]">{submission.problem?.title}</p>
                       </div>
-                      <div className={`flex items-center space-x-1 ${getVerdictColor(submission.verdict)}`}>
-                        {getVerdictIcon(submission.verdict)}
-                        <span className="text-sm font-medium">{submission.verdict}</span>
-                      </div>
+                      <div className={`flex items-center space-x-1 ${getVerdictColor(submission.verdict)}`}>{getVerdictIcon(submission.verdict)}<span className="text-sm font-medium">{submission.verdict}</span></div>
                     </div>
                   ))}
                 </div>
@@ -220,37 +212,20 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
-
         {/* Submission Statistics */}
         {stats?.verdictStats && stats.verdictStats.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Submission Statistics</h3>
+          <div className="mt-8 bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
+            <div className="border-b border-[#00ff99]/30 pb-2 mb-4">
+              <h3 className="text-lg font-bold text-[#00ff99]">Submission Statistics</h3>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {stats.verdictStats.map((stat) => (
-                  <div key={stat._id} className="text-center">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${
-                      stat._id === 'AC' ? 'bg-green-100' :
-                      stat._id === 'WA' ? 'bg-red-100' :
-                      stat._id === 'TLE' ? 'bg-yellow-100' :
-                      'bg-gray-100'
-                    }`}>
-                      <span className={`text-lg font-semibold ${
-                        stat._id === 'AC' ? 'text-green-600' :
-                        stat._id === 'WA' ? 'text-red-600' :
-                        stat._id === 'TLE' ? 'text-yellow-600' :
-                        'text-gray-600'
-                      }`}>
-                        {stat._id}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm font-medium text-gray-900">{stat.count}</p>
-                    <p className="text-xs text-gray-500">submissions</p>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {stats.verdictStats.map((stat) => (
+                <div key={stat._id} className="text-center">
+                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${stat._id === 'AC' ? 'bg-green-900' : stat._id === 'WA' ? 'bg-red-900' : stat._id === 'TLE' ? 'bg-yellow-900' : 'bg-gray-900'}`}> <span className={`text-lg font-semibold ${stat._id === 'AC' ? 'text-green-300' : stat._id === 'WA' ? 'text-red-300' : stat._id === 'TLE' ? 'text-yellow-300' : 'text-gray-300'}`}>{stat._id}</span></div>
+                  <p className="mt-2 text-sm font-medium text-white">{stat.count}</p>
+                  <p className="text-xs text-[#baffea]">submissions</p>
+                </div>
+              ))}
             </div>
           </div>
         )}

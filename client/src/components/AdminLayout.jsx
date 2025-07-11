@@ -21,9 +21,9 @@ const AdminLayout = ({ children }) => {
   }, [location, navigate]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen" style={{ background: '#181c24' }}>
       <AdminNavbar />
-      <main className="flex-1 overflow-auto lg:ml-64">
+      <main className="flex-1 overflow-auto">
         {children}
       </main>
     </div>

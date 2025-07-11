@@ -698,12 +698,14 @@ export const getPublicStats = async (req, res) => {
       totalSubmissions = await Submission.countDocuments({ user: req.user.userId });
     }
     const totalUsers = await User.countDocuments();
+    const totalActiveUsers = await User.countDocuments({ isBanned: false });
     const now = new Date();
     const totalContests = await Contest.countDocuments({ endTime: { $gte: now } });
     res.json({
       totalProblems,
       totalSubmissions,
       totalUsers,
+      totalActiveUsers,
       totalContests
     });
   } catch (error) {
