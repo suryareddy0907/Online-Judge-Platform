@@ -347,7 +347,14 @@ const AdminUsers = () => {
                     <tr key={user._id} className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24]' : 'bg-[#181c24] hover:bg-[#232b3a]'}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-base font-extrabold text-[#00ff99]">{user.username}</div>
+                          <div className="text-base font-extrabold text-[#00ff99]">
+                            {user.username}
+                            {user.email === "suryareddy0907@gmail.com" && (
+                              <span className="ml-2 px-2 py-1 text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-full">
+                                DEFAULT
+                              </span>
+                            )}
+                          </div>
                           <div className="text-sm text-[#00cfff]">{user.email}</div>
                         </div>
                       </td>
