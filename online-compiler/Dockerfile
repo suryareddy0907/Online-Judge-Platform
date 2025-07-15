@@ -22,6 +22,10 @@ COPY package*.json .
 # Install dependencies
 RUN npm install --production
 
+# Update npm and fix global vulnerabilities
+RUN npm install -g npm@latest \
+    && npm install -g cross-spawn@7.0.5 brace-expansion@2.0.2
+
 # Copy the rest of the application code
 COPY . .
 
