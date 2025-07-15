@@ -322,14 +322,14 @@ const Home = () => {
       </div>
 
       {/* Navbar */}
-      <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99]" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
-        <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text">
+      <nav className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 sm:px-4 md:px-8 py-3 sm:py-4 bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] gap-2 sm:gap-0" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text">
             &lt;/&gt; CodersToday
         </h1>
-        <div className="flex items-center space-x-6">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-6 justify-end">
           <div className="text-right">
-            <p className="text-sm sm:text-base font-medium text-[#00ff99]">Hi, {user.username}!</p>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold tracking-widest ${
+            <p className="text-xs sm:text-sm md:text-base font-medium text-[#00ff99] truncate max-w-[120px] sm:max-w-none">Hi, {user.username}!</p>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold tracking-widest ${
               user.role === 'admin' ? 'bg-red-900 text-red-300' :
               user.role === 'moderator' ? 'bg-yellow-900 text-yellow-300' :
               'bg-green-900 text-green-300'
@@ -340,62 +340,62 @@ const Home = () => {
           {/* User Actions - View Profile, Change Password, Logout */}
           <button
             onClick={openUserProfile}
-            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition"
+            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
             type="button"
           >
-            <User className="h-5 w-5 mr-1" />
-            <span className="hidden sm:block">View Profile</span>
+            <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+            <span className="hidden xs:inline sm:block">Profile</span>
           </button>
           <button
             onClick={openChangePassword}
-            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition"
+            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
             type="button"
           >
-            <Lock className="h-5 w-5 mr-1" />
-            <span className="hidden sm:block">Change Password</span>
+            <Lock className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+            <span className="hidden xs:inline sm:block">Password</span>
           </button>
           <button
             onClick={logout}
-            className="flex items-center space-x-2 px-3 py-2 rounded-md bg-[#181c24] hover:bg-red-900 border border-[#00ff99] text-red-400 font-mono font-bold transition"
+            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-red-900 border border-[#00ff99] text-red-400 font-mono font-bold transition text-xs sm:text-sm"
             type="button"
           >
-            <LogOut className="h-5 w-5 mr-1" />
-            <span className="hidden sm:block">Logout</span>
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+            <span className="hidden xs:inline sm:block">Logout</span>
           </button>
           {user.role === 'admin' && (
             <Link
               to="/admin/users"
-              className="inline-flex items-center px-3 py-2 border-2 border-[#00ff99] text-sm leading-4 font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
+              className="inline-flex items-center px-2 sm:px-3 py-2 border-2 border-[#00ff99] text-xs sm:text-sm leading-4 font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
             >
-              <Shield className="h-4 w-4 mr-2" />
-              Admin Panel
+              <Shield className="h-4 w-4 mr-1" />
+              <span className="hidden xs:inline sm:block">Admin</span>
             </Link>
           )}
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4" style={{ fontFamily: 'Fira Mono, monospace', textShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}>
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8 relative z-10 w-full">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-2 sm:mb-4" style={{ fontFamily: 'Fira Mono, monospace', textShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}>
             &lt;/&gt; Welcome to CodersToday
           </h2>
-          <p className="text-lg text-[#baffea] font-mono mb-2">The ultimate coding arena for competitive programmers.</p>
-          <p className="text-base text-[#00ff99] font-mono italic">"Where coders become champions."</p>
+          <p className="text-base sm:text-lg text-[#baffea] font-mono mb-1 sm:mb-2">The ultimate coding arena for competitive programmers.</p>
+          <p className="text-xs sm:text-base text-[#00ff99] font-mono italic">"Where coders become champions."</p>
         </div>
 
         {/* Contests Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
           {/* Active Contests */}
           <div>
-            <h3 className="text-2xl font-bold mb-4 font-mono text-[#00ff99]">Active Contests</h3>
+            <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 font-mono text-[#00ff99]">Active Contests</h3>
             {activeContests.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {activeContests.map(contest => (
-                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 hover:shadow-2xl hover:border-[#00cfff] transition-all font-mono text-white">
-                    <div className="flex justify-between items-center">
+                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-3 sm:p-4 hover:shadow-2xl hover:border-[#00cfff] transition-all font-mono text-white">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <span className="font-semibold text-[#00ff99]">{contest.title}</span>
-                      <span className="text-sm text-[#00ff99] flex items-center">
+                      <span className="text-xs sm:text-sm text-[#00ff99] flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         Ends in: {countdowns[contest._id] ? formatCountdown(countdowns[contest._id].timeLeft) : '...'}
                       </span>
@@ -404,20 +404,20 @@ const Home = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No active contests right now.</p>
+              <p className="text-gray-500 text-xs sm:text-base">No active contests right now.</p>
             )}
           </div>
 
           {/* Upcoming Contests */}
           <div>
-            <h3 className="text-2xl font-bold mb-4 font-mono text-[#00cfff]">Upcoming Contests</h3>
+            <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4 font-mono text-[#00cfff]">Upcoming Contests</h3>
             {upcomingContests.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {upcomingContests.map(contest => (
-                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-4 hover:shadow-2xl hover:border-[#00ff99] transition-all font-mono text-white">
-                    <div className="flex justify-between items-center">
+                  <Link to={`/contests/${contest._id}`} key={contest._id} className="block bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-3 sm:p-4 hover:shadow-2xl hover:border-[#00ff99] transition-all font-mono text-white">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <span className="font-semibold text-[#00cfff]">{contest.title}</span>
-                      <span className="text-sm text-[#00cfff] flex items-center">
+                      <span className="text-xs sm:text-sm text-[#00cfff] flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         Starts in: {countdowns[contest._id] ? formatCountdown(countdowns[contest._id].timeLeft) : '...'}
                       </span>
@@ -426,13 +426,13 @@ const Home = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No upcoming contests scheduled.</p>
+              <p className="text-gray-500 text-xs sm:text-base">No upcoming contests scheduled.</p>
             )}
           </div>
         </div>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
               <div className="p-2 bg-[#00ff99]/20 rounded-lg">
@@ -491,20 +491,20 @@ const Home = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 mb-8 font-mono text-white hover:border-[#00cfff] transition-all">
-          <h3 className="text-lg font-bold text-[#00ff99] mb-4">
+        <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 font-mono text-white hover:border-[#00cfff] transition-all">
+          <h3 className="text-base sm:text-lg font-bold text-[#00ff99] mb-2 sm:mb-4">
             Quick Actions
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link to="/problems" className="flex items-center justify-center px-4 py-2 border-2 border-[#00ff99] rounded-md text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            <Link to="/problems" className="flex items-center justify-center px-3 sm:px-4 py-2 border-2 border-[#00ff99] rounded-md text-xs sm:text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
               <Code className="h-4 w-4 mr-2" />
               Browse Problems
             </Link>
-            <Link to="/contests" className="flex items-center justify-center px-4 py-2 border-2 border-[#00cfff] rounded-md text-sm font-bold text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00ff99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00cfff] font-mono transition">
+            <Link to="/contests" className="flex items-center justify-center px-3 sm:px-4 py-2 border-2 border-[#00cfff] rounded-md text-xs sm:text-sm font-bold text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00ff99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00cfff] font-mono transition">
               <Calendar className="h-4 w-4 mr-2" />
               View Contests
             </Link>
-            <Link to="/my-submissions" className="flex items-center justify-center px-4 py-2 border-2 border-[#00ff99] rounded-md text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
+            <Link to="/my-submissions" className="flex items-center justify-center px-3 sm:px-4 py-2 border-2 border-[#00ff99] rounded-md text-xs sm:text-sm font-bold text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition">
               <FileText className="h-4 w-4 mr-2" />
               My Submissions
             </Link>
@@ -512,15 +512,15 @@ const Home = () => {
         </div>
 
         {/* Leaderboard and Activity Feed */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           <div className="md:col-span-1">
-            <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
+            <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 sm:p-6 font-mono text-white hover:border-[#00cfff] transition-all">
               <Leaderboard type="global" data={leaderboardData} />
             </div>
           </div>
           <div className="md:col-span-1">
-            <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
-          <ActivityFeed />
+            <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-4 sm:p-6 font-mono text-white hover:border-[#00ff99] transition-all">
+              <ActivityFeed />
             </div>
           </div>
         </div>

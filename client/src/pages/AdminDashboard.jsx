@@ -110,16 +110,16 @@ const AdminDashboard = () => {
     <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
       <CodeBackground />
       {/* Header */}
-      <div className="bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] px-8 py-6 flex justify-between items-center" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+      <div className="bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] px-2 sm:px-4 md:px-8 py-4 sm:py-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
         <div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Admin Dashboard</h1>
-          <p className="text-[#baffea] font-mono">Welcome back, {user?.username}!</p>
+          <h1 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Admin Dashboard</h1>
+          <p className="text-[#baffea] font-mono text-xs sm:text-base">Welcome back, {user?.username}!</p>
         </div>
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold tracking-widest ${user?.role === 'admin' ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}`}>{user?.role}</span>
+        <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold tracking-widest ${user?.role === 'admin' ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}`}>{user?.role}</span>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8 relative z-10 w-full">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="flex items-center">
               <div className="p-2 bg-[#00ff99]/20 rounded-lg">
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         {/* Recent Users & Submissions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="border-b border-[#00ff99]/30 pb-2 mb-4">
               <h3 className="text-lg font-bold text-[#00ff99]">Recent Users</h3>
@@ -214,11 +214,11 @@ const AdminDashboard = () => {
         </div>
         {/* Submission Statistics */}
         {stats?.verdictStats && stats.verdictStats.length > 0 && (
-          <div className="mt-8 bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00cfff] transition-all">
+          <div className="mt-6 sm:mt-8 bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 sm:p-6 font-mono text-white hover:border-[#00cfff] transition-all">
             <div className="border-b border-[#00ff99]/30 pb-2 mb-4">
-              <h3 className="text-lg font-bold text-[#00ff99]">Submission Statistics</h3>
+              <h3 className="text-base sm:text-lg font-bold text-[#00ff99]">Submission Statistics</h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
               {stats.verdictStats.map((stat) => (
                 <div key={stat._id} className="text-center">
                   <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${stat._id === 'AC' ? 'bg-green-900' : stat._id === 'WA' ? 'bg-red-900' : stat._id === 'TLE' ? 'bg-yellow-900' : 'bg-gray-900'}`}> <span className={`text-lg font-semibold ${stat._id === 'AC' ? 'text-green-300' : stat._id === 'WA' ? 'text-red-300' : stat._id === 'TLE' ? 'text-yellow-300' : 'text-gray-300'}`}>{stat._id}</span></div>

@@ -137,53 +137,61 @@ const AdminSubmissions = () => {
     <AdminLayout>
       <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
         <CodeBackground />
-        <div className="p-6 relative z-10">
-          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4">Submission Management</h1>
-          <div className="mb-4 flex flex-wrap gap-4 items-end bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            <input
-              type="text"
-              placeholder="User (username or email)"
-                className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
-              value={filters.user}
-              onChange={e => handleFilterChange('user', e.target.value)}
-            />
+        <div className="p-2 sm:p-4 md:p-6 relative z-10">
+          <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4">Submission Management</h1>
+          <div className="mb-4 flex flex-col sm:flex-row sm:gap-4 gap-2 items-stretch">
+            <div className="flex-1">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input
+                  type="text"
+                  placeholder="User (username or email)"
+                  className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
+                  value={filters.user}
+                  onChange={e => handleFilterChange('user', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            <input
-              type="text"
-              placeholder="Problem title"
-                className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
-              value={filters.problem}
-              onChange={e => handleFilterChange('problem', e.target.value)}
-            />
+            <div className="flex-1">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input
+                  type="text"
+                  placeholder="Problem title"
+                  className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100 bg-transparent placeholder-[#baffea]"
+                  value={filters.problem}
+                  onChange={e => handleFilterChange('problem', e.target.value)}
+                />
+              </div>
             </div>
-            <select
-              className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
-              value={filters.language}
-              onChange={e => handleFilterChange('language', e.target.value)}
-            >
-              <option value="">All Languages</option>
-              <option value="c">C</option>
-              <option value="cpp">C++</option>
-              <option value="java">Java</option>
-              <option value="python">Python</option>
-            </select>
-            <select
-              className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
-              value={filters.verdict}
-              onChange={e => handleFilterChange('verdict', e.target.value)}
-            >
-              <option value="">All Verdicts</option>
-              <option value="AC">Accepted</option>
-              <option value="WA">Wrong Answer</option>
-              <option value="TLE">Time Limit Exceeded</option>
-              <option value="RE">Runtime Error</option>
-              <option value="CE">Compilation Error</option>
-              <option value="Pending">Pending</option>
-            </select>
+            <div className="flex-1">
+              <select
+                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
+                value={filters.language}
+                onChange={e => handleFilterChange('language', e.target.value)}
+              >
+                <option value="">All Languages</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <select
+                className="w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono shadow-inner placeholder-[#baffea] transition"
+                value={filters.verdict}
+                onChange={e => handleFilterChange('verdict', e.target.value)}
+              >
+                <option value="">All Verdicts</option>
+                <option value="AC">Accepted</option>
+                <option value="WA">Wrong Answer</option>
+                <option value="TLE">Time Limit Exceeded</option>
+                <option value="RE">Runtime Error</option>
+                <option value="CE">Compilation Error</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
           </div>
           {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
           {loading ? (
@@ -192,14 +200,14 @@ const AdminSubmissions = () => {
               <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Submissions...</span>
             </div>
           ) : (
-            <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-hidden font-mono">
-              <div className="px-6 py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
-                <h3 className="text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
-                  Submissions ({submissions.length})
+            <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg overflow-x-auto font-mono">
+              <div className="px-3 sm:px-6 py-3 sm:py-4 border-b-2 border-[#00ff99] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
+                <h3 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
+                  Submissions
                 </h3>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-[#00cfff]">
+                <table className="min-w-full divide-y divide-[#00ff99] text-xs sm:text-sm">
                   <thead className="bg-[#181c24]">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider font-mono"> </th>

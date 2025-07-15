@@ -103,16 +103,16 @@ const ChangePassword = ({ onClose }) => {
       <MatrixRainBackground />
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-md p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
+        className="relative z-10 w-full max-w-xs sm:max-w-md p-4 sm:p-8 md:p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
         style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}
       >
-        <h1 className="text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2 sm:mb-4">
           &lt;/&gt; CodersToday
         </h1>
-        <h2 className="text-2xl font-bold text-center mb-2 tracking-wide">Change Password</h2>
-        <p className="text-center text-gray-400 mb-6 italic text-sm">Update your password below.</p>
+        <h2 className="text-lg sm:text-2xl font-bold text-center mb-1 sm:mb-2 tracking-wide">Change Password</h2>
+        <p className="text-center text-gray-400 mb-4 sm:mb-6 italic text-xs sm:text-sm">Update your password below.</p>
         {/* Current Password */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Current Password</label>
           <div className="relative">
             <input
@@ -120,7 +120,7 @@ const ChangePassword = ({ onClose }) => {
               name="currentPassword"
               value={formData.currentPassword}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-base text-white placeholder-gray-500 shadow-inner pr-10"
+              className="w-full px-3 sm:px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner pr-10"
               placeholder="Enter current password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -138,7 +138,7 @@ const ChangePassword = ({ onClose }) => {
           </div>
         </div>
         {/* New Password */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">New Password</label>
           <div className="relative">
             <input
@@ -146,7 +146,7 @@ const ChangePassword = ({ onClose }) => {
               name="newPassword"
               value={formData.newPassword}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-base text-white placeholder-gray-500 shadow-inner pr-10"
+              className="w-full px-3 sm:px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner pr-10"
               placeholder="Enter new password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -164,7 +164,7 @@ const ChangePassword = ({ onClose }) => {
           </div>
         </div>
         {/* Confirm New Password */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Confirm New Password</label>
           <div className="relative">
             <input
@@ -172,7 +172,7 @@ const ChangePassword = ({ onClose }) => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-base text-white placeholder-gray-500 shadow-inner pr-10"
+              className="w-full px-3 sm:px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner pr-10"
               placeholder="Confirm new password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -191,39 +191,39 @@ const ChangePassword = ({ onClose }) => {
         </div>
         {/* Error Message */}
         {error && (
-          <div className="bg-red-600/20 border border-red-500 text-red-400 px-4 py-3 rounded-md text-sm mt-2">
+          <div className="bg-red-600/20 border border-red-500 text-red-400 px-3 sm:px-4 py-2 sm:py-3 rounded-md text-xs sm:text-sm mt-2">
             <div className="flex">
               <AlertCircle className="h-5 w-5 text-red-400" />
               <div className="ml-3">
-                <p className="text-sm text-red-400">{error}</p>
+                <p className="text-xs sm:text-sm text-red-400">{error}</p>
               </div>
             </div>
           </div>
         )}
         {/* Success Message */}
         {success && (
-          <div className="bg-green-600/20 border border-green-500 text-green-400 px-4 py-3 rounded-md text-sm mt-2">
+          <div className="bg-green-600/20 border border-green-500 text-green-400 px-3 sm:px-4 py-2 sm:py-3 rounded-md text-xs sm:text-sm mt-2">
             <div className="flex">
               <CheckCircle className="h-5 w-5 text-green-400" />
               <div className="ml-3">
-                <p className="text-sm text-green-400">{success}</p>
+                <p className="text-xs sm:text-sm text-green-400">{success}</p>
               </div>
             </div>
           </div>
         )}
         {/* Buttons */}
-        <div className="flex space-x-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+            className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-md text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-4 py-2 border border-transparent rounded-md text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-3 sm:px-4 py-2 border border-transparent rounded-md text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Changing...' : 'Change Password'}
           </button>

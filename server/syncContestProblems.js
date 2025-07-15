@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
-import Contest from "./models/Contest.js";
-import Problem from "./models/Problem.js";
+import Contest from "./server/models/Contest.js";
+import Problem from "./server/models/Problem.js";
 
 async function syncContestProblems() {
   await mongoose.connect(process.env.MONGO_URI);

@@ -108,29 +108,29 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{
+    <div className="min-h-screen flex items-center justify-center px-2 sm:px-4 relative overflow-hidden" style={{
       background: '#181c24', // dark blue-gray
     }}>
       {/* Matrix Code Rain Canvas (background) */}
       <canvas ref={matrixCanvasRef} className="fixed inset-0 w-full h-full z-0 pointer-events-none" style={{ borderRadius: 0 }} />
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-md p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
+        className="relative z-10 w-full max-w-xs sm:max-w-md p-4 sm:p-8 md:p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
         style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}
       >
         {/* Animated code typing effect */}
-        <div className="mb-6 text-lg font-mono text-green-400 h-6 flex items-center">
+        <div className="mb-4 sm:mb-6 text-base sm:text-lg font-mono text-green-400 h-6 flex items-center">
           <span>{typed}</span><span className="animate-pulse">|</span>
         </div>
         {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500 rounded-full p-2 shadow-xl mb-2 animate-pulse border-4 border-white/10">
-            <span className="text-3xl">&lt;/&gt;</span>
+        <div className="flex flex-col items-center mb-4 sm:mb-6">
+          <div className="bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500 rounded-full p-1 sm:p-2 shadow-xl mb-2 animate-pulse border-4 border-white/10">
+            <span className="text-2xl sm:text-3xl">&lt;/&gt;</span>
           </div>
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">CodersToday</h1>
+          <h1 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">CodersToday</h1>
         </div>
-        <h2 className="text-2xl font-bold text-center mb-2 tracking-wide">Sign in to your account</h2>
-        <p className="text-center text-gray-400 mb-6 italic text-sm">"Code. Compete. Conquer."</p>
+        <h2 className="text-lg sm:text-2xl font-bold text-center mb-1 sm:mb-2 tracking-wide">Sign in to your account</h2>
+        <p className="text-center text-gray-400 mb-4 sm:mb-6 italic text-xs sm:text-sm">"Code. Compete. Conquer."</p>
         <div>
           <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Email or Username</label>
           <input
@@ -140,11 +140,11 @@ const Login = () => {
             onChange={handleChange}
             required
             placeholder="Enter email or username"
-            className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-base text-white placeholder-gray-500 shadow-inner"
+            className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
             autoComplete="username"
           />
         </div>
-        <div className="relative mt-4">
+        <div className="relative mt-3 sm:mt-4">
           <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Password</label>
           <input
             type={showPassword ? "text" : "password"}
@@ -153,12 +153,12 @@ const Login = () => {
             onChange={handleChange}
             required
             placeholder="Enter your password"
-            className="w-full px-4 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-base text-white placeholder-gray-500 shadow-inner"
+            className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
             autoComplete="current-password"
           />
           <span
             onClick={togglePassword}
-            className="absolute top-9 right-3 cursor-pointer text-gray-400 hover:text-pink-400 text-lg select-none"
+            className="absolute top-8 sm:top-9 right-3 cursor-pointer text-gray-400 hover:text-pink-400 text-lg select-none"
             tabIndex={0}
             role="button"
             aria-label="Toggle password visibility"
@@ -167,18 +167,18 @@ const Login = () => {
           </span>
         </div>
         <div className="text-xs text-right mt-2">
-          <Link to="/forgot-password" className="text-purple-400 hover:underline font-extrabold text-base drop-shadow-md transition-colors duration-150">Forgot Password?</Link>
+          <Link to="/forgot-password" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Forgot Password?</Link>
         </div>
-        {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
+        {error && <p className="text-red-500 text-xs sm:text-sm text-center mt-2">{error}</p>}
         <button
           type="submit"
-          className="w-full mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
+          className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-base sm:text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
         >
           Login
         </button>
-        <p className="text-sm text-center text-gray-400 mt-6">
+        <p className="text-xs sm:text-sm text-center text-gray-400 mt-4 sm:mt-6">
           Don't have an account?{' '}
-          <Link to="/register" className="text-purple-400 hover:underline font-extrabold text-base drop-shadow-md transition-colors duration-150">Register</Link>
+          <Link to="/register" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Register</Link>
         </p>
       </form>
     </div>

@@ -227,16 +227,16 @@ const AdminContests = () => {
     <AdminLayout>
       <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
         <CodeBackground />
-        <div className="p-6 relative z-10">
+        <div className="p-2 sm:p-4 md:p-6 relative z-10">
           {/* Header */}
-          <div className="mb-6 flex justify-between items-center">
+          <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
             <div>
-              <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Contest Management</h1>
-              <p className="text-[#baffea] font-mono">Manage coding contests and competitions</p>
+              <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Contest Management</h1>
+              <p className="text-[#baffea] font-mono text-xs sm:text-base">Manage coding contests and competitions</p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center px-4 py-2 border-2 border-[#00ff99] text-sm font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
+              className="inline-flex items-center px-2 sm:px-4 py-2 border-2 border-[#00ff99] text-xs sm:text-sm font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Contest
@@ -244,7 +244,7 @@ const AdminContests = () => {
           </div>
 
           {/* Filters */}
-          <div className="mb-4 flex flex-wrap gap-4 items-end bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 font-mono text-white hover:border-[#00ff99] transition-all">
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-3 sm:p-6 mb-4 sm:mb-6 font-mono text-white hover:border-[#00ff99] transition-all grid grid-cols-1 md:grid-cols-4 gap-2 sm:gap-4">
             <div className="relative w-full md:w-1/3">
               <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               <input
@@ -270,14 +270,14 @@ const AdminContests = () => {
           {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
 
           {/* Contests Table */}
-          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-hidden font-mono">
-            <div className="px-6 py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
-              <h3 className="text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
+          <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg overflow-x-auto font-mono">
+            <div className="px-3 sm:px-6 py-3 sm:py-4 border-b-2 border-[#00cfff] bg-gradient-to-r from-[#181c24] to-[#232b3a]">
+              <h3 className="text-base sm:text-lg font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">
                 Contests ({contests.length})
               </h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#00cfff]">
+              <table className="min-w-full divide-y divide-[#00cfff] text-xs sm:text-sm">
                 <thead className="bg-[#181c24]">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-extrabold text-[#00ff99] uppercase tracking-wider">Title</th>
