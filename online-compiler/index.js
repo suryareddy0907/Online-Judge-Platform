@@ -62,6 +62,10 @@ app.post('/run', async (req, res) => {
             default:
                 return res.status(400).json({ success: false, error: "Unsupported language" });
         }
+        // If output is 'MLE: Memory Limit Exceeded', always return as such
+        if (output === 'MLE: Memory Limit Exceeded') {
+            return res.status(200).json({ output: 'MLE: Memory Limit Exceeded' });
+        }
         return res.json({ filepath, output });
     } catch (error) {
         // Detect compilation error
@@ -74,11 +78,11 @@ app.post('/run', async (req, res) => {
             return res.status(200).json({ success: false, error: "Compilation failed", stderr: sanitized });
         }
         // Handle memory limit exceeded
-        if (errorText && errorText.includes("Memory Limit Exceeded")) {
-            return res.status(200).json({ success: false, error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        if (errorText && (errorText.includes("Memory Limit Exceeded") || errorText.includes("MLE: Memory Limit Exceeded"))) {
+            return res.status(200).json({ output: 'MLE: Memory Limit Exceeded' });
         }
-        // For all other errors, return 500
-        return res.status(500).json({ success: false, error: error.stderr || error.message || errorText });
+        // For all other errors, return as runtime error (not 500)
+        return res.status(200).json({ success: false, error: "Runtime Error", stderr: error.stderr || error.message || errorText });
     }
 });
 

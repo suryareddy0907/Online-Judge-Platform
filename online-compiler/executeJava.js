@@ -54,7 +54,7 @@ const executeJava = (filepath, input = "") => {
       // JVM memory flags for ultra-low container execution
       const jvmFlags = ['-Xmx64m', '-Xms16m', '-XX:ReservedCodeCacheSize=8m'];
       const runArgs = [...jvmFlags, '-cp', jobPath, className];
-      console.log('Java run command:', isWin ? 'java' : (isWin ? 'cmd.exe' : 'prlimit'), runArgs);
+      // console.log('Java run command:', isWin ? 'java' : (isWin ? 'cmd.exe' : 'prlimit'), runArgs);
       let runProcess;
       if (isWin) {
         // Memory limit not enforced on Windows in this implementation
@@ -88,17 +88,27 @@ const executeJava = (filepath, input = "") => {
       runProcess.on('close', (code, signal) => {
         clearTimeout(timer);
         fs.rmSync(jobPath, { recursive: true, force: true });
+        if (signal === 'SIGKILL' || signal === 'SIGSEGV' || signal === 'SIGABRT') {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
+        if (code === null) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
         // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
         if (isWin && code === 3221225725) {
-          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+          return resolve('MLE: Memory Limit Exceeded');
         }
         // Check for memory limit exceeded (prlimit returns 137 or SIGKILL)
         if (!isWin && (signal === 'SIGKILL' || code === 137)) {
-          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+          return resolve('MLE: Memory Limit Exceeded');
         }
         // Filter out Java compiler notes and warnings from both stderr and stdout
         stderr = filterNotes(stderr);
         stdout = filterNotes(stdout);
+        // Check for Java OutOfMemoryError
+        if (stderr && /OutOfMemoryError|Java heap space|GC overhead limit exceeded|Could not reserve enough space/i.test(stderr)) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
         if (code !== 0) {
           // If there is any error output, show it; otherwise, show a generic message
           return reject({ error: `Execution failed with code ${code}`, stderr: stderr || stdout || `Java program exited with code ${code}` });

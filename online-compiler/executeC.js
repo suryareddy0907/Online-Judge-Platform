@@ -57,13 +57,25 @@ const executeC = (filepath, input = "") => {
       });
       runProcess.on('close', (code, signal) => {
         clearTimeout(timer);
-        // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
-        if (isWin && code === 3221225725) {
-          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        if (signal === 'SIGKILL' || signal === 'SIGSEGV' || signal === 'SIGABRT') {
+          return resolve('MLE: Memory Limit Exceeded');
         }
-        // Check for memory limit exceeded (prlimit returns 137 or SIGKILL)
-        if (!isWin && (signal === 'SIGKILL' || code === 137)) {
-          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        if (code === null) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
+        // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
+        if (code === 3221225725) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
+        // Check for memory limit exceeded (SIGKILL, code 137)
+        if (signal === 'SIGKILL' || code === 137) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
+        if (stderr && /MemoryError|out of memory|cannot allocate memory/i.test(stderr)) {
+          return resolve('MLE: Memory Limit Exceeded');
+        }
+        if (code === 1 && (stdout.includes('Memory allocation failed') || stderr.includes('Memory allocation failed'))) {
+          return resolve('MLE: Memory Limit Exceeded');
         }
         if (code !== 0 || stderr) {
           return reject({ error: `Execution failed with code ${code}`, stderr });

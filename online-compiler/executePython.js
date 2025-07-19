@@ -36,18 +36,46 @@ const executePython = (filepath, input = "") => {
     });
     runProcess.on('close', (code, signal) => {
       clearTimeout(timer);
+      if (signal === 'SIGKILL' || signal === 'SIGSEGV' || signal === 'SIGABRT') {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
+      if (code === null) {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
       // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
       if (isWin && code === 3221225725) {
-        return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        return resolve('MLE: Memory Limit Exceeded');
       }
-      // Check for memory limit exceeded (prlimit returns 137 or SIGKILL)
-      if (!isWin && (signal === 'SIGKILL' || code === 137)) {
-        return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+      // Check for memory limit exceeded (SIGKILL, code 137)
+      if (signal === 'SIGKILL' || code === 137) {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
+      // RecursionError (Python stack overflow)
+      if (stderr && /RecursionError|maximum recursion depth exceeded/i.test(stderr)) {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
+      if (stderr && /MemoryError|out of memory|cannot allocate memory/i.test(stderr)) {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
+      // If process exited abnormally with no stderr, treat as MLE
+      if (code !== 0 && !stderr) {
+        return resolve('MLE: Memory Limit Exceeded');
+      }
+      // Windows: treat any non-zero exit code as MLE (unless already handled above)
+      if (isWin && code !== 0) {
+        return resolve('MLE: Memory Limit Exceeded');
       }
       if (code !== 0 || stderr) {
-        return reject({ error: `Execution failed with code ${code}`, stderr });
+        // If we have stderr, return it as a user-friendly error
+        return resolve(stderr || `Execution failed with code ${code}`);
       }
       return resolve(stdout);
+    });
+    // Catch-all for any unexpected errors
+    runProcess.on('exit', (code, signal) => {
+      // If the promise is already settled, do nothing
+      if (stdout || stderr) return;
+      return resolve('MLE: Memory Limit Exceeded');
     });
   });
 };

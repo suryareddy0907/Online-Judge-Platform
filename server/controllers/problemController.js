@@ -69,15 +69,21 @@ export const submitProblem = async (req, res) => {
         if (data.error || (data.output && data.output.error)) {
            let verdict, errorMessage;
            const errorDetails = data.output ? data.output : data;
+           const errorMsg = (errorDetails.error || errorDetails.stderr || errorDetails.output || '').toString().toLowerCase();
            if (errorDetails.error && errorDetails.error.includes("Compilation failed")) {
              verdict = "CE";
              errorMessage = `Compilation Error: ${errorDetails.stderr || errorDetails.error}`;
            } else if (errorDetails.error && errorDetails.error.includes("Time Limit Exceeded")) {
              verdict = "TLE";
              errorMessage = `Time Limit Exceeded on Test Case ${i + 1}`;
-           } else if (errorDetails.error && errorDetails.error.includes("Memory Limit Exceeded")) {
+           } else if (
+             (errorDetails.error && errorDetails.error.toLowerCase().includes("memory limit exceeded")) ||
+             (errorDetails.stderr && errorDetails.stderr.toLowerCase().includes("memory limit exceeded")) ||
+             (errorDetails.output && errorDetails.output.toLowerCase().includes("memory limit exceeded")) ||
+             (data.output && data.output.toLowerCase().includes('memory limit exceeded'))
+           ) {
              verdict = "MLE";
-             errorMessage = `Memory Limit Exceeded on Test Case ${i + 1}`;
+             errorMessage = 'MLE: Memory Limit Exceeded';
            } else {
              verdict = "RE";
              errorMessage = `Runtime Error on Test Case ${i + 1}: ${errorDetails.stderr || errorDetails.error}`;
@@ -89,6 +95,16 @@ export const submitProblem = async (req, res) => {
         const trimmedOutput = (data.output || "").toString().trim();
         const trimmedExpectedOutput = (testCase.output || "").toString().trim();
 
+        // Prioritize MLE: check for memory limit exceeded before WA
+        if (
+          trimmedOutput.toLowerCase().includes('memory limit exceeded') ||
+          (data.error && data.error.toLowerCase().includes('memory limit exceeded')) ||
+          ((trimmedOutput === '' || trimmedOutput === undefined) && (!data.error || data.error === undefined))
+        ) {
+          await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "MLE", judgedAt: new Date(), errorMessage: 'MLE: Memory Limit Exceeded' });
+          return res.status(200).json({ verdict: "MLE", message: 'MLE: Memory Limit Exceeded' });
+        }
+        // Only check for WA after MLE check
         if (trimmedOutput !== trimmedExpectedOutput) {
           await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "WA", judgedAt: new Date(), errorMessage: `Wrong Answer on Test Case ${i + 1}` });
           return res.status(200).json({ verdict: "WA", message: `Wrong Answer on Test Case ${i + 1}` });
@@ -111,9 +127,9 @@ export const submitProblem = async (req, res) => {
           verdict = "CE";
           errorMessage = `Compilation Error: ${error.stderr || error.error || errorText}`;
         }
-        if (errorText && errorText.includes("Memory Limit Exceeded")) {
+        if (errorText && errorText.toLowerCase().includes("memory limit exceeded")) {
           verdict = "MLE";
-          errorMessage = `Memory Limit Exceeded on Test Case ${i + 1}`;
+          errorMessage = 'MLE: Memory Limit Exceeded';
         }
 
         await Submission.findByIdAndUpdate(newSubmission._id, { verdict, judgedAt: new Date(), errorMessage });

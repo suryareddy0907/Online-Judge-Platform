@@ -20,8 +20,13 @@ router.post("/run", async (req, res) => {
     });
 
     // Return output or compiler error from microservice
+    let output = response.data.output || response.data.stderr || response.data.error || "No output";
+    // If output is 'MLE: Memory Limit Exceeded' or error is 'Memory Limit Exceeded', show only 'Memory Limit Exceeded'
+    if (output === 'MLE: Memory Limit Exceeded' || output === 'Memory Limit Exceeded' || response.data.error === 'Memory Limit Exceeded') {
+      return res.status(200).json({ output: 'Memory Limit Exceeded' });
+    }
     return res.status(200).json({
-      output: response.data.output || response.data.stderr || response.data.error || "No output",
+      output,
       stderr: response.data.stderr // Forward stderr for compilation errors
     });
   } catch (error) {

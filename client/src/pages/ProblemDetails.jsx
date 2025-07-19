@@ -87,6 +87,10 @@ const ProblemDetails = () => {
         const compilerOutput = response.data.stderr || response.data.output;
         setOutput({ type: 'CE', message: compilerOutput });
       } else if (
+        response.data.output === 'MLE: Memory Limit Exceeded'
+      ) {
+        setOutput({ type: 'MLE', message: 'Memory limit exceeded' });
+      } else if (
         response.data.error === 'Time Limit Exceeded' ||
         (response.data.output && response.data.output.includes('Process terminated after 2 seconds'))
       ) {
@@ -101,7 +105,9 @@ const ProblemDetails = () => {
       }
     } catch (err) {
       const errMsg = err.response?.data?.stderr || err.response?.data?.output || err.response?.data?.error || err.message || "An unexpected error occurred.";
-      if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('time limit exceeded')) {
+      if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('memory limit exceeded')) {
+        setOutput({ type: 'MLE', message: 'Memory limit exceeded' });
+      } else if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('time limit exceeded')) {
         setOutput({ type: 'TLE', message: 'Time limit exceeded' });
       } else if (typeof errMsg === 'string' && errMsg.toLowerCase().includes('runtime error')) {
         setOutput({ type: 'RE', message: 'Runtime error' });
@@ -135,6 +141,11 @@ const ProblemDetails = () => {
           cleanMsg = cleanMsg.replace(/^(Compilation (Error|error|failed):?\s*)/i, '');
         }
         setOutput({ type: 'CE', message: cleanMsg.trim() });
+      } else if (
+        response.data.verdict === 'MLE' ||
+        (typeof response.data.message === 'string' && response.data.message.toLowerCase().includes('memory limit exceeded'))
+      ) {
+        setOutput('MLE: Memory Limit Exceeded');
       } else {
         setOutput(`${response.data.verdict}: ${response.data.message}`);
       }
@@ -545,7 +556,15 @@ const ProblemDetails = () => {
                           </pre>
                         </div>
                       )}
-                      {!(typeof output === 'object' && (output.type === 'RE' || output.type === 'CE' || output.type === 'TLE')) && (
+                      {typeof output === 'object' && output.type === 'MLE' && (
+                        <div className="bg-[#181c24] border-l-4 border-purple-500 p-3 rounded">
+                          <div className="text-purple-300 font-bold mb-1">MLE: Memory limit exceeded</div>
+                          <pre className="text-[#e0e0e0] whitespace-pre-wrap font-mono text-base leading-relaxed">
+                            {formatOutputMessage(output.message)}
+                          </pre>
+                        </div>
+                      )}
+                      {!(typeof output === 'object' && (output.type === 'RE' || output.type === 'CE' || output.type === 'TLE' || output.type === 'MLE')) && (
                         <pre
                           className="bg-[#181c24] border-l-4 border-[#00cfff] p-3 rounded font-mono text-base leading-relaxed text-[#baffea]"
                           style={{
