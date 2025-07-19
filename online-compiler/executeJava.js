@@ -15,6 +15,7 @@ if (!fs.existsSync(outputPath)) {
 const executeJava = (filepath, input = "") => {
   const jobId = path.basename(filepath).split(".")[0];
   const jobPath = path.resolve(outputPath, jobId);
+  const MEMORY_LIMIT_MB = 256; // 256 MB
   
   if (!fs.existsSync(jobPath)) {
     fs.mkdirSync(jobPath, { recursive: true });
@@ -38,16 +39,30 @@ const executeJava = (filepath, input = "") => {
     const compileCommand = `javac -d "${jobPath}" "${javaFilePath}"`;
 
     exec(compileCommand, (compileErr, _, compileStderr) => {
-      if (compileErr || compileStderr) {
+      // Filter out Java compiler notes and warnings from compileStderr
+      const filterNotes = str => str
+        ? str.split('\n').filter(line => !line.trim().startsWith('Note:')).join('\n').trim()
+        : '';
+      const filteredCompileStderr = filterNotes(compileStderr);
+      if (compileErr || filteredCompileStderr) {
         fs.rmSync(jobPath, { recursive: true, force: true });
-        return reject({ error: "Compilation failed", stderr: compileStderr });
+        // Return only real compiler errors, not notes
+        return reject({ error: "Compilation failed", stderr: filteredCompileStderr || compileErr.message });
       }
 
       const isWin = process.platform === 'win32';
-      const runArgs = ['-cp', jobPath, className];
-      const runProcess = isWin
-        ? spawn('cmd.exe', ['/c', 'java', ...runArgs])
-        : spawn('java', runArgs);
+      // JVM memory flags for ultra-low container execution
+      const jvmFlags = ['-Xmx64m', '-Xms16m', '-XX:ReservedCodeCacheSize=8m'];
+      const runArgs = [...jvmFlags, '-cp', jobPath, className];
+      console.log('Java run command:', isWin ? 'java' : (isWin ? 'cmd.exe' : 'prlimit'), runArgs);
+      let runProcess;
+      if (isWin) {
+        // Memory limit not enforced on Windows in this implementation
+        runProcess = spawn('cmd.exe', ['/c', 'java', ...runArgs]);
+      } else {
+        // Run java directly, let Docker/container manage memory
+        runProcess = spawn('java', runArgs);
+      }
 
       const timer = setTimeout(() => {
         runProcess.kill();
@@ -70,13 +85,30 @@ const executeJava = (filepath, input = "") => {
         fs.rmSync(jobPath, { recursive: true, force: true });
         return reject({ error: "Runtime execution failed", stderr: err.message });
       });
-      runProcess.on('close', (code) => {
+      runProcess.on('close', (code, signal) => {
         clearTimeout(timer);
         fs.rmSync(jobPath, { recursive: true, force: true });
-        if (code !== 0 || stderr) {
-          return reject({ error: `Execution failed with code ${code}`, stderr });
+        // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
+        if (isWin && code === 3221225725) {
+          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
         }
-        return resolve(stdout);
+        // Check for memory limit exceeded (prlimit returns 137 or SIGKILL)
+        if (!isWin && (signal === 'SIGKILL' || code === 137)) {
+          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        }
+        // Filter out Java compiler notes and warnings from both stderr and stdout
+        stderr = filterNotes(stderr);
+        stdout = filterNotes(stdout);
+        if (code !== 0) {
+          // If there is any error output, show it; otherwise, show a generic message
+          return reject({ error: `Execution failed with code ${code}`, stderr: stderr || stdout || `Java program exited with code ${code}` });
+        }
+        if (stderr) {
+          // If there is any error output but code is 0, show it as well
+          return reject({ error: `Java program error output`, stderr });
+        }
+        // If only notes were present, return empty output
+        return resolve(stdout || '');
       });
     });
   });

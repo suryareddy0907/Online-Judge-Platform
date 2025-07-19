@@ -342,31 +342,23 @@ const AdminProblems = () => {
           </div>
 
           {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing page {pagination.currentPage} of {pagination.totalPages}
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+              onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+              disabled={pagination.currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="text-[#baffea] font-mono">Page {pagination.currentPage} of {pagination.totalPages}</span>
+            <button
+              className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+              onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+              disabled={pagination.currentPage === pagination.totalPages}
+            >
+              Next
+            </button>
+          </div>
 
           {/* Create Problem Modal */}
           {showCreateModal && (

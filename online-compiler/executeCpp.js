@@ -15,6 +15,7 @@ if (!fs.existsSync(outputPath)) {
 const executeCpp = (filepath, input = "") => {
   const jobId = path.basename(filepath).split(".")[0];
   const outPath = path.resolve(outputPath, `${jobId}.exe`);
+  const MEMORY_LIMIT_MB = 256; // 256 MB
 
   return new Promise((resolve, reject) => {
     const compileCommand = `g++ "${filepath}" -o "${outPath}"`;
@@ -27,11 +28,16 @@ const executeCpp = (filepath, input = "") => {
         });
       }
 
-      // Use spawn for better stdin/stdout control
       const isWin = process.platform === 'win32';
-      const runProcess = isWin
-        ? spawn('cmd.exe', ['/c', outPath])
-        : spawn(outPath);
+      let runProcess;
+      if (isWin) {
+        // Memory limit not enforced on Windows in this implementation
+        runProcess = spawn('cmd.exe', ['/c', outPath]);
+      } else {
+        // Use 'prlimit' to set memory limit (in bytes)
+        const memBytes = MEMORY_LIMIT_MB * 1024 * 1024;
+        runProcess = spawn('prlimit', ['--as=' + memBytes, outPath]);
+      }
 
       const timer = setTimeout(() => {
         runProcess.kill();
@@ -60,8 +66,16 @@ const executeCpp = (filepath, input = "") => {
         });
       });
 
-      runProcess.on('close', (code) => {
+      runProcess.on('close', (code, signal) => {
         clearTimeout(timer);
+        // Windows: 3221225725 (0xC00000FD) is stack overflow, treat as memory exceeded
+        if (isWin && code === 3221225725) {
+          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        }
+        // Check for memory limit exceeded (prlimit returns 137 or SIGKILL)
+        if (!isWin && (signal === 'SIGKILL' || code === 137)) {
+          return reject({ error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        }
         if (code !== 0 || stderr) {
           return reject({
             error: `Execution failed with code ${code}`,

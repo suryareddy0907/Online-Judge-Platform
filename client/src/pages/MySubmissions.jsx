@@ -100,11 +100,13 @@ const MySubmissions = () => {
   const [filters, setFilters] = useState({ problem: '', language: '', verdict: '' });
   const [viewModal, setViewModal] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchSubmissions();
     // eslint-disable-next-line
-  }, [filters]);
+  }, [filters, page]);
 
   useEffect(() => {
     if (viewModal) {
@@ -123,8 +125,9 @@ const MySubmissions = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getMySubmissions(filters);
+      const data = await getMySubmissions({ ...filters, page, limit: 10 });
       setSubmissions(data.submissions);
+      setTotalPages(data.totalPages || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -246,6 +249,23 @@ const MySubmissions = () => {
             </table>
           </div>
         )}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="text-[#baffea] font-mono">Page {page} of {totalPages}</span>
+          <button
+            className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
         {/* View Modal */}
         {viewModal && selectedSubmission && (
           <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">

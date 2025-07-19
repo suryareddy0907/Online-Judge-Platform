@@ -28,11 +28,13 @@ const AdminSubmissions = () => {
   const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
   const modalOpenedRef = useRef(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchSubmissions();
     // eslint-disable-next-line
-  }, [filters]);
+  }, [filters, page]);
 
   useEffect(() => {
     const handlePopState = (e) => {
@@ -60,8 +62,9 @@ const AdminSubmissions = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getAllSubmissions(filters);
+      const data = await getAllSubmissions({ ...filters, page, limit: 10 });
       setSubmissions(data.submissions);
+      setTotalPages(data.totalPages || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -248,6 +251,23 @@ const AdminSubmissions = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </button>
+                <span className="text-[#baffea] font-mono">Page {page} of {totalPages}</span>
+                <button
+                  className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </button>
               </div>
             </div>
           )}

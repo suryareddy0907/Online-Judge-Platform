@@ -73,6 +73,10 @@ app.post('/run', async (req, res) => {
             const sanitized = sanitizeErrorMessage(error.stderr || error.error || errorText);
             return res.status(200).json({ success: false, error: "Compilation failed", stderr: sanitized });
         }
+        // Handle memory limit exceeded
+        if (errorText && errorText.includes("Memory Limit Exceeded")) {
+            return res.status(200).json({ success: false, error: "Memory Limit Exceeded", stderr: "Memory Limit Exceeded" });
+        }
         // For all other errors, return 500
         return res.status(500).json({ success: false, error: error.stderr || error.message || errorText });
     }

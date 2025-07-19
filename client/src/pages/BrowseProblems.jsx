@@ -120,6 +120,8 @@ const BrowseProblems = () => {
   const [allTags, setAllTags] = useState([]);
   const [solvedCounts, setSolvedCounts] = useState({});
   const [solvedProblems, setSolvedProblems] = useState(new Set());
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   const fetchSolvedCounts = async (problems) => {
@@ -156,11 +158,11 @@ const BrowseProblems = () => {
     setLoading(true);
     setError(null);
     try {
-      // Pass selectedTags as an array directly for OR logic
-      const params = { search, difficulty };
+      const params = { search, difficulty, page, limit: 10 };
       if (selectedTags.length > 0) params.tag = selectedTags;
       const data = await getPublicProblems(params);
       setProblems(data.problems);
+      setTotalPages(data.totalPages || 1);
       // Collect all unique tags from the full problem set, not just filtered results
       if (allTags.length === 0) {
       const tags = new Set();
@@ -185,6 +187,8 @@ const BrowseProblems = () => {
   // No additional client-side AND filtering; use backend results directly
   const filteredProblems = problems;
 
+  const solvedCount = problems.filter(p => solvedProblems.has(p._id)).length;
+
   return (
     <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
       <AuroraBackground />
@@ -193,6 +197,28 @@ const BrowseProblems = () => {
       <div className="max-w-5xl mx-auto px-4 py-10 relative z-10">
         <Logo />
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight text-center mb-8 drop-shadow-lg">Browse Problems</h1>
+        <div className="flex justify-center mb-6">
+          <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">
+            {solvedCount} / {problems.length} problems solved
+          </span>
+        </div>
+        <div className="flex justify-center items-center mb-8">
+          <button
+            className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="text-[#baffea] font-mono">Page {page} of {totalPages}</span>
+          <button
+            className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
         <div className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 mb-8">
           <div className="relative flex-1">
             <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>

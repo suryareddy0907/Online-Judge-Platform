@@ -9,7 +9,8 @@ const AdminContests = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({ search: '', status: '' });
+  const [filters, setFilters] = useState({ search: '', status: '', page: 1 });
+  const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -38,14 +39,19 @@ const AdminContests = () => {
     fetchContests();
     fetchProblems();
     fetchUsers();
-  }, [filters]);
+  }, [filters.page, filters.search, filters.status]);
 
   const fetchContests = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getAllContests(filters);
+      const data = await getAllContests({ ...filters, page: filters.page, limit: 10 });
       setContests(data.contests);
+      setPagination({
+        currentPage: data.currentPage,
+        totalPages: data.totalPages,
+        total: data.total
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -211,6 +217,10 @@ const AdminContests = () => {
       </svg>
     </div>
   );
+
+  const handlePageChange = (page) => {
+    setFilters(prev => ({ ...prev, page }));
+  };
 
   if (loading) {
     return (
@@ -598,6 +608,24 @@ const AdminContests = () => {
               </div>
             </div>
           )}
+
+          <div className="flex justify-between items-center mt-4">
+            <button
+              className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+              onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+              disabled={pagination.currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="text-[#baffea] font-mono">Page {pagination.currentPage} of {pagination.totalPages}</span>
+            <button
+              className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+              onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+              disabled={pagination.currentPage === pagination.totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </AdminLayout>

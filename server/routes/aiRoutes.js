@@ -30,8 +30,11 @@ router.post("/generate-hint", async (req, res) => {
 
 router.post("/analyze-code", async (req, res) => {
   const { code, language, problemStatement } = req.body;
+  if (!code || code.trim().length === 0) {
+    return res.status(400).json({ feedback: "The code is empty. Please write the code." });
+  }
   try {
-    const prompt = `You are an expert programming assistant. Analyze the following ${language} code written for this problem.\n\nProblem:\n${problemStatement}\n\nUser's Code:\n${code}\n\nGive concise, actionable feedback in no more than 5-10 lines. Do not provide detailed explanations—just the most important points, each as a single line. Use Markdown formatting and clearly number each point (1, 2, 3, ...). The feedback should start on a new line after the heading 'Feedback:'.\n\nFeedback:\n`;
+    const prompt = `You are an expert programming assistant. Analyze the following ${language} code written for this problem.\n\nProblem:\n${problemStatement}\n\nUser's Code:\n${code}\n\nGive concise, actionable feedback in no more than 5-10 lines. Do NOT provide any code snippets, code examples, or code blocks. Do not provide detailed explanations—just the most important points, each as a single line. Use Markdown formatting and clearly number each point (1, 2, 3, ...). The feedback should start on a new line after the heading 'Feedback:'.\n\nFeedback:\n`;
     const response = await axios.post(
       "https://api.cohere.ai/v1/generate",
       {
@@ -57,9 +60,7 @@ router.post("/analyze-code", async (req, res) => {
 router.post("/explain-problem", async (req, res) => {
   const { problemStatement, language } = req.body;
   try {
-    const prompt = `You are an expert programming assistant. Your job is to restate the following programming problem in a much simpler, beginner-friendly way. Do NOT give any hints, solution ideas, or advice. Just explain what the problem is about and what the user is supposed to do, in clear, concise language (5-10 lines max). Use Markdown formatting and start the explanation on a new line after the heading 'Explanation:'.
-
-Problem:\n${problemStatement}\n\nExplanation:\n`;
+    const prompt = `You are an expert programming assistant. Your job is to restate ONLY the description of the following programming problem in a much simpler, beginner-friendly way. Do NOT give any hints, solution ideas, logic, or advice. Do NOT mention how to solve the problem or any steps to approach it. Just explain what the problem is about and what the user is supposed to do, in clear, concise language (5-10 lines max). Use Markdown formatting and start the explanation on a new line after the heading 'Explanation:'.\n\nProblem:\n${problemStatement}\n\nExplanation:\n`;
     const response = await axios.post(
       "https://api.cohere.ai/v1/generate",
       {

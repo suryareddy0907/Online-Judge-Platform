@@ -23,6 +23,9 @@ const ProblemDetails = () => {
   const [codeFeedback, setCodeFeedback] = useState("");
   const [explanation, setExplanation] = useState("");
   const [debugOutput, setDebugOutput] = useState("");
+  const lastAnalyzedCodeRef = useRef("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -145,6 +148,11 @@ const ProblemDetails = () => {
   };
 
   const handleGenerateHint = async () => {
+    if (hint) {
+      setPopupMessage("The Hints are generated already.");
+      setShowPopup(true);
+      return;
+    }
     setAiLoading("hint");
     setHint("");
     try {
@@ -162,6 +170,14 @@ const ProblemDetails = () => {
   };
 
   const handleAnalyzeCode = async () => {
+    if (!code || code.trim().length === 0) {
+      setCodeFeedback("The code is empty. Please write the code.");
+      return;
+    }
+    if (lastAnalyzedCodeRef.current === code) {
+      setCodeFeedback("You have already analyzed this code. Please modify your code to analyze again.");
+      return;
+    }
     setAiLoading("analyze");
     setCodeFeedback("");
     try {
@@ -171,8 +187,13 @@ const ProblemDetails = () => {
         problemStatement: problem.statement,
       });
       setCodeFeedback(response.data.feedback);
+      lastAnalyzedCodeRef.current = code;
     } catch (err) {
-      setCodeFeedback("Failed to analyze code.");
+      if (err.response && err.response.data && err.response.data.feedback) {
+        setCodeFeedback(err.response.data.feedback);
+      } else {
+        setCodeFeedback("Failed to analyze code.");
+      }
     } finally {
       setAiLoading("");
     }
@@ -201,6 +222,11 @@ const ProblemDetails = () => {
   };
 
   const handleExplainProblem = async () => {
+    if (explanation) {
+      setPopupMessage("The Explanation is generated already.");
+      setShowPopup(true);
+      return;
+    }
     setAiLoading("explain");
     setExplanation("");
     try {
@@ -442,7 +468,10 @@ const ProblemDetails = () => {
                           language === "python" ? "python" : "plaintext"
                         }
                         value={code}
-                        onChange={value => setCode(value || "")}
+                        onChange={value => {
+                          setCode(value || "");
+                          lastAnalyzedCodeRef.current = "";
+                        }}
                         options={{
                           fontSize: 16,
                           minimap: { enabled: false },
@@ -556,6 +585,19 @@ const ProblemDetails = () => {
           </Allotment.Pane>
         </Allotment>
       </div>
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white text-black rounded-lg shadow-lg p-6 min-w-[280px] text-center">
+            <div className="mb-4 font-bold text-lg">{popupMessage}</div>
+            <button
+              className="mt-2 px-6 py-2 rounded bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99]"
+              onClick={() => setShowPopup(false)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

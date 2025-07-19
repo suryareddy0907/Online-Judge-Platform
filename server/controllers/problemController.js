@@ -75,6 +75,9 @@ export const submitProblem = async (req, res) => {
            } else if (errorDetails.error && errorDetails.error.includes("Time Limit Exceeded")) {
              verdict = "TLE";
              errorMessage = `Time Limit Exceeded on Test Case ${i + 1}`;
+           } else if (errorDetails.error && errorDetails.error.includes("Memory Limit Exceeded")) {
+             verdict = "MLE";
+             errorMessage = `Memory Limit Exceeded on Test Case ${i + 1}`;
            } else {
              verdict = "RE";
              errorMessage = `Runtime Error on Test Case ${i + 1}: ${errorDetails.stderr || errorDetails.error}`;
@@ -107,6 +110,10 @@ export const submitProblem = async (req, res) => {
         if (errorText && errorText.includes("Compilation failed")) {
           verdict = "CE";
           errorMessage = `Compilation Error: ${error.stderr || error.error || errorText}`;
+        }
+        if (errorText && errorText.includes("Memory Limit Exceeded")) {
+          verdict = "MLE";
+          errorMessage = `Memory Limit Exceeded on Test Case ${i + 1}`;
         }
 
         await Submission.findByIdAndUpdate(newSubmission._id, { verdict, judgedAt: new Date(), errorMessage });
