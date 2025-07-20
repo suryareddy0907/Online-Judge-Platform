@@ -3,6 +3,8 @@ import axios from "axios";
 
 const router = express.Router();
 
+const COMPILER_SERVICE_URL = process.env.COMPILER_SERVICE_URL;
+
 // POST /api/run
 router.post("/run", async (req, res) => {
   const { code, language = "cpp", input = "" } = req.body;
@@ -13,7 +15,7 @@ router.post("/run", async (req, res) => {
 
   try {
     // Forward code to online-compiler microservice
-    const response = await axios.post("http://localhost:5001/run", {
+    const response = await axios.post(`${COMPILER_SERVICE_URL}/run`, {
       code,
       language, // Forwarding 'python' directly
       input,
