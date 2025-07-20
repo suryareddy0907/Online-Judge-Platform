@@ -456,3 +456,42 @@ cd ../client
 npm install
 npm run dev
 ```
+
+## 🌐 Deployed Application & Demo
+
+- **Deployed Website:** [https://coders-today.vercel.app/](https://coders-today.vercel.app/)
+- **Demo Video:** [https://www.loom.com/share/979b45c6ae474c6cb9b21cba1f5839b8?sid=7ff39677-ce0c-40bc-9123-6799aed65551](https://www.loom.com/share/979b45c6ae474c6cb9b21cba1f5839b8?sid=7ff39677-ce0c-40bc-9123-6799aed65551)
+
+## 🚀 Deployment Overview
+
+### Frontend (React)
+- **Platform:** Vercel
+- **URL:** [https://coders-today.vercel.app/](https://coders-today.vercel.app/)
+- **Environment Variable:**
+  - `VITE_API_URL` set to the deployed backend URL
+- **Deployment Steps:**
+  1. Push the `client` directory to GitHub.
+  2. Import the repo in Vercel, set the root directory to `client`.
+  3. Set environment variables and deploy.
+
+### Backend (Node.js/Express)
+- **Platform:** Render
+- **URL:** [https://online-judge-platform-6xta.onrender.com](https://online-judge-platform-6xta.onrender.com)
+- **Environment Variables:**
+  - `PORT`, `MONGO_URI`, `JWT_SECRET`, and all required API keys.
+  - `COMPILER_SERVICE_URL` set to the deployed compiler microservice domain
+- **Deployment Steps:**
+  1. Push the `server` directory to GitHub.
+  2. Create a new Web Service on Render, set the root directory to `server`.
+  3. Set environment variables and deploy.
+
+### Compiler Microservice (Online Compiler)
+- **Platform:** AWS EC2 (Dockerized Node.js service)
+- **Domain:** [http://oj-compiler.me:5001](http://oj-compiler.me:5001)
+- **Deployment Steps:**
+  1. Build and push the Docker image to AWS ECR.
+  2. Launch an EC2 instance, install Docker, and run the container exposing port xxxx.
+  3. Assign a domain (e.g., `oj-compiler.me`) to the EC2 public IP using an A record in your DNS provider.
+  4. Ensure the EC2 security group allows inbound traffic on port xxxx.
+
+---
