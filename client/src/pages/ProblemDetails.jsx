@@ -6,6 +6,8 @@ import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import MonacoEditor from "@monaco-editor/react";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const ProblemDetails = () => {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
@@ -75,7 +77,7 @@ const ProblemDetails = () => {
   const handleRun = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/run", {
+      const response = await axios.post(`${API_BASE_URL}/api/run`, {
         code: code,
         language: language,
         input: customInput,
@@ -125,7 +127,7 @@ const ProblemDetails = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `http://localhost:5000/api/problems/${id}/submit`,
+        `${API_BASE_URL}/api/problems/${id}/submit`,
         { code, language },
         {
           headers: {
@@ -167,7 +169,7 @@ const ProblemDetails = () => {
     setAiLoading("hint");
     setHint("");
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/generate-hint", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/generate-hint`, {
         problemStatement: problem.statement,
         userCode: code,
         language: language,
@@ -192,7 +194,7 @@ const ProblemDetails = () => {
     setAiLoading("analyze");
     setCodeFeedback("");
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/analyze-code", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/analyze-code`, {
         code,
         language,
         problemStatement: problem.statement,
@@ -213,7 +215,7 @@ const ProblemDetails = () => {
   const handleGenerateBoilerplate = async (isContinue = false) => {
     setAiLoading("boilerplate");
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/generate-boilerplate", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/generate-boilerplate`, {
         problemStatement: problem.statement,
         language: language,
         currentBoilerplate: isContinue ? code : undefined,
@@ -241,7 +243,7 @@ const ProblemDetails = () => {
     setAiLoading("explain");
     setExplanation("");
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/explain-problem", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/explain-problem`, {
         problemStatement: problem.statement,
         language: language,
       });
@@ -257,7 +259,7 @@ const ProblemDetails = () => {
     setAiLoading("debug");
     setDebugOutput("");
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/debug-code", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/debug-code`, {
         code,
         language,
         problemStatement: problem.statement,
