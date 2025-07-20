@@ -1,7 +1,7 @@
 import axios from "axios";
 import { io } from 'socket.io-client';
 
-const API_BASE_URL = 'http://localhost:5000/api/auth';
+const API_BASE_URL = 'https://online-judge-platform-6xta.onrender.com/api/auth';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
@@ -100,7 +100,7 @@ export const updateUserProfile = async (profileData) => {
 // Public: Get published problems
 export const getPublicProblems = async (params = {}) => {
   const queryParams = new URLSearchParams(params);
-  const response = await fetch(`http://localhost:5000/api/problems?${queryParams}`);
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/problems?${queryParams}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Something went wrong');
@@ -111,7 +111,7 @@ export const getPublicProblems = async (params = {}) => {
 export const getMySubmissions = async (params = {}) => {
   const token = localStorage.getItem('token');
   const queryParams = new URLSearchParams(params);
-  const response = await fetch(`http://localhost:5000/api/problems/my-submissions?${queryParams}`, {
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/problems/my-submissions?${queryParams}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
@@ -128,7 +128,7 @@ export const getMySubmissions = async (params = {}) => {
 export const getPublicStats = async () => {
   const token = localStorage.getItem('token');
   const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-  const response = await fetch('http://localhost:5000/api/admin/public-stats', { headers });
+  const response = await fetch('https://online-judge-platform-6xta.onrender.com/api/admin/public-stats', { headers });
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch stats');
@@ -139,7 +139,7 @@ export const getPublicStats = async () => {
 // Get leaderboard data
 export const getLeaderboard = async (params = {}) => {
   const queryParams = new URLSearchParams(params);
-  const response = await fetch(`http://localhost:5000/api/leaderboard?${queryParams}`);
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/leaderboard?${queryParams}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch leaderboard');
@@ -150,7 +150,7 @@ export const getLeaderboard = async (params = {}) => {
 // Get recent activity feed
 export const getRecentActivity = async (params = {}) => {
   const queryParams = new URLSearchParams(params);
-  const response = await fetch(`http://localhost:5000/api/leaderboard/activity?${queryParams}`);
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/leaderboard/activity?${queryParams}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch recent activity');
@@ -160,7 +160,7 @@ export const getRecentActivity = async (params = {}) => {
 
 // Get number of unique problems solved by a user
 export const getUserSolvedCount = async (userId) => {
-  const response = await fetch(`http://localhost:5000/api/admin/user/${userId}/solved-count`);
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/admin/user/${userId}/solved-count`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch solved count');
@@ -175,7 +175,7 @@ export const getPublicContests = async (params = {}) => {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  const response = await fetch(`http://localhost:5000/api/contests?${queryParams}`, { headers });
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/contests?${queryParams}`, { headers });
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch contests');
@@ -184,7 +184,7 @@ export const getPublicContests = async (params = {}) => {
 };
 
 // Only one socket instance for the whole app
-export const socket = io('http://localhost:5000');
+export const socket = io('https://online-judge-platform-6xta.onrender.com');
 
 // Add socket connection debugging
 socket.on('connect', () => {
@@ -205,7 +205,7 @@ socket.on('test', (data) => {
 
 export const registerForContest = async (contestId) => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`/api/contests/${contestId}/register`, {
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/contests/${contestId}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ export const registerForContest = async (contestId) => {
 
 export const unregisterForContest = async (contestId) => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`/api/contests/${contestId}/register`, {
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/contests/${contestId}/register`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ export const unregisterForContest = async (contestId) => {
 };
 
 export const getContestLeaderboard = async (contestId) => {
-  const response = await fetch(`http://localhost:5000/api/contests/${contestId}/leaderboard`);
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/contests/${contestId}/leaderboard`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch contest leaderboard');
@@ -263,7 +263,7 @@ export const getContestLeaderboard = async (contestId) => {
 
 export const getProblemById = async (id) => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`/api/problems/${id}`, {
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/problems/${id}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -278,7 +278,7 @@ export const getProblemById = async (id) => {
 
 export const getContestDetails = async (contestId) => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`http://localhost:5000/api/contests/${contestId}`, {
+  const response = await fetch(`https://online-judge-platform-6xta.onrender.com/api/contests/${contestId}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,

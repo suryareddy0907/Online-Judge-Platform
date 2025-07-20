@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL + '/admin';
+const API_BASE_URL = 'https://online-judge-platform-6xta.onrender.com/api/admin';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
