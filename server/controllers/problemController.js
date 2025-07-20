@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import axios from "axios";
 import { getContestLeaderboard } from './leaderboardController.js';
 
+const COMPILER_SERVICE_URL = process.env.COMPILER_SERVICE_URL;
+
 // GET /api/problems - public, published only
 export const getPublicProblems = async (req, res) => {
   try {
@@ -64,7 +66,7 @@ export const submitProblem = async (req, res) => {
       };
 
       try {
-        const { data } = await axios.post("http://localhost:5001/run", runPayload);
+        const { data } = await axios.post(`${COMPILER_SERVICE_URL}/run`, runPayload);
 
         if (data.error || (data.output && data.output.error)) {
            let verdict, errorMessage;
