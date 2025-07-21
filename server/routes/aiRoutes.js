@@ -121,15 +121,14 @@ ${code}`;
 router.post("/complexity", async (req, res) => {
   const { code, language, problemStatement } = req.body;
   try {
-    const prompt = `You are an expert programming assistant. Analyze the following ${language} code for this problem:
+    const prompt = `You are an expert programming assistant. Analyze ONLY the code provided below (do NOT suggest or recommend any algorithms or approaches). If the code does not implement any relevant logic, reply: 'Cannot determine time and space complexity as the code does not implement any relevant logic.'
 
-Problem:
-${problemStatement}
+Language: ${language}
 
 User's Code:
 ${code}
 
-Give a concise summary (5-10 lines) of the code's time and space complexity. Only mention the main functions/loops/algorithms. Do NOT use markdown, code blocks, or symbols like *, #, or backticks. Use plain English and simple numbered points. If the code is incomplete, state what is missing for a full analysis.`;
+Give a concise summary (5-10 lines) of the code's time and space complexity. Do NOT use markdown, code blocks, or symbols like *, #, or backticks. Use plain English and simple numbered points.`;
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
