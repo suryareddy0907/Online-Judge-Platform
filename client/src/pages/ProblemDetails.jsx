@@ -5,6 +5,8 @@ import axios from "axios";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import MonacoEditor from "@monaco-editor/react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -26,6 +28,8 @@ function getBoilerplate(lang) {
 
 const ProblemDetails = () => {
   const { id } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,6 +53,12 @@ const ProblemDetails = () => {
   const [showExplanation, setShowExplanation] = useState(true);
   const [showDebugOutput, setShowDebugOutput] = useState(true);
   const [showResizeHint, setShowResizeHint] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

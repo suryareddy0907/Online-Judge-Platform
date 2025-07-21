@@ -21,6 +21,8 @@ const App = () => {
   return (
     <Routes>
       {/* Public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -29,15 +31,6 @@ const App = () => {
       {/* Protected routes */}
       <Route
         path="/"
-        element={
-          <PrivateRoute>
-            <Home />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/home"
         element={
           <PrivateRoute>
             <Home />
@@ -97,9 +90,7 @@ const App = () => {
       <Route
         path="/contests/:id"
         element={
-          <PrivateRoute>
-            <ContestDetails />
-          </PrivateRoute>
+          <ContestDetails />
         }
       />
 
@@ -112,8 +103,8 @@ const App = () => {
         }
       />
 
-      {/* Redirect all unknown routes to login */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Redirect all unknown routes to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

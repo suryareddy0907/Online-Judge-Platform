@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { getContestDetails, getContestLeaderboard } from '../services/authService';
 import Leaderboard from '../components/Leaderboard';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,7 @@ const ContestDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [contest, setContest] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,12 @@ const ContestDetails = () => {
   const [clock, setClock] = useState('');
   const [runConfetti, setRunConfetti] = useState(false);
   const { width, height } = useWindowSize();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const fetchContestData = async () => {

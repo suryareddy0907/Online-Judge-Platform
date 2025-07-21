@@ -325,49 +325,65 @@ const Home = () => {
             &lt;/&gt; CodersToday
         </h1>
         <div className="flex flex-wrap items-center gap-2 sm:gap-6 justify-end">
-          <div className="text-right">
-            <p className="text-xs sm:text-sm md:text-base font-medium text-[#00ff99] truncate max-w-[120px] sm:max-w-none">Hi, {user.username}!</p>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold tracking-widest ${
-              user.role === 'admin' ? 'bg-red-900 text-red-300' :
-              user.role === 'moderator' ? 'bg-yellow-900 text-yellow-300' :
-              'bg-green-900 text-green-300'
-            }`}>
-              {user.role}
-            </span>
-          </div>
-          {/* User Actions - View Profile, Change Password, Logout */}
-          <button
-            onClick={openUserProfile}
-            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
-            type="button"
-          >
-            <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
-            <span className="hidden xs:inline sm:block">Profile</span>
-          </button>
-          <button
-            onClick={openChangePassword}
-            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
-            type="button"
-          >
-            <Lock className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
-            <span className="hidden xs:inline sm:block">Password</span>
-          </button>
-          <button
-            onClick={logout}
-            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-red-900 border border-[#00ff99] text-red-400 font-mono font-bold transition text-xs sm:text-sm"
-            type="button"
-          >
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
-            <span className="hidden xs:inline sm:block">Logout</span>
-          </button>
-          {user.role === 'admin' && (
-            <Link
-              to="/admin/users"
-              className="inline-flex items-center px-2 sm:px-3 py-2 border-2 border-[#00ff99] text-xs sm:text-sm leading-4 font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
-            >
-              <Shield className="h-4 w-4 mr-1" />
-              <span className="hidden xs:inline sm:block">Admin</span>
-            </Link>
+          {user ? (
+            <>
+              <div className="text-right">
+                <p className="text-xs sm:text-sm md:text-base font-medium text-[#00ff99] truncate max-w-[120px] sm:max-w-none">Hi, {user.username}!</p>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold tracking-widest ${
+                  user.role === 'admin' ? 'bg-red-900 text-red-300' :
+                  user.role === 'moderator' ? 'bg-yellow-900 text-yellow-300' :
+                  'bg-green-900 text-green-300'
+                }`}>
+                  {user.role}
+                </span>
+              </div>
+              {/* User Actions - View Profile, Change Password, Logout */}
+              <button
+                onClick={openUserProfile}
+                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
+                type="button"
+              >
+                <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+                <span className="hidden xs:inline sm:block">Profile</span>
+              </button>
+              <button
+                onClick={openChangePassword}
+                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
+                type="button"
+              >
+                <Lock className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+                <span className="hidden xs:inline sm:block">Password</span>
+              </button>
+              <button
+                onClick={logout}
+                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-red-900 border border-[#00ff99] text-red-400 font-mono font-bold transition text-xs sm:text-sm"
+                type="button"
+              >
+                <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+                <span className="hidden xs:inline sm:block">Logout</span>
+              </button>
+              {user.role === 'admin' && (
+                <Link
+                  to="/admin/users"
+                  className="inline-flex items-center px-2 sm:px-3 py-2 border-2 border-[#00ff99] text-xs sm:text-sm leading-4 font-bold rounded-md text-[#00ff99] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00cfff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00ff99] font-mono transition"
+                >
+                  <Shield className="h-4 w-4 mr-1" />
+                  <span className="hidden xs:inline sm:block">Admin</span>
+                </Link>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-xs sm:text-sm md:text-base font-medium text-[#00ff99]">Hi, User!</p>
+              <Link to="/login" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+                <span className="hidden xs:inline sm:block">Login</span>
+              </Link>
+              <Link to="/register" className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
+                <span className="hidden xs:inline sm:block">Register</span>
+              </Link>
+            </>
           )}
         </div>
       </nav>
