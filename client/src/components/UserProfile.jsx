@@ -290,12 +290,28 @@ const UserProfile = () => {
                           ))}
                         </div>
                       </div>
-                      {/* Month labels below the grid, centered under the first week that contains a day in that month */}
+                      {/* Month labels below the grid, shifted left to match first column with any day in the month */}
                       <div className="flex mt-2 ml-6" style={{ minWidth: weeks.length * 16 }}>
                         {weeks.map((week, w) => {
-                          // Find if this week contains the first day of a month
-                          const firstOfMonth = week.find(date => date.getDate() === 1 && date <= today);
-                          const label = firstOfMonth ? firstOfMonth.toLocaleString('default', { month: 'short' }) : '';
+                          // Find if this week contains any day in a new month compared to the previous week
+                          let label = '';
+                          for (let d = 0; d < 7; d++) {
+                            const date = week[d];
+                            if (date > today) continue;
+                            if (w === 0 && date.getDate() !== 1 && date.getDate() <= 7) {
+                              // For the very first week, if not starting on the 1st, still show the month
+                              label = date.toLocaleString('default', { month: 'short' });
+                              break;
+                            }
+                            if (w > 0) {
+                              const prevWeek = weeks[w - 1];
+                              const prevDate = prevWeek[d];
+                              if (date.getMonth() !== prevDate.getMonth()) {
+                                label = date.toLocaleString('default', { month: 'short' });
+                                break;
+                              }
+                            }
+                          }
                           return (
                             <div key={w} style={{ width: 16, textAlign: 'center', marginRight: 2 }}>
                               <span className="text-xs text-[#baffea] font-mono">{label}</span>
