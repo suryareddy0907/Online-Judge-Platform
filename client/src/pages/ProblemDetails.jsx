@@ -28,6 +28,10 @@ const ProblemDetails = () => {
   const lastAnalyzedCodeRef = useRef("");
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
+  const [showHint, setShowHint] = useState(true);
+  const [showCodeFeedback, setShowCodeFeedback] = useState(true);
+  const [showExplanation, setShowExplanation] = useState(true);
+  const [showDebugOutput, setShowDebugOutput] = useState(true);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -373,24 +377,52 @@ const ProblemDetails = () => {
                   {aiLoading === "debug" ? "Debugging..." : "Debug Code"}
                 </button>
               </div>
-              {hint && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900">
+              {hint && showHint && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900 relative">
                   <strong>Hint:</strong> <span style={{ whiteSpace: 'pre-line' }}>{hint.replace(/^\s*Hint:\s*/i, '').replace(/(\d+\.)/g, '\n$1').replace(/^\n/, '')}</span>
+                  <button
+                    className="absolute top-2 right-2 text-blue-400 hover:text-blue-700 text-lg font-bold"
+                    onClick={() => setShowHint(false)}
+                    aria-label="Close Hint"
+                  >
+                    &times;
+                  </button>
                 </div>
               )}
-              {codeFeedback && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-900">
+              {codeFeedback && showCodeFeedback && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-900 relative">
                   <strong>Code Feedback:</strong> <span style={{ whiteSpace: 'pre-line' }}>{codeFeedback.replace(/(\d+\.)/g, '\n$1').replace(/^\n/, '')}</span>
+                  <button
+                    className="absolute top-2 right-2 text-green-400 hover:text-green-700 text-lg font-bold"
+                    onClick={() => setShowCodeFeedback(false)}
+                    aria-label="Close Code Feedback"
+                  >
+                    &times;
+                  </button>
                 </div>
               )}
-              {explanation && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900">
+              {explanation && showExplanation && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900 relative">
                   <strong>Explanation:</strong> <span dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>') }} />
+                  <button
+                    className="absolute top-2 right-2 text-yellow-400 hover:text-yellow-700 text-lg font-bold"
+                    onClick={() => setShowExplanation(false)}
+                    aria-label="Close Explanation"
+                  >
+                    &times;
+                  </button>
                 </div>
               )}
-              {debugOutput && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900">
+              {debugOutput && showDebugOutput && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900 relative">
                   <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: debugOutput.replace(/\n/g, '<br/>') }} />
+                  <button
+                    className="absolute top-2 right-2 text-red-400 hover:text-red-700 text-lg font-bold"
+                    onClick={() => setShowDebugOutput(false)}
+                    aria-label="Close Debug Output"
+                  >
+                    &times;
+                  </button>
                 </div>
               )}
               {/* Problem Statement */}

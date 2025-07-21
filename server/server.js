@@ -29,13 +29,9 @@ const io = new SocketIOServer(server, {
 app.set('io', io);
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-  
   // Send a test event to verify connection
   socket.emit('test', { message: 'Socket connection working!' });
-  
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
   });
 });
 
