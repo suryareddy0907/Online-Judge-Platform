@@ -259,7 +259,7 @@ const UserProfile = () => {
                           ))}
                         </div>
                         {/* Weeks as columns */}
-                        <div className="flex" style={{ marginLeft: 24 }}>
+                        <div className="flex" style={{ marginLeft: 120 }}>
                           {weeks.map((week, w) => {
                             // Find if this week is the start of a new month
                             const isMonthStart = monthLabels.some(m => m.week === w);
@@ -284,7 +284,7 @@ const UserProfile = () => {
                         </div>
                       </div>
                       {/* Month labels below the grid, centered under first week of each month */}
-                      <div className="flex mt-2" style={{ minWidth: 53 * 16, marginLeft: 62 }}>
+                      <div className="flex mt-2" style={{ minWidth: 53 * 16, marginLeft: 158 }}>
                         {weeks.map((_, w) => {
                           const monthLabel = monthLabels.find(m => m.week === w)?.label;
                           return (
