@@ -22,9 +22,9 @@ const ContestDetails = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate('/login', { replace: false, state: { from: location } });
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   useEffect(() => {
     const fetchContestData = async () => {

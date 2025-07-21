@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getProblemById } from "../services/authService";
 import axios from "axios";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import MonacoEditor from "@monaco-editor/react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -30,6 +29,7 @@ const ProblemDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,9 +56,9 @@ const ProblemDetails = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate('/login', { replace: false, state: { from: location } });
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

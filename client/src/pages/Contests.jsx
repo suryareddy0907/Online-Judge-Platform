@@ -233,8 +233,8 @@ const Contests = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#181c24] text-white">
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
-          <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Contests...</span>
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff]"></div>
+          <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse">Loading Contests...</span>
         </div>
       </div>
     );
@@ -242,7 +242,6 @@ const Contests = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-      <AuroraBackground />
       <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
         {/* Header */}
         <div className="shadow-md bg-[#232b3a] border-b-2 border-[#00cfff]">
@@ -323,10 +322,9 @@ const Contests = () => {
                 return (
                   <div
                     key={contest._id}
-                    className={`bg-[#232b3a] border-2 rounded-2xl shadow-xl overflow-hidden font-mono transition-all ${
+                    className={`bg-[#232b3a] border-2 rounded-2xl overflow-hidden font-mono transition-all ${
                       isActive ? 'border-[#00ff99]' : isUpcoming ? 'border-[#00cfff]' : 'border-[#baffea]'
                     }`}
-                    style={{ boxShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}
                   >
                     {/* Contest Header */}
                     <div className="p-8">
@@ -402,7 +400,7 @@ const Contests = () => {
                     {/* Contest Actions */}
                     <div className="px-8 py-6 bg-[#181c24] border-t-2 border-[#00cfff]">
                       {isActive ? (
-                        <button className="w-full bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold px-4 py-3 rounded-lg hover:from-[#00cfff] hover:to-[#00ff99] focus:outline-none focus:ring-2 focus:ring-[#00ff99] flex items-center justify-center transition-all shadow-lg"
+                        <button className="w-full bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] font-bold px-4 py-3 rounded-lg hover:from-[#00cfff] hover:to-[#00ff99] focus:outline-none focus:ring-2 focus:ring-[#00ff99] flex items-center justify-center transition-all"
                           onClick={() => handleJoinContest(contest)}>
                           <Trophy className="h-5 w-5 mr-2 text-[#00cfff]" />
                           Join Contest
