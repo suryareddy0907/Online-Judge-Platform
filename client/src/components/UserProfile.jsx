@@ -294,14 +294,6 @@ const UserProfile = () => {
                           ))}
                         </div>
                       </div>
-                      {/* Month labels below the grid, aligned to the first week of each month */}
-                      <div className="flex mt-2 ml-6" style={{ minWidth: weeks.length * 16 }}>
-                        {weeks.map((_, w) => (
-                          <div key={w} style={{ width: 16, textAlign: 'center', marginRight: 2 }}>
-                            <span className="text-xs text-[#baffea] font-mono">{monthLabelsMap[w] || ''}</span>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   </div>
                   <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
