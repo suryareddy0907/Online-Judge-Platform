@@ -124,8 +124,8 @@ A comprehensive online coding platform with a powerful admin panel for managing 
   - Uses Cohere API to restate the problem in simpler, beginner-friendly language (no hints or solutions).
   - Requires `PROBLEM_EXPLAIN_KEY` in your server `.env` file.
 
-- **Boilerplate Code Generation:**
-  - Uses OpenRouter API (Mistral 7B Instruct model) to generate minimal, idiomatic starter code for the selected language and problem.
+- **Time and Space Complexity Analysis:**
+  - Uses OpenRouter API (Mistral 7B Instruct model) to analyze the code written in the editor and provide a concise summary (5-10 lines) of its time and space complexity.
   - Requires `BOILERPLATE_KEY` (OpenRouter API key) in your server `.env` file.
 
 - **Code Debugging:**
@@ -133,7 +133,7 @@ A comprehensive online coding platform with a powerful admin panel for managing 
   - Requires `DEBUG_KEY` (OpenRouter API key) in your server `.env` file.
 
 **Note:**
-- All AI features are accessible via dedicated buttons on the problem details page.
+- All AI features are accessible via dedicated buttons on the problem details page, including the new "Generate Time and Space Complexities" button.
 - Each feature requires the corresponding API key to be set in your server `.env` file.
 - The backend will return clear error messages if an API key is missing or invalid.
 
