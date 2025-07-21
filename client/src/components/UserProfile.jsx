@@ -59,13 +59,36 @@ const UserProfile = () => {
     return map;
   }, [submissions, heatmapFilter]);
 
-  // Generate last 365 days for the heatmap
-  const today = new Date();
-  const days = Array.from({ length: 365 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (364 - i));
+  // LeetCode/Codeforces-style heatmap: 53 weeks x 7 days
+  // Find the start date (last Sunday before 1 year ago)
+  const startDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 364);
+    d.setHours(0, 0, 0, 0);
+    // Move to previous Sunday
+    d.setDate(d.getDate() - d.getDay());
     return d;
-  });
+  })();
+  // Build 53 weeks x 7 days
+  const weeks = Array.from({ length: 53 }, (_, w) =>
+    Array.from({ length: 7 }, (_, d) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + w * 7 + d);
+      return date;
+    })
+  );
+  // Month labels (above first day of each month)
+  const monthLabels = [];
+  let lastMonth = null;
+  for (let w = 0; w < weeks.length; w++) {
+    const firstDay = weeks[w][0];
+    const month = firstDay.getMonth();
+    if (month !== lastMonth) {
+      monthLabels.push({ week: w, label: firstDay.toLocaleString('default', { month: 'short' }) });
+      lastMonth = month;
+    }
+  }
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Find max count for color scaling
   const maxCount = Math.max(1, ...Object.values(heatmapData));
@@ -168,18 +191,42 @@ const UserProfile = () => {
               </button>
             </div>
             <div className="overflow-x-auto w-full flex justify-center">
-              <div className="grid grid-cols-26 gap-1" style={{ minWidth: 26 * 14 }}>
-                {days.map((d, i) => {
-                  const key = d.toISOString().slice(0, 10);
-                  const count = heatmapData[key] || 0;
-                  return (
-                    <div
-                      key={key}
-                      title={`${key}: ${count} submission${count !== 1 ? 's' : ''}`}
-                      style={{ width: 12, height: 12, background: getColor(count), borderRadius: 2, border: '1px solid #232b3a' }}
-                    />
-                  );
-                })}
+              <div>
+                {/* Month labels */}
+                <div className="flex ml-10" style={{ minWidth: 53 * 14 }}>
+                  {Array.from({ length: 53 }).map((_, w) => {
+                    const label = monthLabels.find(m => m.week === w)?.label;
+                    return (
+                      <div key={w} className="w-3 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 14 }}>{label || ''}</div>
+                    );
+                  })}
+                </div>
+                <div className="flex">
+                  {/* Day labels */}
+                  <div className="flex flex-col mr-1">
+                    {dayLabels.map((d, i) => (
+                      <div key={d} className="h-3 w-8 text-xs text-[#baffea] text-right pr-1 font-mono" style={{ height: 14 }}>{i % 2 === 0 ? d : ''}</div>
+                    ))}
+                  </div>
+                  {/* Heatmap grid */}
+                  <div className="flex">
+                    {weeks.map((week, w) => (
+                      <div key={w} className="flex flex-col">
+                        {week.map((date, d) => {
+                          const key = date.toISOString().slice(0, 10);
+                          const count = (date > today ? null : heatmapData[key] || 0);
+                          return (
+                            <div
+                              key={key}
+                              title={date > today ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
+                              style={{ width: 12, height: 12, background: count === null ? 'transparent' : getColor(count), borderRadius: 2, border: '1px solid #232b3a', marginBottom: 2 }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
