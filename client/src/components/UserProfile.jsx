@@ -19,10 +19,15 @@ const UserProfile = () => {
   const [submissions, setSubmissions] = useState([]);
   const [heatmapFilter, setHeatmapFilter] = useState('all'); // 'all' or 'ac'
   const navigate = useNavigate();
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    // Wait for user context to finish loading
+    if (user === undefined) return;
+    if (user === null) {
       navigate('/login', { replace: true });
+    } else {
+      setAuthLoading(false);
     }
   }, [user, navigate]);
 
@@ -169,12 +174,18 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
       <div className="max-w-4xl mx-auto py-12 px-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-8 px-4 py-2 border-2 border-[#00cfff] rounded-lg text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] font-bold transition-all"
-        >
-          ← Back
-        </button>
+        {authLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-8 px-4 py-2 border-2 border-[#00cfff] rounded-lg text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] font-bold transition-all"
+          >
+            ← Back
+          </button>
+        )}
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-8 tracking-tight text-center">User Profile</h1>
         <div className="flex flex-col items-center w-full">
           {loading ? (
