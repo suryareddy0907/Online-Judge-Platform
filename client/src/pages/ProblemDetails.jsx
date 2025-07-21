@@ -303,6 +303,38 @@ const ProblemDetails = () => {
       .join('\n');
   };
 
+  const formatDebugOutput = (rawOutput) => {
+    if (!rawOutput) return "";
+  
+    // Remove the "Here is a thorough debugging review:" part
+    let cleanedOutput = rawOutput.replace(/here is a thorough debugging review:/i, "").trim();
+  
+    // Split into sections
+    const sections = cleanedOutput.split(/###\s*\d+\)\s*/).filter(Boolean);
+  
+    const formattedSections = sections.map(section => {
+      const lines = section.split('\n').filter(line => line.trim() !== '');
+      if (lines.length === 0) return null;
+  
+      const title = lines[0].trim();
+      const content = lines.slice(1).join('\n').trim();
+  
+      // If the content (after the title) indicates no errors, skip this section
+      if (/^none\./i.test(content) || /^the provided code is syntactically correct/i.test(content)) {
+        return null;
+      }
+  
+      // Return the formatted section (title and content)
+      return `<h3>${title}</h3><p>${content.replace(/\n/g, '<br/>')}</p>`;
+    }).filter(Boolean); // Filter out null (empty or "no error") sections
+  
+    if (formattedSections.length === 0) {
+      return "No errors found in your code. Good job!";
+    }
+  
+    return formattedSections.join('<br/>');
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#181c24] text-[#00ff99] font-mono animate-pulse">Loading...</div>;
   if (error || !problem) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-[#181c24] font-mono">{error || "Problem not found"}</div>;
 
@@ -415,7 +447,7 @@ const ProblemDetails = () => {
               )}
               {debugOutput && showDebugOutput && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-900 relative">
-                  <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: debugOutput.replace(/\n/g, '<br/>') }} />
+                  <strong>Debug Output:</strong> <span dangerouslySetInnerHTML={{ __html: formatDebugOutput(debugOutput) }} />
                   <button
                     className="absolute top-2 right-2 text-red-400 hover:text-red-700 text-lg font-bold"
                     onClick={() => setShowDebugOutput(false)}
