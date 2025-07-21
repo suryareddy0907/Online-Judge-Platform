@@ -129,7 +129,7 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#181c24] font-mono p-4 relative">
-      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl">
         <h2 className="text-3xl font-extrabold text-center bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">
           Create Your Account
         </h2>
@@ -145,67 +145,69 @@ function Register() {
           <h1 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">CodersToday</h1>
         </div>
         <p className="text-center text-gray-400 mb-4 sm:mb-6 italic text-xs sm:text-sm">"Join. Code. Rise."</p>
-        <FormInput
-          label="Username"
-          type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          placeholder="Enter your username"
-        />
-        <FormInput
-          label="Email"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter your email"
-        />
-        <div className="relative mt-3 sm:mt-4">
+        <form onSubmit={handleSubmit}>
           <FormInput
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
+            label="Username"
+            type="text"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
-            placeholder="Enter your password"
+            placeholder="Enter your username"
           />
-          <span
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute top-8 sm:top-[45px] right-3 cursor-pointer text-lg text-gray-400 hover:text-pink-400 select-none"
-            tabIndex={0}
-            role="button"
-            aria-label="Toggle password visibility"
-          >
-            {showPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
-        <div className="relative mt-3 sm:mt-4">
           <FormInput
-            label="Confirm Password"
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            value={formData.confirmPassword}
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
-            placeholder="Confirm your password"
+            placeholder="Enter your email"
           />
-          <span
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute top-8 sm:top-[45px] right-3 cursor-pointer text-lg text-gray-400 hover:text-pink-400 select-none"
-            tabIndex={0}
-            role="button"
-            aria-label="Toggle confirm password visibility"
+          <div className="relative mt-3 sm:mt-4">
+            <FormInput
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+            />
+            <span
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute top-8 sm:top-[45px] right-3 cursor-pointer text-lg text-gray-400 hover:text-pink-400 select-none"
+              tabIndex={0}
+              role="button"
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
+          <div className="relative mt-3 sm:mt-4">
+            <FormInput
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+            />
+            <span
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              className="absolute top-8 sm:top-[45px] right-3 cursor-pointer text-lg text-gray-400 hover:text-pink-400 select-none"
+              tabIndex={0}
+              role="button"
+              aria-label="Toggle confirm password visibility"
+            >
+              {showConfirmPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
+          {error && <p className="text-red-500 text-xs sm:text-sm text-center mt-2">{error}</p>}
+          <button
+            type="submit"
+            className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-base sm:text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
           >
-            {showConfirmPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
-        {error && <p className="text-red-500 text-xs sm:text-sm text-center mt-2">{error}</p>}
-        <button
-          type="submit"
-          className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-base sm:text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
-        >
-          Register
-        </button>
+            Register
+          </button>
+        </form>
         <p className="text-xs sm:text-sm text-center text-gray-400 mt-4 sm:mt-6">
           Already have an account?{' '}
           <Link to="/login" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Log in</Link>

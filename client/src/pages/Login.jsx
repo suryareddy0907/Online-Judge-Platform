@@ -109,7 +109,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#181c24] font-mono p-4 relative">
-      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl">
         <h2 className="text-3xl font-extrabold text-center bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">
           Login to Your Account
         </h2>
@@ -126,51 +126,53 @@ const Login = () => {
         </div>
         <h2 className="text-lg sm:text-2xl font-bold text-center mb-1 sm:mb-2 tracking-wide">Sign in to your account</h2>
         <p className="text-center text-gray-400 mb-4 sm:mb-6 italic text-xs sm:text-sm">"Code. Compete. Conquer."</p>
-        <div>
-          <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Email or Username</label>
-          <input
-            type="text"
-            name="identifier"
-            value={formData.identifier}
-            onChange={handleChange}
-            required
-            placeholder="Enter email or username"
-            className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
-            autoComplete="username"
-          />
-        </div>
-        <div className="relative mt-3 sm:mt-4">
-          <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Password</label>
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            placeholder="Enter your password"
-            className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
-            autoComplete="current-password"
-          />
-          <span
-            onClick={togglePassword}
-            className="absolute top-8 sm:top-9 right-3 cursor-pointer text-gray-400 hover:text-pink-400 text-lg select-none"
-            tabIndex={0}
-            role="button"
-            aria-label="Toggle password visibility"
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Email or Username</label>
+            <input
+              type="text"
+              name="identifier"
+              value={formData.identifier}
+              onChange={handleChange}
+              required
+              placeholder="Enter email or username"
+              className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
+              autoComplete="username"
+            />
+          </div>
+          <div className="relative mt-3 sm:mt-4">
+            <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Password</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Enter your password"
+              className="w-full px-3 py-2 sm:px-4 sm:py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm sm:text-base text-white placeholder-gray-500 shadow-inner"
+              autoComplete="current-password"
+            />
+            <span
+              onClick={togglePassword}
+              className="absolute top-8 sm:top-9 right-3 cursor-pointer text-gray-400 hover:text-pink-400 text-lg select-none"
+              tabIndex={0}
+              role="button"
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
+          <div className="text-xs text-right mt-2">
+            <Link to="/forgot-password" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Forgot Password?</Link>
+          </div>
+          {error && <p className="text-red-500 text-xs sm:text-sm text-center mt-2">{error}</p>}
+          <button
+            type="submit"
+            className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-base sm:text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
           >
-            {showPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
-        <div className="text-xs text-right mt-2">
-          <Link to="/forgot-password" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Forgot Password?</Link>
-        </div>
-        {error && <p className="text-red-500 text-xs sm:text-sm text-center mt-2">{error}</p>}
-        <button
-          type="submit"
-          className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-purple-500 hover:to-pink-500 text-white py-2 rounded-lg font-bold text-base sm:text-lg tracking-wide shadow-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-400 border-0"
-        >
-          Login
-        </button>
+            Login
+          </button>
+        </form>
         <p className="text-xs sm:text-sm text-center text-gray-400 mt-4 sm:mt-6">
           Don't have an account?{' '}
           <Link to="/register" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Register</Link>
