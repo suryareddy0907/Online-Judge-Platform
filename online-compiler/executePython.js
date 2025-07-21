@@ -57,18 +57,15 @@ const executePython = (filepath, input = "") => {
       if (stderr && /MemoryError|out of memory|cannot allocate memory/i.test(stderr)) {
         return resolve('MLE: Memory Limit Exceeded');
       }
-      // If process exited abnormally with no stderr, treat as MLE
+      // If process exited abnormally with no stderr, treat as generic runtime error (not MLE)
       if (code !== 0 && !stderr) {
-        return resolve('MLE: Memory Limit Exceeded');
+        return resolve(`Execution failed with code ${code}`);
       }
-      // Windows: treat any non-zero exit code as MLE (unless already handled above)
-      if (isWin && code !== 0) {
-        return resolve('MLE: Memory Limit Exceeded');
-      }
+      // If we have stderr, return it as a user-friendly error
       if (code !== 0 || stderr) {
-        // If we have stderr, return it as a user-friendly error
         return resolve(stderr || `Execution failed with code ${code}`);
       }
+      // If code is 0 (success), return stdout (even if empty)
       return resolve(stdout);
     });
     // Catch-all for any unexpected errors
