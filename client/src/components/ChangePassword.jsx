@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { changePassword } from '../services/authService';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, X } from 'lucide-react';
 
-const ChangePassword = ({ onClose }) => {
+const ChangePassword = ({ show, onClose }) => {
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',

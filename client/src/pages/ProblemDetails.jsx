@@ -8,6 +8,22 @@ import MonacoEditor from "@monaco-editor/react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+// Returns boilerplate code for the given language
+function getBoilerplate(lang) {
+  switch (lang) {
+    case 'cpp':
+      return `#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // your code goes here\n    return 0;\n}`;
+    case 'c':
+      return `#include <stdio.h>\n\nint main() {\n    // your code goes here\n    return 0;\n}`;
+    case 'java':
+      return `import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // your code goes here\n    }\n}`;
+    case 'python':
+      return `# your code goes here\ndef main():\n    pass\n\nif __name__ == '__main__':\n    main()`;
+    default:
+      return '';
+  }
+}
+
 const ProblemDetails = () => {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
@@ -32,6 +48,14 @@ const ProblemDetails = () => {
   const [showCodeFeedback, setShowCodeFeedback] = useState(true);
   const [showExplanation, setShowExplanation] = useState(true);
   const [showDebugOutput, setShowDebugOutput] = useState(true);
+  const [showResizeHint, setShowResizeHint] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowResizeHint(false);
+    }, 5000); // Hide after 5 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -48,6 +72,13 @@ const ProblemDetails = () => {
     };
     fetchProblem();
   }, [id]);
+
+  // Set boilerplate on problem load and language change, unless user has started editing
+  useEffect(() => {
+    if (problem) {
+      setCode(getBoilerplate(language));
+    }
+  }, [problem, language]);
 
   useEffect(() => {
     if (output && allotmentRef.current) {
@@ -216,28 +247,6 @@ const ProblemDetails = () => {
     }
   };
 
-  const handleGenerateBoilerplate = async (isContinue = false) => {
-    setAiLoading("boilerplate");
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/ai/generate-boilerplate`, {
-        problemStatement: problem.statement,
-        language: language,
-        currentBoilerplate: isContinue ? code : undefined,
-      });
-      if (isContinue && code) {
-        // If the model says 'COMPLETE', do not append
-        if (response.data.boilerplate.trim() === 'COMPLETE') return;
-        setCode(code + "\n" + response.data.boilerplate);
-      } else {
-        setCode(response.data.boilerplate);
-      }
-    } catch (err) {
-      setOutput("Failed to generate boilerplate code.");
-    } finally {
-      setAiLoading("");
-    }
-  };
-
   const handleExplainProblem = async () => {
     if (explanation) {
       setPopupMessage("The Explanation is generated already.");
@@ -333,7 +342,7 @@ const ProblemDetails = () => {
                 </button>
                 <button
                   className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                  onClick={() => handleGenerateBoilerplate(false)}
+                  onClick={() => setCode(getBoilerplate(language))}
                   disabled={aiLoading !== ""}
                 >
                   {aiLoading === "boilerplate" ? (
@@ -343,15 +352,6 @@ const ProblemDetails = () => {
                   ) : null}
                   {aiLoading === "boilerplate" ? "Generating..." : "Generate Boilerplate"}
                 </button>
-                {code && code.length > 0 && (
-                  <button
-                    className="bg-purple-400 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                    onClick={() => handleGenerateBoilerplate(true)}
-                    disabled={aiLoading !== ""}
-                  >
-                    {aiLoading === "boilerplate" ? "Generating..." : "Continue Boilerplate"}
-                  </button>
-                )}
                 <button
                   className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded transition flex items-center"
                   onClick={handleExplainProblem}
@@ -521,7 +521,7 @@ const ProblemDetails = () => {
                           fontSize: 16,
                           minimap: { enabled: false },
                           scrollBeyondLastLine: false,
-                          wordWrap: "on",
+                          wordWrap: "off",
                           fontFamily: "Fira Mono, monospace",
                           automaticLayout: true,
                           lineNumbers: "on",
@@ -541,7 +541,7 @@ const ProblemDetails = () => {
                 <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 modal-scrollbar overflow-y-auto h-full" style={{ fontFamily: 'Fira Mono, monospace' }}>
                   <label className="block text-[#00ff99] text-base font-bold mb-2">Custom Test Case</label>
                   <textarea
-                    className="w-full border-2 border-[#00cfff] rounded-lg px-4 py-3 mb-4 bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99] placeholder-[#baffea] resize-y"
+                    className="w-full border-2 border-[#00cfff] rounded-lg px-4 py-3 mb-4 bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99] placeholder-[#baffea] resize-y whitespace-pre overflow-x-auto"
                     rows={3}
                     placeholder="Enter custom input..."
                     value={customInput}
@@ -651,6 +651,15 @@ const ProblemDetails = () => {
           </div>
         </div>
       )}
+      {/* Resize Hint */}
+      <div className={`fixed bottom-5 right-5 bg-[#00cfff] text-black p-4 rounded-lg shadow-lg z-50 transition-all duration-500 ease-in-out ${showResizeHint ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5 pointer-events-none'}`}>
+        <p className="text-sm font-bold flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Pro Tip: You can resize the panels by dragging the separators!
+        </p>
+      </div>
     </>
   );
 };
