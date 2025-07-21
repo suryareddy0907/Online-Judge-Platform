@@ -252,8 +252,9 @@ export const unregisterForContest = async (contestId) => {
   return data;
 };
 
-export const getContestLeaderboard = async (contestId) => {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contests/${contestId}/leaderboard`);
+export const getContestLeaderboard = async (contestId, params = {}) => {
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contests/${contestId}/leaderboard?${queryParams}`);
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to fetch contest leaderboard');

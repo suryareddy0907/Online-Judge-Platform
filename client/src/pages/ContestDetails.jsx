@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import { getContestDetails, getContestLeaderboard } from '../services/authService';
+import { getContestDetails, getContestLeaderboard, getMySubmissions } from '../services/authService';
 import Leaderboard from '../components/Leaderboard';
 import { useAuth } from '../context/AuthContext';
 import { Clock } from 'lucide-react';
@@ -20,6 +20,7 @@ const ContestDetails = () => {
   const [leaderboardLimit, setLeaderboardLimit] = useState(10);
   const [leaderboardSearch, setLeaderboardSearch] = useState("");
   const [searchedUser, setSearchedUser] = useState(null);
+  const [solvedCount, setSolvedCount] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -34,6 +35,18 @@ const ContestDetails = () => {
       try {
         const contestData = await getContestDetails(id);
         setContest(contestData.contest);
+        if (contestData.contest && contestData.contest.problems && user) {
+          const problemIds = contestData.contest.problems.map(p => p._id);
+          const submissionsData = await getMySubmissions({ verdict: 'AC' });
+          const solvedSet = new Set(
+            (submissionsData.submissions || [])
+              .filter(sub => sub.verdict === 'AC' && sub.problem && problemIds.includes(sub.problem._id))
+              .map(sub => sub.problem._id)
+          );
+          setSolvedCount(solvedSet.size);
+        } else {
+          setSolvedCount(0);
+        }
       } catch (err) {
         setError('Failed to load contest data');
       } finally {
@@ -41,7 +54,7 @@ const ContestDetails = () => {
       }
     };
     fetchContestData();
-  }, [id]);
+  }, [id, user]);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -150,6 +163,11 @@ const ContestDetails = () => {
           )}
         </ul>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Leaderboard</h2>
+        <div className="mb-4 flex justify-center">
+          <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">
+            {solvedCount} / {contest.problems.length} problems solved
+          </span>
+        </div>
         <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl p-6 shadow-lg font-mono">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
             <form
