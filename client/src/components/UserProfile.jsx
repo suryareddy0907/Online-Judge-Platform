@@ -101,21 +101,34 @@ const UserProfile = () => {
       return date;
     })
   );
-  // Month labels: map of week index to month label
-  const monthLabelsMap = {};
-  let lastMonth = null;
+  // Compute which months are present in the heatmap
+  const monthsInHeatmap = [];
+  let lastMonthNum = null;
   for (let w = 0; w < weeks.length; w++) {
     for (let d = 0; d < 7; d++) {
       const date = weeks[w][d];
       if (date > today) continue;
-      const month = date.getMonth();
-      if (month !== lastMonth) {
-        monthLabelsMap[w] = date.toLocaleString('default', { month: 'short' });
-        lastMonth = month;
+      const monthNum = date.getMonth();
+      if (monthNum !== lastMonthNum) {
+        monthsInHeatmap.push({
+          month: date.toLocaleString('default', { month: 'short' }),
+          startWeek: w
+        });
+        lastMonthNum = monthNum;
         break;
       }
     }
   }
+  // Calculate segment width for each month
+  const totalWeeks = weeks.length;
+  const segmentWidth = Math.floor(totalWeeks / monthsInHeatmap.length);
+  const monthSegments = monthsInHeatmap.map((m, i) => {
+    // Last month takes the remaining weeks
+    const width = (i === monthsInHeatmap.length - 1)
+      ? totalWeeks - segmentWidth * (monthsInHeatmap.length - 1)
+      : segmentWidth;
+    return { ...m, width };
+  });
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Find max count for color scaling
@@ -263,18 +276,18 @@ const UserProfile = () => {
                     </div>
                   </div>
                   {/* Heatmap Grid - LeetCode style */}
-                  <div className="w-full flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
-                    <div style={{ width: '100%' }}>
-                      {/* Month labels above the grid, aligned to the first week of each month, with boxes below every label */}
-                      <div className="flex mb-2 ml-6" style={{ minWidth: weeks.length * 20 }}>
-                        {weeks.map((_, w) => (
-                          <div key={w} style={{ width: 20, textAlign: 'center', marginRight: 2 }}>
-                            <span className="text-xs text-[#baffea] font-mono">{monthLabelsMap[w] || ''}</span>
+                  <div className="flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
+                    <div style={{ width: weeks.length * 22 + 30, margin: '0 auto' }}>
+                      {/* Month labels above the grid, evenly divided so each month has boxes below it */}
+                      <div className="flex mb-2 mx-auto" style={{ width: weeks.length * 22 }}>
+                        {monthSegments.map((seg, i) => (
+                          <div key={i} style={{ width: seg.width * 22, textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <span className="text-xs text-[#baffea] font-mono">{seg.month}</span>
                           </div>
                         ))}
                       </div>
                       {/* Heatmap grid: weeks as columns, days as rows */}
-                      <div className="flex">
+                      <div className="flex mx-auto" style={{ width: weeks.length * 22 }}>
                         {/* Days of week (Sun-Sat) as rows */}
                         <div className="flex flex-col justify-between mr-2" style={{ height: 7 * 20 }}>
                           {dayLabels.map((d, i) => (
