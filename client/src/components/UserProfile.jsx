@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getUserProfile, updateUserProfile } from '../services/authService';
+import React, { useState, useEffect, useMemo } from 'react';
+import { getUserProfile, updateUserProfile, getMySubmissions } from '../services/authService';
 import { User, Mail, Calendar, Shield, Edit, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,9 +15,12 @@ const UserProfile = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [submissions, setSubmissions] = useState([]);
+  const [heatmapFilter, setHeatmapFilter] = useState('all'); // 'all' or 'ac'
 
   useEffect(() => {
     fetchProfile();
+    fetchSubmissions();
   }, []);
 
   const fetchProfile = async () => {
@@ -33,6 +36,49 @@ const UserProfile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchSubmissions = async () => {
+    try {
+      const data = await getMySubmissions();
+      setSubmissions(data.submissions || []);
+    } catch (e) {
+      setSubmissions([]);
+    }
+  };
+
+  // Compute heatmap data: { 'YYYY-MM-DD': count }
+  const heatmapData = useMemo(() => {
+    const map = {};
+    submissions.forEach(sub => {
+      if (heatmapFilter === 'ac' && sub.verdict !== 'AC') return;
+      const date = new Date(sub.submittedAt);
+      const key = date.toISOString().slice(0, 10); // YYYY-MM-DD
+      map[key] = (map[key] || 0) + 1;
+    });
+    return map;
+  }, [submissions, heatmapFilter]);
+
+  // Generate last 365 days for the heatmap
+  const today = new Date();
+  const days = Array.from({ length: 365 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() - (364 - i));
+    return d;
+  });
+
+  // Find max count for color scaling
+  const maxCount = Math.max(1, ...Object.values(heatmapData));
+
+  const getColor = (count) => {
+    if (!count) return '#232b3a';
+    // Scale from light to dark green
+    const percent = Math.min(1, count / maxCount);
+    if (percent === 0) return '#232b3a';
+    if (percent < 0.25) return '#baffea';
+    if (percent < 0.5) return '#00ff99';
+    if (percent < 0.75) return '#00cfff';
+    return '#00b36b';
   };
 
   const handleInputChange = (e) => {
@@ -105,6 +151,39 @@ const UserProfile = () => {
             alt="Profile"
             className="w-32 h-32 rounded-full mb-8 border-4 border-[#00cfff] shadow-lg"
           />
+          {/* Heatmap Toggle */}
+          <div className="w-full flex flex-col items-center mb-8">
+            <div className="flex gap-4 mb-2">
+              <button
+                className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'all' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
+                onClick={() => setHeatmapFilter('all')}
+              >
+                All Submissions
+              </button>
+              <button
+                className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'ac' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
+                onClick={() => setHeatmapFilter('ac')}
+              >
+                Only AC
+              </button>
+            </div>
+            <div className="overflow-x-auto w-full flex justify-center">
+              <div className="grid grid-cols-26 gap-1" style={{ minWidth: 26 * 14 }}>
+                {days.map((d, i) => {
+                  const key = d.toISOString().slice(0, 10);
+                  const count = heatmapData[key] || 0;
+                  return (
+                    <div
+                      key={key}
+                      title={`${key}: ${count} submission${count !== 1 ? 's' : ''}`}
+                      style={{ width: 12, height: 12, background: getColor(count), borderRadius: 2, border: '1px solid #232b3a' }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
+          </div>
           {loading ? (
             <div className="flex justify-center items-center h-48">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
