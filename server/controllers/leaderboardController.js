@@ -6,13 +6,13 @@ import Contest from '../models/Contest.js';
 // Get leaderboard data
 export const getLeaderboard = async (req, res) => {
   try {
-    const { sortBy = 'rating', limit = 10 } = req.query;
+    const { sortBy = 'rating', limit = 10, page = 1, search = "" } = req.query;
 
     const users = await User.find({
       isActive: true,
       isBanned: false
     })
-    .select('username rating problemsSolved avatar createdAt')
+    .select('username problemsSolved avatar createdAt')
     .lean();
 
     const userIds = users.map(u => u._id);
@@ -32,35 +32,79 @@ export const getLeaderboard = async (req, res) => {
       }
     });
 
+    // For each user, find the time when they reached their current problemsSolved count (earliest last AC submission for their last unique problem)
+    const userLastSolvedTime = {};
+    users.forEach(user => {
+      const userACs = acSubmissions.filter(sub => String(sub.user) === String(user._id) && sub.problem && sub.problem.isPublished);
+      // Map: problemId -> earliest AC submission time
+      const problemToTime = {};
+      userACs.forEach(sub => {
+        const pid = String(sub.problem._id);
+        if (!problemToTime[pid] || new Date(sub.submittedAt) < new Date(problemToTime[pid])) {
+          problemToTime[pid] = sub.submittedAt;
+        }
+      });
+      // The time when the user reached their current problemsSolved count is the latest among their earliest ACs for each unique problem
+      const times = Object.values(problemToTime).map(t => new Date(t));
+      if (times.length > 0) {
+        userLastSolvedTime[user._id.toString()] = new Date(Math.max(...times.map(t => t.getTime())));
+      } else {
+        userLastSolvedTime[user._id.toString()] = null;
+      }
+    });
+
     const usersWithData = users.map(user => ({
       ...user,
       problemsSolved: userSolvedMap[user._id.toString()]?.size || 0,
+      lastSolvedAt: userLastSolvedTime[user._id.toString()] // may be null
     }));
 
     usersWithData.sort((a, b) => {
-      if (sortBy === 'problemsSolved') {
-        if (b.problemsSolved !== a.problemsSolved) {
-          return b.problemsSolved - a.problemsSolved;
-        }
-        return b.rating - a.rating;
+      if (b.problemsSolved !== a.problemsSolved) {
+        return b.problemsSolved - a.problemsSolved;
       }
-      if (b.rating !== a.rating) {
-        return b.rating - a.rating;
+      // Tie-breaker: user who reached this count first (earlier lastSolvedAt wins)
+      if (a.lastSolvedAt && b.lastSolvedAt) {
+        return a.lastSolvedAt - b.lastSolvedAt;
       }
-      return b.problemsSolved - a.problemsSolved;
+      if (a.lastSolvedAt) return -1;
+      if (b.lastSolvedAt) return 1;
+      // Final tie-breaker: username
+      return a.username.localeCompare(b.username);
     });
     
-    const limitedUsers = usersWithData.slice(0, parseInt(limit));
+    // Pagination
+    const totalUsers = usersWithData.length;
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+    const totalPages = Math.ceil(totalUsers / limitInt);
+    const paginatedUsers = usersWithData.slice((pageInt - 1) * limitInt, pageInt * limitInt);
 
-    const usersWithRank = limitedUsers.map((user, index) => ({
+    // Add rank to paginated users
+    const usersWithRank = paginatedUsers.map((user, index) => ({
       ...user,
-      rank: index + 1
+      rank: (pageInt - 1) * limitInt + index + 1
     }));
+
+    // User search
+    let searchedUser = null;
+    if (search) {
+      const foundIndex = usersWithData.findIndex(u => u.username.toLowerCase() === search.toLowerCase());
+      if (foundIndex !== -1) {
+        searchedUser = {
+          ...usersWithData[foundIndex],
+          rank: foundIndex + 1
+        };
+      }
+    }
 
     res.json({
       success: true,
       data: usersWithRank,
-      sortBy
+      totalUsers,
+      totalPages,
+      currentPage: pageInt,
+      searchedUser
     });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);

@@ -15,7 +15,8 @@ import {
   FileText,
   User,
   Lock,
-  Clock
+  Clock,
+  Search
 } from "lucide-react";
 import { getPublicStats, getPublicContests, getLeaderboard } from '../services/authService';
 
@@ -123,6 +124,10 @@ const Home = () => {
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [leaderboardLimit, setLeaderboardLimit] = useState(10);
+  const [leaderboardSearch, setLeaderboardSearch] = useState("");
+  const [searchedUser, setSearchedUser] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -143,17 +148,23 @@ const Home = () => {
     const fetchLeaderboard = async () => {
       try {
         setLoadingLeaderboard(true);
-        const response = await getLeaderboard({ sortBy: 'rating', limit: 10 });
+        const response = await getLeaderboard({
+          page: leaderboardPage,
+          limit: leaderboardLimit,
+          search: leaderboardSearch.trim()
+        });
         setLeaderboardData(response.data);
+        setSearchedUser(response.searchedUser || null);
       } catch (err) {
         console.error('Failed to fetch leaderboard:', err);
         setLeaderboardData([]);
+        setSearchedUser(null);
       } finally {
         setLoadingLeaderboard(false);
       }
     };
     fetchLeaderboard();
-  }, []);
+  }, [leaderboardPage, leaderboardLimit, leaderboardSearch]);
 
   useEffect(() => {
     const fetchContests = async () => {
@@ -521,7 +532,41 @@ const Home = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           <div className="md:col-span-1">
             <div className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-4 sm:p-6 font-mono text-white hover:border-[#00cfff] transition-all">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); }}
+                >
+                  <Search className="h-5 w-5 text-[#00ff99]" />
+                  <input
+                    type="text"
+                    placeholder="Search username"
+                    value={leaderboardSearch}
+                    onChange={e => setLeaderboardSearch(e.target.value)}
+                    className="px-3 py-1 rounded border-2 border-[#00ff99] bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00cfff]"
+                  />
+                  <button type="submit" className="px-3 py-1 rounded bg-[#00ff99] text-[#181c24] font-bold">Search</button>
+                </form>
+                <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                  <button
+                    className="px-2 py-1 rounded bg-[#00cfff] text-[#181c24] font-bold disabled:opacity-50"
+                    onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
+                    disabled={leaderboardPage === 1}
+                  >Prev</button>
+                  <span className="text-[#baffea] font-mono">Page {leaderboardPage}</span>
+                  <button
+                    className="px-2 py-1 rounded bg-[#00ff99] text-[#181c24] font-bold disabled:opacity-50"
+                    onClick={() => setLeaderboardPage(p => p + 1)}
+                    disabled={leaderboardData.length < leaderboardLimit}
+                  >Next</button>
+                </div>
+              </div>
               <Leaderboard type="global" data={leaderboardData} />
+              {searchedUser && (
+                <div className="mt-4 p-3 bg-[#181c24] border-2 border-[#00ff99] rounded-lg text-[#baffea] font-mono">
+                  <span className="font-bold">{searchedUser.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.problemsSolved}</span> solved problems.
+                </div>
+              )}
             </div>
           </div>
           <div className="md:col-span-1">
