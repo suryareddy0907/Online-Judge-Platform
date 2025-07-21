@@ -203,21 +203,6 @@ const AdminContests = () => {
     return new Date(dateString).toLocaleString();
   };
 
-  const CodeBackground = () => (
-    <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
-      <svg width="100%" height="100%" className="absolute inset-0">
-        <defs>
-          <linearGradient id="contestsCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#00ff99" />
-            <stop offset="100%" stopColor="#00cfff" />
-          </linearGradient>
-        </defs>
-        <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#contestsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Contest Management"}</text>
-        <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#contestsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"function manageContests() { }"}</text>
-      </svg>
-    </div>
-  );
-
   const handlePageChange = (page) => {
     setFilters(prev => ({ ...prev, page }));
   };
@@ -226,7 +211,7 @@ const AdminContests = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full bg-[#181c24]">
-          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg"></div>
           <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Contests...</span>
         </div>
       </AdminLayout>
@@ -236,7 +221,6 @@ const AdminContests = () => {
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-        <CodeBackground />
         <div className="p-2 sm:p-4 md:p-6 relative z-10">
           {/* Header */}
           <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
@@ -358,7 +342,7 @@ const AdminContests = () => {
           {/* Create Contest Modal */}
           {showCreateModal && (
             <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
-              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
                 <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text text-center mb-6 tracking-tight">Create New Contest</h3>
                 <form onSubmit={handleCreateSubmit} className="space-y-4">
                   <div>
@@ -468,7 +452,7 @@ const AdminContests = () => {
           {/* Edit Contest Modal */}
           {showEditModal && selectedContest && (
             <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
-              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00cfff, 0 0 64px #00ff99' }}>
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
                 <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text text-center mb-6 tracking-tight">Edit Contest</h3>
                 <form onSubmit={handleEditSubmit} className="space-y-4">
                   <div>
@@ -578,7 +562,7 @@ const AdminContests = () => {
           {/* View Contest Modal */}
           {showViewModal && selectedContest && (
             <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
-              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00cfff] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00cfff, 0 0 64px #00ff99' }}>
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00cfff] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
                 <h3 className="text-2xl font-extrabold bg-gradient-to-r from-[#00cfff] to-[#00ff99] text-transparent bg-clip-text text-center mb-6 tracking-tight">Contest Details</h3>
                 <div className="space-y-4 text-left text-[#baffea]">
                   <div><span className="font-bold text-[#00ff99]">Title:</span> <span className="text-white">{selectedContest.title}</span></div>

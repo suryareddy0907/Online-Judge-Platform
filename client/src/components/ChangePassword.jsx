@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { changePassword } from '../services/authService';
-import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 const ChangePassword = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -97,9 +97,19 @@ const ChangePassword = ({ onClose }) => {
     }
   };
 
+  if (!show) {
+    return null;
+  }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
       <div className="relative w-full max-w-md p-8 m-4 bg-[#232b3a] rounded-2xl border-2 border-[#00cfff] shadow-2xl text-white font-mono">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          aria-label="Close change password"
+        >
+          <X className="h-6 w-6" />
+        </button>
         <h1 className="text-2xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">
           &lt;/&gt; CodersToday
         </h1>

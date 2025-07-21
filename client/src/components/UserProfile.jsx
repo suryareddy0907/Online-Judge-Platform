@@ -96,24 +96,20 @@ const UserProfile = ({ show, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
       <div className="relative w-full max-w-lg p-8 m-4 bg-[#232b3a] rounded-2xl border-2 border-[#00cfff] shadow-2xl text-white font-mono">
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">User Profile</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-pink-400 text-xl sm:text-2xl font-bold"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </div>
-        {profile && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          aria-label="Close profile"
+        >
+          <X className="h-6 w-6" />
+        </button>
+        <div className="flex flex-col items-center">
+          <img
+            src={profile.avatar || `https://ui-avatars.com/api/?name=${profile.username}&background=0D8ABC&color=fff`}
+            alt="Profile"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-2 sm:mb-4"
+          />
           <div className="space-y-3 sm:space-y-4">
-            {/* Profile Picture Placeholder */}
-            <div className="flex justify-center mb-2 sm:mb-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500 rounded-full flex items-center justify-center border-4 border-white/10 animate-pulse">
-                <User className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-              </div>
-            </div>
             {/* Username */}
             <div>
               <label className="block text-xs font-semibold mb-1 tracking-widest uppercase text-gray-400">Username</label>
@@ -228,7 +224,7 @@ const UserProfile = ({ show, onClose }) => {
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

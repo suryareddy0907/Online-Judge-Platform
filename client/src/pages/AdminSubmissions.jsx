@@ -3,21 +3,6 @@ import AdminLayout from '../components/AdminLayout';
 import { getAllSubmissions, deleteSubmission, getSubmissionDetails } from '../services/adminService';
 import { useNavigate } from 'react-router-dom';
 
-const CodeBackground = () => (
-  <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
-    <svg width="100%" height="100%" className="absolute inset-0">
-      <defs>
-        <linearGradient id="submissionsCodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00ff99" />
-          <stop offset="100%" stopColor="#00cfff" />
-        </linearGradient>
-      </defs>
-      <text x="50%" y="20%" textAnchor="middle" fontSize="2.5rem" fill="url(#submissionsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"// Submission Management"}</text>
-      <text x="50%" y="40%" textAnchor="middle" fontSize="2.5rem" fill="url(#submissionsCodeGradient)" fontFamily="Fira Mono, monospace" opacity="0.18">{"function manageSubmissions() { }"}</text>
-    </svg>
-  </div>
-);
-
 const AdminSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +124,6 @@ const AdminSubmissions = () => {
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-        <CodeBackground />
         <div className="p-2 sm:p-4 md:p-6 relative z-10">
           <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-4">Submission Management</h1>
           <div className="mb-4 flex flex-col sm:flex-row sm:gap-4 gap-2 items-stretch">
@@ -199,7 +183,7 @@ const AdminSubmissions = () => {
           {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</div>}
           {loading ? (
             <div className="min-h-[300px] flex flex-col items-center justify-center bg-[#181c24]">
-              <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+              <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg"></div>
               <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Submissions...</span>
             </div>
           ) : (
@@ -274,7 +258,7 @@ const AdminSubmissions = () => {
           {/* View Modal */}
           {viewModal && (
             <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
-              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
                 <button
                   className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-2xl font-bold"
                   onClick={handleCloseModal}
@@ -291,7 +275,7 @@ const AdminSubmissions = () => {
                 </button>
                 {!selectedSubmission ? (
                   <div className="min-h-[200px] flex flex-col items-center justify-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg"></div>
                     <span className="mt-6 text-[#00ff99] font-mono text-base tracking-widest animate-pulse drop-shadow-lg">Loading Submission...</span>
                   </div>
                 ) : selectedSubmission.error ? (

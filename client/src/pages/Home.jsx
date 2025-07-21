@@ -302,8 +302,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-      <AuroraBackground />
-      <MatrixRain />
       {/* Animated code background */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
         <svg width="100%" height="100%" className="absolute inset-0">
@@ -322,7 +320,7 @@ const Home = () => {
       </div>
 
       {/* Navbar */}
-      <nav className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 sm:px-4 md:px-8 py-3 sm:py-4 bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] gap-2 sm:gap-0" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+      <nav className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 sm:px-4 md:px-8 py-3 sm:py-4 bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] gap-2 sm:gap-0" style={{ fontFamily: 'Fira Mono, monospace' }}>
         <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text">
             &lt;/&gt; CodersToday
         </h1>
@@ -377,7 +375,7 @@ const Home = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8 relative z-10 w-full">
         <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-2 sm:mb-4" style={{ fontFamily: 'Fira Mono, monospace', textShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}>
+          <h2 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-2 sm:mb-4" style={{ fontFamily: 'Fira Mono, monospace' }}>
             &lt;/&gt; Welcome to CodersToday
           </h2>
           <p className="text-base sm:text-lg text-[#baffea] font-mono mb-1 sm:mb-2">The ultimate coding arena for competitive programmers.</p>
@@ -528,11 +526,11 @@ const Home = () => {
 
       {/* Modals */}
       {showChangePassword && (
-        <ChangePassword onClose={closeChangePassword} />
+        <ChangePassword show={showChangePassword} onClose={closeChangePassword} />
       )}
       
       {showUserProfile && (
-        <UserProfile onClose={closeUserProfile} />
+        <UserProfile show={showUserProfile} onClose={closeUserProfile} />
       )}
     </div>
   );

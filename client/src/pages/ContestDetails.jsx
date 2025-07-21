@@ -136,7 +136,7 @@ const ContestDetails = () => {
         <ul className="mb-12 space-y-4">
           {contest.problems && contest.problems.length > 0 ? (
             contest.problems.map((problem) => (
-              <li key={problem._id} className={`bg-[#232b3a] border-2 rounded-xl p-4 shadow flex items-center justify-between font-mono transition-all ${problem.solved ? 'border-[#00ff99]' : 'border-[#00cfff]'}`} style={{ boxShadow: '0 0 8px #00ff99, 0 0 16px #00cfff' }}>
+              <li key={problem._id} className={`bg-[#232b3a] border-2 rounded-xl p-4 shadow flex items-center justify-between font-mono transition-all ${problem.solved ? 'border-[#00ff99]' : 'border-[#00cfff]'}`}>
                 <Link to={`/problems/${problem._id}`} className={`font-bold text-lg ${problem.solved ? 'text-[#00ff99]' : 'text-[#00cfff]'} hover:underline`}>
                   {problem.title}
                 </Link>

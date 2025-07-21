@@ -134,7 +134,6 @@ const BrowseProblems = () => {
 
   return (
     <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-      <AuroraBackground />
       <CodeBackground />
       <div className="max-w-5xl mx-auto px-4 py-10 relative z-10">
         <Logo />
@@ -220,7 +219,6 @@ const BrowseProblems = () => {
                 key={problem._id}
                     className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 cursor-pointer hover:border-[#00cfff] hover:shadow-2xl transition-all font-mono group relative"
                 onClick={() => navigate(`/problems/${problem._id}`)}
-                    style={{ boxShadow: '0 0 16px #00ff99, 0 0 32px #00cfff' }}
                   >
                     {/* Solved badge */}
                     {solvedProblems.has(problem._id) && (

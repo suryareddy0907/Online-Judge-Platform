@@ -268,7 +268,7 @@ const MySubmissions = () => {
         {/* View Modal */}
         {viewModal && selectedSubmission && (
           <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
-            <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}>
+            <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
               {/* Custom Back Button */}
               <button
                 className="absolute top-2 left-2 text-[#00cfff] hover:text-[#00ff99] text-2xl font-bold"

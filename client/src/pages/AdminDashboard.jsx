@@ -67,7 +67,7 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#181c24]">
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 32px #00ff99, 0 0 64px #00cfff' }}></div>
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg"></div>
           <span className="mt-8 text-[#00ff99] font-mono text-lg tracking-widest animate-pulse drop-shadow-lg">Loading Admin Dashboard...</span>
         </div>
       </div>
@@ -110,9 +110,8 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
-        <CodeBackground />
         {/* Header */}
-        <div className="bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] px-2 sm:px-4 md:px-8 py-4 sm:py-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <div className="bg-[#232b3a] shadow-lg border-b-2 border-[#00ff99] px-2 sm:px-4 md:px-8 py-4 sm:py-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
           <div>
             <h1 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight mb-1">Admin Dashboard</h1>
             <p className="text-[#baffea] font-mono text-xs sm:text-base">Welcome back, {user?.username}!</p>
