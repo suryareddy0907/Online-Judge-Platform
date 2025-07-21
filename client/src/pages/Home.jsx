@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ChangePassword from "../components/ChangePassword";
-import UserProfile from "../components/UserProfile";
 import Leaderboard from "../components/Leaderboard";
 import ActivityFeed from "../components/ActivityFeed";
 import { 
@@ -114,7 +113,6 @@ const MatrixRain = () => {
 const Home = () => {
   const { user, logout } = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showUserProfile, setShowUserProfile] = useState(false);
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
@@ -227,18 +225,6 @@ const Home = () => {
     };
   }, []);
 
-  // Handle browser back button for UserProfile modal
-  useEffect(() => {
-    if (!showUserProfile) return;
-    const handlePopState = () => {
-      setShowUserProfile(false);
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [showUserProfile]);
-
   // Handle browser back button for ChangePassword modal
   useEffect(() => {
     if (!showChangePassword) return;
@@ -278,18 +264,6 @@ const Home = () => {
 
   const activeContests = contests.filter(c => getContestStatus(c).status === 'active');
   const upcomingContests = contests.filter(c => getContestStatus(c).status === 'upcoming');
-
-  const openUserProfile = () => {
-    window.history.pushState({ modal: 'profile' }, '');
-    setShowUserProfile(true);
-  };
-
-  const closeUserProfile = () => {
-    setShowUserProfile(false);
-    if (window.history.state && window.history.state.modal === 'profile') {
-      window.history.back();
-    }
-  };
 
   const openChangePassword = () => {
     window.history.pushState({ modal: 'changePassword' }, '');
@@ -341,14 +315,13 @@ const Home = () => {
                 </span>
               </div>
               {/* User Actions - View Profile, Change Password, Logout */}
-              <button
-                onClick={openUserProfile}
+              <Link
+                to="/profile"
                 className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
-                type="button"
               >
                 <User className="h-4 w-4 sm:h-5 sm:w-5 mr-0 sm:mr-1" />
                 <span className="hidden xs:inline sm:block">Profile</span>
-              </button>
+              </Link>
               <button
                 onClick={openChangePassword}
                 className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md bg-[#181c24] hover:bg-gray-800 border border-[#00ff99] text-[#00ff99] font-mono font-bold transition text-xs sm:text-sm"
@@ -580,10 +553,6 @@ const Home = () => {
       {/* Modals */}
       {showChangePassword && (
         <ChangePassword show={showChangePassword} onClose={closeChangePassword} />
-      )}
-      
-      {showUserProfile && (
-        <UserProfile show={showUserProfile} onClose={closeUserProfile} />
       )}
     </div>
   );
