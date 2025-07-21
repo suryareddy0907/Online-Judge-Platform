@@ -140,7 +140,20 @@ router.post("/generate-boilerplate", async (req, res) => {
 router.post("/debug-code", async (req, res) => {
   const { code, language, problemStatement } = req.body;
   try {
-    const prompt = `You are an expert ${language} programmer and code reviewer. Given the following problem and code, perform a thorough debugging review. For each of the following categories, identify, explain concisely (1-2 lines per issue), and suggest a brief fix for any issues found: 1) Syntax Errors, 2) Runtime Errors, 3) Logical Errors, 4) Performance Bottlenecks, 5) Semantic or Design Issues. Do NOT write, output, or suggest any code or code snippets. Only list and explain the issues, referencing line numbers or variable names if needed. Your job is only to point out and explain errors, not to write or rewrite any code. Use Markdown formatting and number each point. Do NOT provide a full solution or lengthy explanations.\n\nProblem:\n${problemStatement}\n\nUser's code:\n${code}`;
+    const prompt = `You are a code debugging assistant. Analyze the user's code based on the problem statement and list any errors.
+
+**IMPORTANT RULES:**
+1.  Your entire response **MUST** be 5-10 lines total.
+2.  **ONLY** list the errors. If there are no errors in a category (like Syntax), **DO NOT MENTION IT**.
+3.  **NO MARKDOWN**. Do not use \`###\`, \`*\`, \`**\`, or backticks.
+4.  Use a simple numbered list for the errors you find.
+5.  Explain issues in plain, simple English.
+
+**Problem:**
+${problemStatement}
+
+**User's code:**
+${code}`;
     const response = await axios.post(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + process.env.DEBUG_KEY,
       {
