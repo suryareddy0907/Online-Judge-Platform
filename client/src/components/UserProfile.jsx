@@ -171,6 +171,26 @@ const UserProfile = () => {
     );
   };
 
+  // Helper function for max streak
+  function getMaxStreak(weeks, heatmapData) {
+    let maxStreak = 0, currentStreak = 0;
+    const today = new Date();
+    for (let w = 0; w < weeks.length; w++) {
+      for (let d = 0; d < weeks[w].length; d++) {
+        const date = weeks[w][d];
+        if (date > today) continue;
+        const key = date.toISOString().slice(0, 10);
+        if (heatmapData[key]) {
+          currentStreak++;
+          maxStreak = Math.max(maxStreak, currentStreak);
+        } else {
+          currentStreak = 0;
+        }
+      }
+    }
+    return maxStreak;
+  }
+
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
       <div className="max-w-4xl mx-auto py-12 px-4">
@@ -215,46 +235,66 @@ const UserProfile = () => {
                     Only AC
                   </button>
                 </div>
-                <div className="overflow-x-auto w-full flex justify-center">
-                  <div>
-                    {/* Month labels */}
-                    <div className="flex ml-10" style={{ minWidth: 53 * 14 }}>
-                      {Array.from({ length: 53 }).map((_, w) => {
-                        const label = monthLabels.find(m => m.week === w)?.label;
-                        return (
-                          <div key={w} className="w-3 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 14 }}>{label || ''}</div>
-                        );
-                      })}
+                {/* LeetCode-style Heatmap Summary */}
+                <div className="w-full flex flex-col items-center mb-8">
+                  {/* Summary Row */}
+                  <div className="flex flex-wrap items-center justify-between w-full mb-2 px-2">
+                    <div className="text-lg font-bold text-white">
+                      {Object.values(heatmapData).reduce((a, b) => a + b, 0)} submissions in the past one year
                     </div>
-                    <div className="flex">
-                      {/* Day labels */}
-                      <div className="flex flex-col mr-1">
-                        {dayLabels.map((d, i) => (
-                          <div key={d} className="h-3 w-8 text-xs text-[#baffea] text-right pr-1 font-mono" style={{ height: 14 }}>{i % 2 === 0 ? d : ''}</div>
-                        ))}
-                      </div>
-                      {/* Heatmap grid */}
+                    <div className="flex gap-6 text-sm text-[#baffea] font-mono">
+                      <span>Total active days: <span className="font-bold text-[#00ff99]">{Object.keys(heatmapData).length}</span></span>
+                      <span>Max streak: <span className="font-bold text-[#00ff99]">{getMaxStreak(weeks, heatmapData)}</span></span>
+                    </div>
+                  </div>
+                  {/* Heatmap Grid */}
+                  <div className="overflow-x-auto w-full flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
+                    <div>
                       <div className="flex">
-                        {weeks.map((week, w) => (
-                          <div key={w} className="flex flex-col">
-                            {week.map((date, d) => {
-                              const key = date.toISOString().slice(0, 10);
-                              const count = (date > new Date() ? null : heatmapData[key] || 0);
-                              return (
-                                <div
-                                  key={key}
-                                  title={date > new Date() ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
-                                  style={{ width: 12, height: 12, background: count === null ? 'transparent' : getColor(count), borderRadius: 2, border: '1px solid #232b3a', marginBottom: 2 }}
-                                />
-                              );
-                            })}
-                          </div>
-                        ))}
+                        {/* Heatmap grid with month gaps, no day labels */}
+                        <div className="flex">
+                          {weeks.map((week, w) => {
+                            // Add a gap after the last week of each month
+                            const isMonthEnd = !!monthLabels.find(m => m.week === w + 1);
+                            return (
+                              <div key={w} style={{ display: 'flex', flexDirection: 'row' }}>
+                                <div className="flex flex-col">
+                                  {week.map((date, d) => {
+                                    const key = date.toISOString().slice(0, 10);
+                                    const count = (date > new Date() ? null : heatmapData[key] || 0);
+                                    return (
+                                      <div
+                                        key={key}
+                                        title={date > new Date() ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
+                                        style={{ width: 14, height: 14, background: count === null ? '#232b3a' : getColor(count), borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', outline: '1px solid #333', outlineOffset: '-1px', transition: 'background 0.2s' }}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                                {isMonthEnd && <div style={{ width: 8 }}></div>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      {/* Month labels below the grid */}
+                      <div className="flex mt-2 ml-2" style={{ minWidth: 53 * 16 }}>
+                        {Array.from({ length: 53 }).map((_, w) => {
+                          const label = monthLabels.find(m => m.week === w)?.label;
+                          // Add a gap after the last week of each month
+                          const nextMonth = monthLabels.find(m => m.week === w + 1)?.label;
+                          return (
+                            <div key={w} style={{ display: 'flex', flexDirection: 'row' }}>
+                              <div className="w-4 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 16 }}>{label || ''}</div>
+                              {nextMonth && <div style={{ width: 8 }}></div>}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
+                  <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
                 </div>
-                <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
               </div>
               {/* Profile Info Section */}
               <div className="w-full flex flex-col gap-8">
