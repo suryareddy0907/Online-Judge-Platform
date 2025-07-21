@@ -163,6 +163,11 @@ const ContestDetails = () => {
           )}
         </ul>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Leaderboard</h2>
+        {contestHasEnded && winner && (
+          <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg">
+            <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
+          </div>
+        )}
         <div className="mb-4 flex justify-center">
           <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">
             {solvedCount} / {contest.problems.length} problems solved
