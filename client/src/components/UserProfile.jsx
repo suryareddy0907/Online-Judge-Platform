@@ -247,46 +247,49 @@ const UserProfile = () => {
                       <span>Max streak: <span className="font-bold text-[#00ff99]">{getMaxStreak(weeks, heatmapData)}</span></span>
                     </div>
                   </div>
-                  {/* Heatmap Grid */}
+                  {/* Heatmap Grid - LeetCode style */}
                   <div className="overflow-x-auto w-full flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
                     <div>
+                      {/* Heatmap grid: weeks as columns, days as rows */}
                       <div className="flex">
-                        {/* Heatmap grid with month gaps, no day labels */}
+                        {/* Days of week (Sun-Sat) as rows */}
+                        <div className="flex flex-col justify-between mr-2" style={{ height: 7 * 16 }}>
+                          {dayLabels.map((d, i) => (
+                            <div key={d} className="h-4 w-4 text-xs text-[#baffea] text-center font-mono" style={{ height: 16, lineHeight: '16px' }}>{d[0]}</div>
+                          ))}
+                        </div>
+                        {/* Weeks as columns */}
                         <div className="flex">
                           {weeks.map((week, w) => {
-                            // Add a gap after the last week of each month
-                            const isMonthEnd = !!monthLabels.find(m => m.week === w + 1);
+                            // Find if this week is the start of a new month
+                            const isMonthStart = monthLabels.some(m => m.week === w);
                             return (
-                              <div key={w} style={{ display: 'flex', flexDirection: 'row' }}>
-                                <div className="flex flex-col">
-                                  {week.map((date, d) => {
-                                    const key = date.toISOString().slice(0, 10);
-                                    const count = (date > new Date() ? null : heatmapData[key] || 0);
-                                    return (
-                                      <div
-                                        key={key}
-                                        title={date > new Date() ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
-                                        style={{ width: 14, height: 14, background: count === null ? '#232b3a' : getColor(count), borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', outline: '1px solid #333', outlineOffset: '-1px', transition: 'background 0.2s' }}
-                                      />
-                                    );
-                                  })}
-                                </div>
-                                {isMonthEnd && <div style={{ width: 8 }}></div>}
+                              <div key={w} style={{ display: 'flex', flexDirection: 'column', marginRight: isMonthStart && w !== 0 ? 6 : 2 }}>
+                                {week.map((date, d) => {
+                                  const key = date.toISOString().slice(0, 10);
+                                  const count = (date > new Date() ? null : heatmapData[key] || 0);
+                                  // Light gray for empty/future cells, green scale for submissions
+                                  const cellColor = count === null ? '#2d2f36' : count === 0 ? '#44464d' : getColor(count);
+                                  return (
+                                    <div
+                                      key={key}
+                                      title={count > 0 ? `${count} submission${count !== 1 ? 's' : ''} on ${date.toLocaleDateString()}` : undefined}
+                                      style={{ width: 14, height: 14, background: cellColor, borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', outline: isMonthStart && d === 0 && w !== 0 ? '2px solid #555' : 'none', outlineOffset: '-2px', transition: 'background 0.2s' }}
+                                    />
+                                  );
+                                })}
                               </div>
                             );
                           })}
                         </div>
                       </div>
-                      {/* Month labels below the grid */}
-                      <div className="flex mt-2 ml-2" style={{ minWidth: 53 * 16 }}>
-                        {Array.from({ length: 53 }).map((_, w) => {
-                          const label = monthLabels.find(m => m.week === w)?.label;
-                          // Add a gap after the last week of each month
-                          const nextMonth = monthLabels.find(m => m.week === w + 1)?.label;
+                      {/* Month labels below the grid, centered under first week of each month */}
+                      <div className="flex mt-2 ml-6" style={{ minWidth: 53 * 16 }}>
+                        {weeks.map((_, w) => {
+                          const monthLabel = monthLabels.find(m => m.week === w)?.label;
                           return (
-                            <div key={w} style={{ display: 'flex', flexDirection: 'row' }}>
-                              <div className="w-4 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 16 }}>{label || ''}</div>
-                              {nextMonth && <div style={{ width: 8 }}></div>}
+                            <div key={w} style={{ width: 16, textAlign: 'center', marginRight: monthLabel && w !== 0 ? 6 : 2 }}>
+                              <span className="text-xs text-[#baffea] font-mono">{monthLabel || ''}</span>
                             </div>
                           );
                         })}
