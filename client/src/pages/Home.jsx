@@ -265,14 +265,6 @@ const Home = () => {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-        <p className="text-lg font-medium">Loading user...</p>
-      </div>
-    );
-  }
-
   const activeContests = contests.filter(c => getContestStatus(c).status === 'active');
   const upcomingContests = contests.filter(c => getContestStatus(c).status === 'upcoming');
 
