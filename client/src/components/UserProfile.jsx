@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getUserProfile, updateUserProfile, getMySubmissions } from '../services/authService';
 import { User, Mail, Calendar, Shield, Edit, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
   const { user, updateUser } = useAuth();
@@ -17,6 +18,13 @@ const UserProfile = () => {
   const [success, setSuccess] = useState('');
   const [submissions, setSubmissions] = useState([]);
   const [heatmapFilter, setHeatmapFilter] = useState('all'); // 'all' or 'ac'
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     fetchProfile();
@@ -162,80 +170,86 @@ const UserProfile = () => {
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
       <div className="max-w-4xl mx-auto py-12 px-4">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => navigate(-1)}
           className="mb-8 px-4 py-2 border-2 border-[#00cfff] rounded-lg text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] font-bold transition-all"
         >
           ← Back
         </button>
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-8 tracking-tight text-center">User Profile</h1>
         <div className="flex flex-col items-center w-full">
-          <img
-            src={profile?.avatar || (profile ? `https://ui-avatars.com/api/?name=${profile.username}&background=0D8ABC&color=fff` : "")}
-            alt="Profile"
-            className="w-32 h-32 rounded-full mb-8 border-4 border-[#00cfff] shadow-lg"
-          />
-          {/* Heatmap Toggle */}
-          <div className="w-full flex flex-col items-center mb-8">
-            <div className="flex gap-4 mb-2">
-              <button
-                className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'all' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
-                onClick={() => setHeatmapFilter('all')}
-              >
-                All Submissions
-              </button>
-              <button
-                className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'ac' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
-                onClick={() => setHeatmapFilter('ac')}
-              >
-                Only AC
-              </button>
-            </div>
-            <div className="overflow-x-auto w-full flex justify-center">
-              <div>
-                {/* Month labels */}
-                <div className="flex ml-10" style={{ minWidth: 53 * 14 }}>
-                  {Array.from({ length: 53 }).map((_, w) => {
-                    const label = monthLabels.find(m => m.week === w)?.label;
-                    return (
-                      <div key={w} className="w-3 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 14 }}>{label || ''}</div>
-                    );
-                  })}
-                </div>
-                <div className="flex">
-                  {/* Day labels */}
-                  <div className="flex flex-col mr-1">
-                    {dayLabels.map((d, i) => (
-                      <div key={d} className="h-3 w-8 text-xs text-[#baffea] text-right pr-1 font-mono" style={{ height: 14 }}>{i % 2 === 0 ? d : ''}</div>
-                    ))}
-                  </div>
-                  {/* Heatmap grid */}
-                  <div className="flex">
-                    {weeks.map((week, w) => (
-                      <div key={w} className="flex flex-col">
-                        {week.map((date, d) => {
-                          const key = date.toISOString().slice(0, 10);
-                          const count = (date > today ? null : heatmapData[key] || 0);
-                          return (
-                            <div
-                              key={key}
-                              title={date > today ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
-                              style={{ width: 12, height: 12, background: count === null ? 'transparent' : getColor(count), borderRadius: 2, border: '1px solid #232b3a', marginBottom: 2 }}
-                            />
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
-          </div>
           {loading ? (
             <div className="flex justify-center items-center h-48">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
             </div>
           ) : profile ? (
+            <>
+              <img
+                src={profile.avatar || `https://ui-avatars.com/api/?name=${profile.username}&background=0D8ABC&color=fff`}
+                alt="Profile"
+                className="w-32 h-32 rounded-full mb-8 border-4 border-[#00cfff] shadow-lg"
+              />
+              {/* Heatmap Toggle */}
+              <div className="w-full flex flex-col items-center mb-8">
+                <div className="flex gap-4 mb-2">
+                  <button
+                    className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'all' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
+                    onClick={() => setHeatmapFilter('all')}
+                  >
+                    All Submissions
+                  </button>
+                  <button
+                    className={`px-4 py-1 rounded-full font-bold border-2 ${heatmapFilter === 'ac' ? 'bg-[#00ff99] text-[#181c24] border-[#00ff99]' : 'bg-[#232b3a] text-[#baffea] border-[#00cfff]'}`}
+                    onClick={() => setHeatmapFilter('ac')}
+                  >
+                    Only AC
+                  </button>
+                </div>
+                <div className="overflow-x-auto w-full flex justify-center">
+                  <div>
+                    {/* Month labels */}
+                    <div className="flex ml-10" style={{ minWidth: 53 * 14 }}>
+                      {Array.from({ length: 53 }).map((_, w) => {
+                        const label = monthLabels.find(m => m.week === w)?.label;
+                        return (
+                          <div key={w} className="w-3 h-4 text-xs text-[#baffea] text-center font-mono" style={{ width: 14 }}>{label || ''}</div>
+                        );
+                      })}
+                    </div>
+                    <div className="flex">
+                      {/* Day labels */}
+                      <div className="flex flex-col mr-1">
+                        {dayLabels.map((d, i) => (
+                          <div key={d} className="h-3 w-8 text-xs text-[#baffea] text-right pr-1 font-mono" style={{ height: 14 }}>{i % 2 === 0 ? d : ''}</div>
+                        ))}
+                      </div>
+                      {/* Heatmap grid */}
+                      <div className="flex">
+                        {weeks.map((week, w) => (
+                          <div key={w} className="flex flex-col">
+                            {week.map((date, d) => {
+                              const key = date.toISOString().slice(0, 10);
+                              const count = (date > today ? null : heatmapData[key] || 0);
+                              return (
+                                <div
+                                  key={key}
+                                  title={date > today ? '' : `${key}: ${count} submission${count !== 1 ? 's' : ''}`}
+                                  style={{ width: 12, height: 12, background: count === null ? 'transparent' : getColor(count), borderRadius: 2, border: '1px solid #232b3a', marginBottom: 2 }}
+                                />
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-xs text-[#baffea] mt-2">Last 1 year</div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-red-500 mb-8">{error || "Failed to load profile."}</div>
+          )}
+          {!loading && profile ? (
             <div className="w-full flex flex-col gap-8">
               <div className="flex flex-col md:flex-row md:gap-12 gap-8 w-full">
                 <div className="flex-1">
@@ -347,9 +361,7 @@ const UserProfile = () => {
                 )}
               </div>
             </div>
-          ) : (
-            <div className="text-center text-red-500">{error || "Failed to load profile."}</div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
