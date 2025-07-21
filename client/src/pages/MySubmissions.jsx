@@ -163,7 +163,6 @@ const MySubmissions = () => {
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono px-4 py-10 relative overflow-hidden" style={{ fontFamily: 'Fira Mono, monospace' }}>
       <AuroraBackground />
-      <MatrixRain />
       <div className="max-w-5xl mx-auto">
         <Logo />
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-8 tracking-tight">My Submissions</h1>

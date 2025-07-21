@@ -108,16 +108,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-2 sm:px-4 relative overflow-hidden" style={{
-      background: '#181c24', // dark blue-gray
-    }}>
-      {/* Matrix Code Rain Canvas (background) */}
-      <canvas ref={matrixCanvasRef} className="fixed inset-0 w-full h-full z-0 pointer-events-none" style={{ borderRadius: 0 }} />
-      <form
-        onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-xs sm:max-w-md p-4 sm:p-8 md:p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
-        style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}
-      >
+    <div className="min-h-screen flex items-center justify-center bg-[#181c24] font-mono p-4 relative">
+      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <h2 className="text-3xl font-extrabold text-center bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">
+          Login to Your Account
+        </h2>
         {/* Animated code typing effect */}
         <div className="mb-4 sm:mb-6 text-base sm:text-lg font-mono text-green-400 h-6 flex items-center">
           <span>{typed}</span><span className="animate-pulse">|</span>
@@ -180,7 +175,7 @@ const Login = () => {
           Don't have an account?{' '}
           <Link to="/register" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Register</Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 };

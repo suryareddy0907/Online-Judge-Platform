@@ -128,16 +128,11 @@ function Register() {
   }, [charIdx, snippetIdx]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-2 sm:px-4 relative overflow-hidden" style={{
-      background: '#181c24',
-    }}>
-      {/* Matrix Code Rain Canvas (background) */}
-      <canvas ref={matrixCanvasRef} className="fixed inset-0 w-full h-full z-0 pointer-events-none" style={{ borderRadius: 0 }} />
-      <form
-        onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-xs sm:max-w-md p-4 sm:p-8 md:p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden"
-        style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}
-      >
+    <div className="min-h-screen flex items-center justify-center bg-[#181c24] font-mono p-4 relative">
+      <div className="relative z-10 w-full max-w-md bg-[#232b3a] p-8 rounded-xl border-2 border-[#00cfff] shadow-2xl" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}>
+        <h2 className="text-3xl font-extrabold text-center bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">
+          Create Your Account
+        </h2>
         {/* Animated code typing effect */}
         <div className="mb-4 sm:mb-6 text-base sm:text-lg font-mono text-green-400 h-6 flex items-center">
           <span>{typed}</span><span className="animate-pulse">|</span>
@@ -149,7 +144,6 @@ function Register() {
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">CodersToday</h1>
         </div>
-        <h2 className="text-lg sm:text-2xl font-bold text-center mb-1 sm:mb-2 tracking-wide">Create your account</h2>
         <p className="text-center text-gray-400 mb-4 sm:mb-6 italic text-xs sm:text-sm">"Join. Code. Rise."</p>
         <FormInput
           label="Username"
@@ -216,7 +210,7 @@ function Register() {
           Already have an account?{' '}
           <Link to="/login" className="text-purple-400 hover:underline font-extrabold text-sm drop-shadow-md transition-colors duration-150">Log in</Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 }

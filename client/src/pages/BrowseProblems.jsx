@@ -37,63 +37,6 @@ const AuroraBackground = () => (
   </div>
 );
 
-// Matrix Code Rain Overlay
-const MatrixRain = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let fontSize = 18;
-    let columns = Math.floor(width / fontSize);
-    let drops = Array(columns).fill(1);
-    const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    function resize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-      columns = Math.floor(width / fontSize);
-      drops = Array(columns).fill(1);
-    }
-    window.addEventListener('resize', resize);
-    resize();
-    function draw() {
-      ctx.fillStyle = 'rgba(24,28,36,0.18)';
-      ctx.fillRect(0, 0, width, height);
-      ctx.font = `${fontSize}px Fira Mono, monospace`;
-      for (let i = 0; i < columns; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.shadowColor = '#00ff99';
-        ctx.shadowBlur = 8;
-        ctx.fillStyle = Math.random() > 0.95 ? '#00cfff' : '#00ff99';
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        ctx.shadowBlur = 0;
-        if (drops[i] * fontSize > height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-      animationFrameId = requestAnimationFrame(draw);
-    }
-    draw();
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 w-full h-full z-0 pointer-events-none select-none"
-      style={{ opacity: 0.55, mixBlendMode: 'lighter' }}
-    />
-  );
-};
-
 // Animated code background SVG (copied from Home)
 const CodeBackground = () => (
   <div className="absolute inset-0 z-0 pointer-events-none select-none opacity-30">
@@ -192,7 +135,6 @@ const BrowseProblems = () => {
   return (
     <div className="min-h-screen flex flex-col text-white relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
       <AuroraBackground />
-      <MatrixRain />
       <CodeBackground />
       <div className="max-w-5xl mx-auto px-4 py-10 relative z-10">
         <Logo />

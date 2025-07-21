@@ -243,7 +243,6 @@ const Contests = () => {
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#181c24', fontFamily: 'Fira Mono, monospace' }}>
       <AuroraBackground />
-      <MatrixRain />
       <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
         {/* Header */}
         <div className="shadow-md bg-[#232b3a] border-b-2 border-[#00cfff]">

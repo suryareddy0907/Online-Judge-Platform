@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getUserProfile, updateUserProfile } from '../services/authService';
 import { User, Mail, Calendar, Shield, Edit, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
-import MatrixRainBackground from './MatrixRainBackground';
+import { useAuth } from '../context/AuthContext';
 
-const UserProfile = ({ onClose }) => {
+const UserProfile = ({ show, onClose }) => {
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -88,21 +89,13 @@ const UserProfile = ({ onClose }) => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
-        <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg" style={{ boxShadow: '0 0 24px #00ff99, 0 0 48px #00cfff' }}></div>
-          <span className="mt-6 text-[#00ff99] font-mono text-base tracking-widest animate-pulse drop-shadow-lg">Loading Profile...</span>
-        </div>
-      </div>
-    );
+  if (!show) {
+    return null;
   }
 
   return (
-    <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50 overflow-y-auto">
-      <MatrixRainBackground />
-      <div className="relative z-10 w-full max-w-xs sm:max-w-md mx-auto p-4 sm:p-8 md:p-10 rounded-2xl shadow-2xl border border-transparent bg-[#232b3a]/80 backdrop-blur-md transition-all duration-300 group hover:scale-105 hover:shadow-pink-500/30 before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-gradient-to-br before:from-purple-500 before:via-pink-400 before:to-blue-500 before:opacity-60 before:blur-md animated-glow-border overflow-hidden" style={{ fontFamily: 'Fira Mono, monospace', boxShadow: '0 0 32px 0 #7f5af0, 0 0 64px 0 #ff6ac1' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg p-8 m-4 bg-[#232b3a] rounded-2xl border-2 border-[#00cfff] shadow-2xl text-white font-mono">
         <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h2 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text tracking-tight">User Profile</h2>
           <button

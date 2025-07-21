@@ -377,7 +377,7 @@ const AdminUsers = () => {
                             </select>
                             <button
                               onClick={() => handleBanToggle(user._id, !user.isBanned)}
-                              className={`px-2 py-1 rounded font-bold border-2 ${user.isBanned ? 'bg-gradient-to-r from-green-500 to-green-700 text-white border-green-400 hover:from-green-700 hover:to-green-500' : 'bg-gradient-to-r from-yellow-500 to-red-500 text-white border-yellow-400 hover:from-red-500 hover:to-yellow-500'} transition-all`}
+                              className={`px-2 py-1 rounded font-bold border-2 ${user.isBanned ? 'bg-green-500 text-white border-green-400 hover:bg-green-600' : 'bg-red-500 text-white border-red-400 hover:bg-red-600'} transition-all`}
                               title={user.isBanned ? 'Unban User' : 'Ban User'}
                             >
                               {user.isBanned ? 'Unban' : 'Ban'}
