@@ -53,6 +53,8 @@ const ProblemDetails = () => {
   const [showExplanation, setShowExplanation] = useState(true);
   const [showDebugOutput, setShowDebugOutput] = useState(true);
   const [showResizeHint, setShowResizeHint] = useState(true);
+  const [complexity, setComplexity] = useState("");
+  const [showComplexity, setShowComplexity] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -297,6 +299,25 @@ const ProblemDetails = () => {
     }
   };
 
+  const handleGenerateComplexity = async () => {
+    setAiLoading("complexity");
+    setComplexity("");
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/complexity`, {
+        code,
+        language,
+        problemStatement: problem.statement,
+      });
+      setComplexity(response.data.complexity);
+      setShowComplexity(true);
+    } catch (err) {
+      setComplexity("Failed to analyze complexity.");
+      setShowComplexity(true);
+    } finally {
+      setAiLoading("");
+    }
+  };
+
   // Clean up AI-generated debug output to remove markdown
   const cleanDebugOutput = (rawText) => {
     if (!rawText) return "";
@@ -364,16 +385,16 @@ const ProblemDetails = () => {
                   {aiLoading === "analyze" ? "Analyzing..." : "Analyze Code"}
                 </button>
                 <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
-                  onClick={() => setCode(getBoilerplate(language))}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition flex items-center"
+                  onClick={handleGenerateComplexity}
                   disabled={aiLoading !== ""}
                 >
-                  {aiLoading === "boilerplate" ? (
+                  {aiLoading === "complexity" ? (
                     <span className="inline-flex items-center justify-center mr-2">
                       <span className="spinner-circle"></span>
                     </span>
                   ) : null}
-                  {aiLoading === "boilerplate" ? "Generating..." : "Generate Boilerplate"}
+                  {aiLoading === "complexity" ? "Analyzing..." : "Generate Time and Space Complexities"}
                 </button>
                 <button
                   className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded transition flex items-center"
@@ -443,6 +464,18 @@ const ProblemDetails = () => {
                     className="absolute top-2 right-2 text-red-400 hover:text-red-700 text-lg font-bold"
                     onClick={() => setShowDebugOutput(false)}
                     aria-label="Close Debug Output"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
+              {complexity && showComplexity && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900 relative">
+                  <strong>Time & Space Complexity:</strong> <span style={{ whiteSpace: 'pre-line' }}>{complexity}</span>
+                  <button
+                    className="absolute top-2 right-2 text-blue-400 hover:text-blue-700 text-lg font-bold"
+                    onClick={() => setShowComplexity(false)}
+                    aria-label="Close Complexity"
                   >
                     &times;
                   </button>

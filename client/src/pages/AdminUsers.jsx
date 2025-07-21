@@ -51,7 +51,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [filters.page]);
+  }, [filters]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -89,7 +89,10 @@ const AdminUsers = () => {
   };
 
   const handlePageChange = (page) => {
-    setFilters(prev => ({ ...prev, page }));
+    setFilters(prev => {
+      const newPage = Math.max(1, Math.min(page, pagination.totalPages));
+      return { ...prev, page: newPage };
+    });
   };
 
   const handleRoleUpdate = async (userId, newRole) => {

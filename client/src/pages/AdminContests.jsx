@@ -204,7 +204,10 @@ const AdminContests = () => {
   };
 
   const handlePageChange = (page) => {
-    setFilters(prev => ({ ...prev, page }));
+    setFilters(prev => {
+      const newPage = Math.max(1, Math.min(page, pagination.totalPages));
+      return { ...prev, page: newPage };
+    });
   };
 
   if (loading) {

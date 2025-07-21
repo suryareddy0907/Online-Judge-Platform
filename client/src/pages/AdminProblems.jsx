@@ -65,7 +65,7 @@ const AdminProblems = () => {
 
   useEffect(() => {
     fetchProblems();
-  }, [filters.page]);
+  }, [filters]);
 
   // Handle browser back for view/edit modals
   useEffect(() => {
@@ -122,7 +122,10 @@ const AdminProblems = () => {
   };
 
   const handlePageChange = (page) => {
-    setFilters(prev => ({ ...prev, page }));
+    setFilters(prev => {
+      const newPage = Math.max(1, Math.min(page, pagination.totalPages));
+      return { ...prev, page: newPage };
+    });
   };
 
   const handleTogglePublish = async (problemId, isPublished) => {

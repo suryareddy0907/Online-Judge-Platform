@@ -82,61 +82,6 @@ router.post("/explain-problem", async (req, res) => {
   }
 });
 
-router.post("/generate-boilerplate", async (req, res) => {
-  const { problemStatement, language, currentBoilerplate } = req.body;
-  try {
-    let messages;
-    if (currentBoilerplate && currentBoilerplate.trim().length > 0) {
-      messages = [
-        {
-          role: "system",
-          content: `You are an expert ${language} programmer. Continue generating only the minimal code skeleton (template) for a solution in ${language} to the following problem. The skeleton must be structured in this order: (1) all necessary headers, (2) any required namespaces (e.g., 'using namespace std;' in C++), (3) all helper function or class definitions with empty bodies (no logic) immediately below the headers and namespaces, and (4) a complete main function with only input/output structure and function calls, but no implementation logic. Do NOT include any helper function declarations (prototypes), comments, explanations, or TODOs. Only output the next part of the code skeleton, nothing else. The code must be a modifiable template for the user. Do NOT repeat any code already provided. If the skeleton is already complete, reply with 'COMPLETE'.`
-        },
-        {
-          role: "user",
-          content: `Problem:\n${problemStatement}\n\nCurrent code:\n${currentBoilerplate}`
-        }
-      ];
-    } else {
-      messages = [
-        {
-          role: "system",
-          content: `You are an expert ${language} programmer. Given the following problem, generate only the minimal code skeleton (template) for a solution in ${language}. The skeleton must be structured in this order: (1) all necessary headers, (2) any required namespaces (e.g., 'using namespace std;' in C++), (3) all helper function or class definitions with empty bodies (no logic) immediately below the headers and namespaces, and (4) a complete main function with only input/output structure and function calls, but no implementation logic. Do NOT include any helper function declarations (prototypes), comments, explanations, or TODOs. Only output the code skeleton, nothing else. The code must be a modifiable template for the user.`
-        },
-        {
-          role: "user",
-          content: `Problem:\n${problemStatement}`
-        }
-      ];
-    }
-    const response = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        model: "mistralai/mistral-7b-instruct",
-        messages: messages,
-        max_tokens: 300,
-        temperature: 0.3,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.BOILERPLATE_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const raw = response.data.choices?.[0]?.message?.content?.trim() || "";
-    let code = raw;
-    code = code.replace(/```[a-zA-Z]*\n([\s\S]*?)```/g, '$1').replace(/```/g, '');
-    code = code.replace(/^[^#\n{\[]*[\n]+/, '');
-    code = code.split('\n').filter(line => !/todo/i.test(line)).join('\n');
-    code = code.trim();
-    res.json({ boilerplate: code });
-  } catch (error) {
-    console.error("Boilerplate generation error:", error?.response?.data || error.message || error);
-    res.status(500).json({ error: "Failed to generate boilerplate code" });
-  }
-});
-
 router.post("/debug-code", async (req, res) => {
   const { code, language, problemStatement } = req.body;
   try {
@@ -170,6 +115,43 @@ ${code}`;
   } catch (error) {
     console.error("Debug code error:", error?.response?.data || error.message || error);
     res.status(500).json({ error: "Failed to debug code" });
+  }
+});
+
+router.post("/complexity", async (req, res) => {
+  const { code, language, problemStatement } = req.body;
+  try {
+    const prompt = `You are an expert programming assistant. Analyze the following ${language} code for this problem:
+
+Problem:
+${problemStatement}
+
+User's Code:
+${code}
+
+Give a concise summary (5-10 lines) of the code's time and space complexity. Only mention the main functions/loops/algorithms. Do NOT use markdown, code blocks, or symbols like *, #, or backticks. Use plain English and simple numbered points. If the code is incomplete, state what is missing for a full analysis.`;
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "mistralai/mistral-7b-instruct",
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 300,
+        temperature: 0.3,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.BOILERPLATE_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const complexity = response.data.choices?.[0]?.message?.content?.trim() || "";
+    res.json({ complexity });
+  } catch (error) {
+    console.error("Complexity analysis error:", error?.response?.data || error.message || error);
+    res.status(500).json({ error: "Failed to analyze complexity" });
   }
 });
 
