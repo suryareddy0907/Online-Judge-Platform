@@ -71,12 +71,6 @@ const executePython = (filepath, input = "") => {
       // Fallback: return stdout
       return resolve(stdout);
     });
-    // Catch-all for any unexpected errors
-    runProcess.on('exit', (code, signal) => {
-      // If the promise is already settled, do nothing
-      if (stdout || stderr) return;
-      return resolve('MLE: Memory Limit Exceeded');
-    });
   });
 };
 
