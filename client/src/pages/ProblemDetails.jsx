@@ -278,8 +278,10 @@ const ProblemDetails = () => {
         problemStatement: problem.statement,
       });
       setDebugOutput(response.data.debug);
+      setShowDebugOutput(true);
     } catch (err) {
       setDebugOutput("Failed to debug code.");
+      setShowDebugOutput(true);
     } finally {
       setAiLoading("");
     }
