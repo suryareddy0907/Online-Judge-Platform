@@ -134,11 +134,6 @@ const ContestDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
-      {contestHasEnded && winner && (
-        <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg max-w-3xl mx-auto">
-          <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
-        </div>
-      )}
       <nav className="w-full flex justify-between items-center px-8 py-6 bg-[#232b3a] border-b-2 border-[#00cfff] shadow-md">
         <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">&lt;/&gt; CodersToday</h1>
         {user && (
@@ -149,6 +144,11 @@ const ContestDetails = () => {
         )}
       </nav>
       <div className="max-w-5xl mx-auto py-12 px-4">
+        {contestHasEnded && winner && (
+          <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg max-w-3xl mx-auto">
+            <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
+          </div>
+        )}
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-4 tracking-tight flex items-center gap-4">{contest.title}
           <span className="flex items-center text-lg font-bold text-[#00cfff] ml-4">
             <Clock className="h-6 w-6 mr-2" /> {clock}
