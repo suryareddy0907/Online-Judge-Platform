@@ -173,6 +173,15 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
+      {/* DEBUG OUTPUT - REMOVE AFTER TROUBLESHOOTING */}
+      <div style={{background:'#232b3a',color:'#00ff99',padding:'8px',margin:'8px 0',borderRadius:'8px',fontSize:'14px'}}>
+        <b>DEBUG:</b><br/>
+        user: {JSON.stringify(user)}<br/>
+        profile: {JSON.stringify(profile)}<br/>
+        loading: {String(loading)}<br/>
+        authLoading: {String(authLoading)}<br/>
+        error: {String(error)}
+      </div>
       <div className="max-w-4xl mx-auto py-12 px-4">
         {authLoading ? (
           <div className="flex justify-center items-center h-48">
