@@ -269,38 +269,36 @@ const UserProfile = () => {
                             <div key={d} className="h-4 w-4 text-xs text-[#baffea] text-center font-mono" style={{ height: 16, lineHeight: '16px' }}>{d[0]}</div>
                           ))}
                         </div>
-                        {/* Weeks as columns */}
-                        <div className="flex" style={{ marginLeft: 120 }}>
-                          {weeks.map((week, w) => {
-                            // Find if this week is the start of a new month
-                            const isMonthStart = monthLabels.some(m => m.week === w);
-                            return (
-                              <div key={w} style={{ display: 'flex', flexDirection: 'column', marginRight: isMonthStart && w !== 0 ? 6 : 2 }}>
-                                {week.map((date, d) => {
-                                  const key = date.toISOString().slice(0, 10);
-                                  const count = (date > new Date() ? null : heatmapData[key] || 0);
-                                  // Light gray for empty/future cells, green scale for submissions
-                                  const cellColor = count === null ? '#2d2f36' : count === 0 ? '#44464d' : getColor(count);
-                                  return (
-                                    <div
-                                      key={key}
-                                      title={count > 0 ? `${count} submission${count !== 1 ? 's' : ''} made on ${date.toLocaleDateString()}` : undefined}
-                                      style={{ width: 14, height: 14, background: cellColor, borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', outline: isMonthStart && d === 0 && w !== 0 ? '2px solid #555' : 'none', outlineOffset: '-2px', transition: 'background 0.2s' }}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
+                        {/* Weeks as columns, left-aligned, no extra margin */}
+                        <div className="flex">
+                          {weeks.map((week, w) => (
+                            <div key={w} style={{ display: 'flex', flexDirection: 'column', marginRight: 2 }}>
+                              {week.map((date, d) => {
+                                const key = date.toISOString().slice(0, 10);
+                                const count = (date > today ? null : heatmapData[key] || 0);
+                                // Subtle color for empty/future cells, green scale for submissions
+                                const cellColor = count === null ? '#2d2f36' : count === 0 ? '#44464d' : getColor(count);
+                                return (
+                                  <div
+                                    key={key}
+                                    title={count > 0 ? `${count} submission${count !== 1 ? 's' : ''} made on ${date.toLocaleDateString()}` : undefined}
+                                    style={{ width: 14, height: 14, background: cellColor, borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', transition: 'background 0.2s' }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      {/* Month labels below the grid, centered under first week of each month */}
-                      <div className="flex mt-2" style={{ minWidth: 53 * 16, marginLeft: 158 }}>
-                        {weeks.map((_, w) => {
-                          const monthLabel = monthLabels.find(m => m.week === w)?.label;
+                      {/* Month labels below the grid, centered under the first week that contains a day in that month */}
+                      <div className="flex mt-2 ml-6" style={{ minWidth: weeks.length * 16 }}>
+                        {weeks.map((week, w) => {
+                          // Find if this week contains the first day of a month
+                          const firstOfMonth = week.find(date => date.getDate() === 1 && date <= today);
+                          const label = firstOfMonth ? firstOfMonth.toLocaleString('default', { month: 'short' }) : '';
                           return (
-                            <div key={w} style={{ width: 16, textAlign: 'center', marginRight: monthLabel && w !== 0 ? 6 : 2 }}>
-                              <span className="text-xs text-[#baffea] font-mono">{monthLabel || ''}</span>
+                            <div key={w} style={{ width: 16, textAlign: 'center', marginRight: 2 }}>
+                              <span className="text-xs text-[#baffea] font-mono">{label}</span>
                             </div>
                           );
                         })}
