@@ -66,6 +66,7 @@ app.post('/run', async (req, res) => {
         if (output === 'MLE: Memory Limit Exceeded') {
             return res.status(200).json({ output: 'MLE: Memory Limit Exceeded' });
         }
+        // If output is empty string, return as output (do not treat as MLE)
         return res.json({ filepath, output });
     } catch (error) {
         // Detect compilation error

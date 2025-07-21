@@ -49,6 +49,21 @@ export const submitProblem = async (req, res) => {
       return res.status(400).json({ message: "Problem has no hidden test cases" });
     }
 
+    // If code is empty or only whitespace, treat as WA
+    if (!code || code.trim().length === 0) {
+      const newSubmission = await Submission.create({
+        user: userId,
+        problem: problemId,
+        code,
+        language,
+        totalTestCases: problem.testCases.length,
+        verdict: "WA",
+        errorMessage: "Wrong Answer: No code submitted",
+        judgedAt: new Date(),
+      });
+      return res.status(200).json({ verdict: "WA", message: "Wrong Answer: No code submitted" });
+    }
+
     const newSubmission = await Submission.create({
       user: userId,
       problem: problemId,
@@ -67,6 +82,12 @@ export const submitProblem = async (req, res) => {
 
       try {
         const { data } = await axios.post(`${COMPILER_SERVICE_URL}/run`, runPayload);
+
+        // If compiler service says no code provided, treat as WA
+        if (data.output && data.output === "No code provided") {
+          await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "WA", judgedAt: new Date(), errorMessage: "Wrong Answer: No code submitted" });
+          return res.status(200).json({ verdict: "WA", message: "Wrong Answer: No code submitted" });
+        }
 
         if (data.error || (data.output && data.output.error)) {
            let verdict, errorMessage;
@@ -97,16 +118,15 @@ export const submitProblem = async (req, res) => {
         const trimmedOutput = (data.output || "").toString().trim();
         const trimmedExpectedOutput = (testCase.output || "").toString().trim();
 
-        // Prioritize MLE: check for memory limit exceeded before WA
+        // Remove logic that treats empty output as MLE
         if (
           trimmedOutput.toLowerCase().includes('memory limit exceeded') ||
-          (data.error && data.error.toLowerCase().includes('memory limit exceeded')) ||
-          ((trimmedOutput === '' || trimmedOutput === undefined) && (!data.error || data.error === undefined))
+          (data.error && data.error.toLowerCase().includes('memory limit exceeded'))
         ) {
           await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "MLE", judgedAt: new Date(), errorMessage: 'MLE: Memory Limit Exceeded' });
           return res.status(200).json({ verdict: "MLE", message: 'MLE: Memory Limit Exceeded' });
         }
-        // Only check for WA after MLE check
+        // If output does not match expected, always WA (after MLE/TLE/RE/CE checks)
         if (trimmedOutput !== trimmedExpectedOutput) {
           await Submission.findByIdAndUpdate(newSubmission._id, { verdict: "WA", judgedAt: new Date(), errorMessage: `Wrong Answer on Test Case ${i + 1}` });
           return res.status(200).json({ verdict: "WA", message: `Wrong Answer on Test Case ${i + 1}` });

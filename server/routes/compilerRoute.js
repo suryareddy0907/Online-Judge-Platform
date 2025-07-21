@@ -9,8 +9,8 @@ const COMPILER_SERVICE_URL = process.env.COMPILER_SERVICE_URL;
 router.post("/run", async (req, res) => {
   const { code, language = "cpp", input = "" } = req.body;
 
-  if (!code) {
-    return res.status(400).json({ output: "No code provided" });
+  if (!code || code.trim().length === 0) {
+    return res.status(200).json({ output: "No code provided" });
   }
 
   try {
