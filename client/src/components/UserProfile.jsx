@@ -72,8 +72,10 @@ const UserProfile = () => {
     return map;
   }, [submissions, heatmapFilter]);
 
-  // LeetCode/Codeforces-style heatmap: 53 weeks x 7 days
+  // LeetCode/Codeforces-style heatmap: weeks x 7 days
   // Find the start date (last Sunday before 1 year ago)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const startDate = (() => {
     const d = new Date();
     d.setDate(d.getDate() - 364);
@@ -82,8 +84,17 @@ const UserProfile = () => {
     d.setDate(d.getDate() - d.getDay());
     return d;
   })();
-  // Build 53 weeks x 7 days
-  const weeks = Array.from({ length: 53 }, (_, w) =>
+  // Find the end date (last Saturday after today)
+  const endDate = (() => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + (6 - d.getDay()));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  })();
+  // Build weeks from startDate to endDate
+  const numDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+  const numWeeks = Math.ceil(numDays / 7);
+  const weeks = Array.from({ length: numWeeks }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + w * 7 + d);
