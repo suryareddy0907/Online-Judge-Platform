@@ -263,14 +263,22 @@ const UserProfile = () => {
                     </div>
                   </div>
                   {/* Heatmap Grid - LeetCode style */}
-                  <div className="overflow-x-auto w-full flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
-                    <div>
+                  <div className="w-full flex justify-center" style={{ background: '#22252a', borderRadius: 12, padding: 16 }}>
+                    <div style={{ width: '100%' }}>
+                      {/* Month labels above the grid, aligned to the first week of each month, with boxes below every label */}
+                      <div className="flex mb-2 ml-6" style={{ minWidth: weeks.length * 20 }}>
+                        {weeks.map((_, w) => (
+                          <div key={w} style={{ width: 20, textAlign: 'center', marginRight: 2 }}>
+                            <span className="text-xs text-[#baffea] font-mono">{monthLabelsMap[w] || ''}</span>
+                          </div>
+                        ))}
+                      </div>
                       {/* Heatmap grid: weeks as columns, days as rows */}
                       <div className="flex">
                         {/* Days of week (Sun-Sat) as rows */}
-                        <div className="flex flex-col justify-between mr-2" style={{ height: 7 * 16 }}>
+                        <div className="flex flex-col justify-between mr-2" style={{ height: 7 * 20 }}>
                           {dayLabels.map((d, i) => (
-                            <div key={d} className="h-4 w-4 text-xs text-[#baffea] text-center font-mono" style={{ height: 16, lineHeight: '16px' }}>{d[0]}</div>
+                            <div key={d} className="h-5 w-5 text-xs text-[#baffea] text-center font-mono" style={{ height: 20, lineHeight: '20px' }}>{d[0]}</div>
                           ))}
                         </div>
                         {/* Weeks as columns, left-aligned, no extra margin */}
@@ -286,7 +294,7 @@ const UserProfile = () => {
                                   <div
                                     key={key}
                                     title={count > 0 ? `${count} submission${count !== 1 ? 's' : ''} made on ${date.toLocaleDateString()}` : undefined}
-                                    style={{ width: 14, height: 14, background: cellColor, borderRadius: 3, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', transition: 'background 0.2s' }}
+                                    style={{ width: 20, height: 20, background: cellColor, borderRadius: 4, border: '1px solid #232b3a', marginBottom: 2, marginRight: 0, boxSizing: 'border-box', transition: 'background 0.2s' }}
                                   />
                                 );
                               })}
