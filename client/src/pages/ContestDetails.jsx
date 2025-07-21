@@ -21,6 +21,8 @@ const ContestDetails = () => {
   const [leaderboardSearch, setLeaderboardSearch] = useState("");
   const [searchedUser, setSearchedUser] = useState(null);
   const [solvedCount, setSolvedCount] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -62,7 +64,7 @@ const ContestDetails = () => {
         const leaderboardData = await getContestLeaderboard(id, {
           page: leaderboardPage,
           limit: leaderboardLimit,
-          search: leaderboardSearch.trim()
+          search: searchQuery.trim()
         });
         setLeaderboard(leaderboardData.data);
         setSearchedUser(leaderboardData.searchedUser || null);
@@ -72,7 +74,7 @@ const ContestDetails = () => {
       }
     };
     fetchLeaderboard();
-  }, [id, leaderboardPage, leaderboardLimit, leaderboardSearch]);
+  }, [id, leaderboardPage, leaderboardLimit, searchQuery]);
 
   useEffect(() => {
     if (!contest) return;
@@ -132,6 +134,11 @@ const ContestDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#181c24] text-white font-mono" style={{ fontFamily: 'Fira Mono, monospace' }}>
+      {contestHasEnded && winner && (
+        <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg max-w-3xl mx-auto">
+          <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
+        </div>
+      )}
       <nav className="w-full flex justify-between items-center px-8 py-6 bg-[#232b3a] border-b-2 border-[#00cfff] shadow-md">
         <h1 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">&lt;/&gt; CodersToday</h1>
         {user && (
@@ -148,6 +155,11 @@ const ContestDetails = () => {
           </span>
         </h1>
         <p className="mb-8 text-[#baffea] text-lg font-mono">{contest.description}</p>
+        <div className="mb-4 flex justify-center">
+          <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">
+            {solvedCount} / {contest.problems.length} problems solved
+          </span>
+        </div>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Problems</h2>
         <ul className="mb-12 space-y-4">
           {contest.problems && contest.problems.length > 0 ? (
@@ -163,27 +175,17 @@ const ContestDetails = () => {
           )}
         </ul>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Leaderboard</h2>
-        {contestHasEnded && winner && (
-          <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg">
-            <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
-          </div>
-        )}
-        <div className="mb-4 flex justify-center">
-          <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">
-            {solvedCount} / {contest.problems.length} problems solved
-          </span>
-        </div>
         <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl p-6 shadow-lg font-mono">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
             <form
               className="flex items-center gap-2"
-              onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); }}
+              onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); setSearchQuery(searchInput); }}
             >
               <input
                 type="text"
                 placeholder="Search username"
-                value={leaderboardSearch}
-                onChange={e => setLeaderboardSearch(e.target.value)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
                 className="px-3 py-1 rounded border-2 border-[#00cfff] bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99]"
               />
               <button type="submit" className="px-3 py-1 rounded bg-[#00cfff] text-[#181c24] font-bold">Search</button>

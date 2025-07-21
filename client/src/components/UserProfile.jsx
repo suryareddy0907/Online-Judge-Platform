@@ -3,7 +3,7 @@ import { getUserProfile, updateUserProfile } from '../services/authService';
 import { User, Mail, Calendar, Shield, Edit, Save, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const UserProfile = ({ show, onClose }) => {
+const UserProfile = () => {
   const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -89,19 +89,14 @@ const UserProfile = ({ show, onClose }) => {
     );
   };
 
-  if (!show) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg p-8 m-4 bg-[#232b3a] rounded-2xl border-2 border-[#00cfff] shadow-2xl text-white font-mono">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#181c24] text-white font-mono py-10 px-4" style={{ fontFamily: 'Fira Mono, monospace' }}>
+      <div className="w-full max-w-lg p-8 bg-[#232b3a] rounded-2xl border-2 border-[#00cfff] shadow-2xl text-white font-mono relative">
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-          aria-label="Close profile"
+          onClick={() => window.history.back()}
+          className="absolute top-4 left-4 text-[#00cfff] hover:text-white transition-colors border border-[#00cfff] rounded px-3 py-1 font-bold"
         >
-          <X className="h-6 w-6" />
+          ← Back
         </button>
         {loading ? (
           <div className="flex justify-center items-center h-48">

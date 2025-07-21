@@ -16,6 +16,7 @@ import ProblemDetails from "./pages/ProblemDetails";
 import MySubmissions from "./pages/MySubmissions";
 import Contests from "./pages/Contests";
 import ContestDetails from "./pages/ContestDetails";
+import UserProfile from "./components/UserProfile";
 
 const App = () => {
   return (
@@ -99,6 +100,15 @@ const App = () => {
         element={
           <PrivateRoute>
             <MySubmissions />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <UserProfile />
           </PrivateRoute>
         }
       />
