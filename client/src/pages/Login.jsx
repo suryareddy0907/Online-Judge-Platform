@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const { login: authLogin } = useAuth(); // update context method
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -93,7 +94,8 @@ const Login = () => {
       const { token, user } = res;
 
       authLogin(token, user); // set context user and save token, including isBanned
-      navigate("/home");         // redirect to protected home
+      const from = location.state?.from?.pathname || "/home";
+      navigate(from, { replace: true });
 
     } catch (err) {
       console.error("Login failed:", err);
