@@ -4,7 +4,6 @@ import { getContestDetails, getContestLeaderboard } from '../services/authServic
 import Leaderboard from '../components/Leaderboard';
 import { useAuth } from '../context/AuthContext';
 import { Clock } from 'lucide-react';
-import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 
 const ContestDetails = () => {
@@ -17,8 +16,10 @@ const ContestDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clock, setClock] = useState('');
-  const [runConfetti, setRunConfetti] = useState(false);
-  const { width, height } = useWindowSize();
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
+  const [leaderboardLimit, setLeaderboardLimit] = useState(10);
+  const [leaderboardSearch, setLeaderboardSearch] = useState("");
+  const [searchedUser, setSearchedUser] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -31,19 +32,8 @@ const ContestDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        const [contestData, leaderboardData] = await Promise.all([
-          getContestDetails(id),
-          getContestLeaderboard(id)
-        ]);
+        const contestData = await getContestDetails(id);
         setContest(contestData.contest);
-        setLeaderboard(leaderboardData.data);
-
-        if (location.state?.showResultsAnimation) {
-          const contestHasEnded = new Date() > new Date(contestData.contest.endTime);
-          if (contestHasEnded) {
-            setRunConfetti(true);
-          }
-        }
       } catch (err) {
         setError('Failed to load contest data');
       } finally {
@@ -51,7 +41,25 @@ const ContestDetails = () => {
       }
     };
     fetchContestData();
-  }, [id, location.state]);
+  }, [id]);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const leaderboardData = await getContestLeaderboard(id, {
+          page: leaderboardPage,
+          limit: leaderboardLimit,
+          search: leaderboardSearch.trim()
+        });
+        setLeaderboard(leaderboardData.data);
+        setSearchedUser(leaderboardData.searchedUser || null);
+      } catch (err) {
+        setLeaderboard([]);
+        setSearchedUser(null);
+      }
+    };
+    fetchLeaderboard();
+  }, [id, leaderboardPage, leaderboardLimit, leaderboardSearch]);
 
   useEffect(() => {
     if (!contest) return;
@@ -120,24 +128,12 @@ const ContestDetails = () => {
           </div>
         )}
       </nav>
-      {runConfetti && (
-        <Confetti
-          width={width}
-          height={height}
-          style={{ position: 'fixed', top: 0, left: 0, zIndex: 1, pointerEvents: 'none' }}
-        />
-      )}
       <div className="max-w-5xl mx-auto py-12 px-4">
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-4 tracking-tight flex items-center gap-4">{contest.title}
           <span className="flex items-center text-lg font-bold text-[#00cfff] ml-4">
             <Clock className="h-6 w-6 mr-2" /> {clock}
           </span>
         </h1>
-        {runConfetti && winner && (
-          <div className="my-6 p-4 bg-[#232b3a] border-l-4 border-yellow-400 text-yellow-200 rounded-lg text-center font-mono shadow-lg">
-            <p className="font-bold text-xl">🎉 Congratulations to {winner.user.username} for winning the contest! 🎉</p>
-          </div>
-        )}
         <p className="mb-8 text-[#baffea] text-lg font-mono">{contest.description}</p>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Problems</h2>
         <ul className="mb-12 space-y-4">
@@ -155,12 +151,45 @@ const ContestDetails = () => {
         </ul>
         <h2 className="text-2xl font-extrabold mb-4 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight">Leaderboard</h2>
         <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl p-6 shadow-lg font-mono">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <form
+              className="flex items-center gap-2"
+              onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); }}
+            >
+              <input
+                type="text"
+                placeholder="Search username"
+                value={leaderboardSearch}
+                onChange={e => setLeaderboardSearch(e.target.value)}
+                className="px-3 py-1 rounded border-2 border-[#00cfff] bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99]"
+              />
+              <button type="submit" className="px-3 py-1 rounded bg-[#00cfff] text-[#181c24] font-bold">Search</button>
+            </form>
+            <div className="flex items-center gap-2 mt-2 sm:mt-0">
+              <button
+                className="px-2 py-1 rounded bg-[#00cfff] text-[#181c24] font-bold disabled:opacity-50"
+                onClick={() => setLeaderboardPage(p => Math.max(1, p - 1))}
+                disabled={leaderboardPage === 1}
+              >Prev</button>
+              <span className="text-[#baffea] font-mono">Page {leaderboardPage}</span>
+              <button
+                className="px-2 py-1 rounded bg-[#00ff99] text-[#181c24] font-bold disabled:opacity-50"
+                onClick={() => setLeaderboardPage(p => p + 1)}
+                disabled={leaderboard.length < leaderboardLimit}
+              >Next</button>
+            </div>
+          </div>
           <Leaderboard 
             type="contest"
             data={leaderboard}
             contestName={contest.title}
             problems={contest.problems}
           />
+          {searchedUser && (
+            <div className="mt-4 p-3 bg-[#181c24] border-2 border-[#00cfff] rounded-lg text-[#baffea] font-mono">
+              <span className="font-bold">{searchedUser.user.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.score}</span> solved problems.
+            </div>
+          )}
         </div>
       </div>
     </div>
