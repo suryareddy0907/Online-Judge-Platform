@@ -81,6 +81,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Add updateUser for profile updates
+  const updateUser = (fields) => {
+    setUser((prev) => ({ ...prev, ...fields }));
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -88,7 +93,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {!loading && (
         <>
           {user && user.isBanned && <BannedModal />}
