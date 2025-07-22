@@ -62,10 +62,20 @@ const AdminProblems = () => {
     tags: ''
   });
   const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState(filters.search);
 
   useEffect(() => {
     fetchProblems();
   }, [filters]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput !== filters.search) {
+        setFilters(prev => ({ ...prev, search: searchInput, page: 1 }));
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, filters.search]);
 
   // Handle browser back for view/edit modals
   useEffect(() => {
@@ -220,12 +230,11 @@ const AdminProblems = () => {
                 <input
                   type="text"
                   placeholder="Search problems"
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  onKeyDown={(e) => {
+                  value={searchInput}
+                  onChange={e => setSearchInput(e.target.value)}
+                  onKeyDown={e => {
                     if (e.key === 'Enter') {
-                      e.preventDefault();
-                      fetchProblems();
+                      setFilters(prev => ({ ...prev, search: searchInput, page: 1 }));
                     }
                   }}
                   className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"

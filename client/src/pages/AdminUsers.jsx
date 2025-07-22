@@ -44,6 +44,7 @@ const AdminUsers = () => {
   const [editUserId, setEditUserId] = useState(null);
   const [editError, setEditError] = useState('');
   const [editLoading, setEditLoading] = useState(false);
+  const [searchInput, setSearchInput] = useState(filters.search);
 
   const searchDebounceRef = useRef();
   const navigate = useNavigate();
@@ -52,6 +53,15 @@ const AdminUsers = () => {
   useEffect(() => {
     fetchUsers();
   }, [filters]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput !== filters.search) {
+        setFilters(prev => ({ ...prev, search: searchInput, page: 1 }));
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, filters.search]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -244,12 +254,11 @@ const AdminUsers = () => {
                 <input
                   type="text"
                   placeholder="Search users"
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  onKeyDown={(e) => {
+                  value={searchInput}
+                  onChange={e => setSearchInput(e.target.value)}
+                  onKeyDown={e => {
                     if (e.key === 'Enter') {
-                      e.preventDefault();
-                      fetchUsers();
+                      setFilters(prev => ({ ...prev, search: searchInput, page: 1 }));
                     }
                   }}
                   className="pl-10 w-full border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
