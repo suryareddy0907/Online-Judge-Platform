@@ -209,7 +209,11 @@ const AdminSubmissions = () => {
                       </tr>
                     ) : (
                       submissions.map((sub, idx) => (
-                        <tr key={sub._id} className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24]' : 'bg-[#181c24] hover:bg-[#232b3a]'}>
+                        <tr
+                          key={sub._id}
+                          className={idx % 2 === 0 ? 'bg-[#232b3a] hover:bg-[#181c24] cursor-pointer' : 'bg-[#181c24] hover:bg-[#232b3a] cursor-pointer'}
+                          onClick={() => handleView(sub._id)}
+                        >
                           <td className="px-6 py-4 align-top text-xl font-mono">{getVerdictIcon(sub.verdict)}</td>
                           <td className="px-6 py-4 align-top whitespace-nowrap">
                             <div className="font-mono text-base font-bold text-[#00ff99]">
