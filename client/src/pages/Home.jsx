@@ -538,7 +538,7 @@ const Home = () => {
                   >Next</button>
                 </div>
               </div>
-              {searchedUser && (
+              {leaderboardSearch && searchedUser && (
                 <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#00ff99] rounded-lg text-[#baffea] font-mono">
                   <span className="font-bold">{searchedUser.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.problemsSolved}</span> solved problems.
                 </div>

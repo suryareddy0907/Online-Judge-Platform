@@ -204,17 +204,17 @@ const ContestDetails = () => {
               >Next</button>
             </div>
           </div>
+          {searchQuery && searchedUser && (
+            <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#00cfff] rounded-lg text-[#baffea] font-mono">
+              <span className="font-bold">{searchedUser.user.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.score}</span> solved problems.
+            </div>
+          )}
           <Leaderboard 
             type="contest"
             data={leaderboard}
             contestName={contest.title}
             problems={contest.problems}
           />
-          {searchedUser && (
-            <div className="mt-4 p-3 bg-[#181c24] border-2 border-[#00cfff] rounded-lg text-[#baffea] font-mono">
-              <span className="font-bold">{searchedUser.user.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.score}</span> solved problems.
-            </div>
-          )}
         </div>
       </div>
     </div>
