@@ -100,6 +100,7 @@ const Contests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ search: '', status: '' });
+  const [searchInput, setSearchInput] = useState('');
   const { user } = useAuth();
   const [registering, setRegistering] = useState({});
   const [registered, setRegistered] = useState({});
@@ -110,6 +111,16 @@ const Contests = () => {
     fetchContests();
     // eslint-disable-next-line
   }, [filters]);
+
+  // Debounce search input (10 minutes)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput !== filters.search) {
+        setFilters(prev => ({ ...prev, search: searchInput }));
+      }
+    }, 600000); // 10 minutes in milliseconds
+    return () => clearTimeout(handler);
+  }, [searchInput, filters.search]);
 
   // Update countdowns every second
   useEffect(() => {
@@ -279,8 +290,13 @@ const Contests = () => {
                 type="text"
                 placeholder="Search contests"
                 className="w-full border-2 border-[#00cfff] rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white placeholder-[#baffea] font-mono shadow-inner"
-                value={filters.search}
-                onChange={e => handleFilterChange('search', e.target.value)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    setFilters(prev => ({ ...prev, search: searchInput }));
+                  }
+                }}
               />
             </div>
             <select

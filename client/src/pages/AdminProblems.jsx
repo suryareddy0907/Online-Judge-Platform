@@ -73,7 +73,7 @@ const AdminProblems = () => {
       if (searchInput !== filters.search) {
         setFilters(prev => ({ ...prev, search: searchInput, page: 1 }));
       }
-    }, 500);
+    }, 600000); // 10 minutes in milliseconds
     return () => clearTimeout(handler);
   }, [searchInput, filters.search]);
 
