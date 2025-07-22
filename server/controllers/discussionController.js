@@ -1,5 +1,6 @@
 import Discussion from '../models/Discussion.js';
 import mongoose from 'mongoose';
+import User from '../models/User.js';
 
 export const getDiscussion = async (req, res) => {
   try {
@@ -15,7 +16,12 @@ export const postComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { text, parentId } = req.body;
-    const user = req.user?.username;
+    let user = req.user?.username;
+    if (!user && req.user?.userId) {
+      // Fallback: fetch username from DB
+      const dbUser = await User.findById(req.user.userId).select('username');
+      user = dbUser?.username;
+    }
     if (!user || !text) return res.status(400).json({ message: 'User and text required' });
     const comment = await Discussion.create({ problemId: id, user, text, parentId: parentId || null });
     res.status(201).json({ comment });
