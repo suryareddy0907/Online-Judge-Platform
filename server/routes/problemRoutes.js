@@ -19,8 +19,8 @@ router.get('/:id', protect, getProblemById);
 
 // Discussion routes
 router.get('/:id/discussion', getDiscussion);
-router.post('/:id/discussion', postComment);
-router.delete('/discussion/:commentId', deleteComment);
-router.patch('/discussion/:commentId', editComment);
+router.post('/:id/discussion', protect, postComment);
+router.delete('/discussion/:commentId', protect, deleteComment);
+router.patch('/discussion/:commentId', protect, editComment);
 
 export default router; 

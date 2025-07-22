@@ -14,7 +14,8 @@ export const getDiscussion = async (req, res) => {
 export const postComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const { user, text, parentId } = req.body;
+    const { text, parentId } = req.body;
+    const user = req.user?.username;
     if (!user || !text) return res.status(400).json({ message: 'User and text required' });
     const comment = await Discussion.create({ problemId: id, user, text, parentId: parentId || null });
     res.status(201).json({ comment });
@@ -26,7 +27,8 @@ export const postComment = async (req, res) => {
 export const editComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const { user, text } = req.body;
+    const { text } = req.body;
+    const user = req.user?.username;
     if (!user || !text) return res.status(400).json({ message: 'User and text required' });
     const comment = await Discussion.findById(commentId);
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
@@ -44,8 +46,10 @@ export const editComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
+    const user = req.user?.username;
     const comment = await Discussion.findById(commentId);
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
+    if (comment.user !== user) return res.status(403).json({ message: 'You can only delete your own comments' });
     comment.deleted = true;
     await comment.save();
     res.json({ message: 'Comment deleted' });

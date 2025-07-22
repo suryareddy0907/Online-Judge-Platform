@@ -17,11 +17,15 @@ const fetchDiscussion = async (problemId) => {
   }));
 };
 
-const postCommentAPI = async (problemId, user, text, parentId = null) => {
+const postCommentAPI = async (problemId, text, parentId = null) => {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/problems/${problemId}/discussion`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user, text, parentId })
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ text, parentId })
   });
   if (!res.ok) throw new Error('Failed to post comment');
   const data = await res.json();
@@ -29,17 +33,26 @@ const postCommentAPI = async (problemId, user, text, parentId = null) => {
 };
 
 const deleteCommentAPI = async (commentId) => {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/problems/discussion/${commentId}`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    },
   });
   if (!res.ok) throw new Error('Failed to delete comment');
 };
 
-const editCommentAPI = async (commentId, user, text) => {
+const editCommentAPI = async (commentId, text) => {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE_URL}/problems/discussion/${commentId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user, text })
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ text })
   });
   if (!res.ok) throw new Error('Failed to edit comment');
   const data = await res.json();
@@ -128,7 +141,7 @@ const ProblemDiscussion = () => {
     setPosting(true);
     try {
       // Save to backend
-      const comment = await postCommentAPI(id, user.username, newComment.trim(), replyTo);
+      const comment = await postCommentAPI(id, newComment.trim(), replyTo);
       socketRef.current.emit("postComment", { ...comment, problemId: id });
       setNewComment("");
       setReplyTo(null);
@@ -155,7 +168,7 @@ const ProblemDiscussion = () => {
     e.preventDefault();
     if (!user || !editText.trim()) return;
     try {
-      const updated = await editCommentAPI(editId, user.username, editText.trim());
+      const updated = await editCommentAPI(editId, editText.trim());
       socketRef.current.emit("editComment", { ...updated, problemId: id });
       setEditId(null);
       setEditText("");
