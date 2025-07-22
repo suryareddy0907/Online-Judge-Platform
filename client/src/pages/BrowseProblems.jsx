@@ -137,6 +137,12 @@ const BrowseProblems = () => {
       <CodeBackground />
       <div className="max-w-5xl mx-auto px-4 py-10 relative z-10">
         <Logo />
+        <button
+          className="mb-6 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00ff99] text-[#00ff99] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00cfff] transition-all"
+          onClick={() => navigate('/')}
+        >
+          <span className="mr-2 text-2xl">&#8592;</span> Back To Home
+        </button>
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text tracking-tight text-center mb-8 drop-shadow-lg">Browse Problems</h1>
         <div className="flex justify-center mb-6">
           <span className="bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-5 py-2 rounded-full font-bold text-lg shadow-lg border-2 border-[#00ff99] font-mono">

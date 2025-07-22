@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getMySubmissions } from '../services/authService';
 import { Logo } from '../components/AdminNavbar';
+import { useNavigate } from 'react-router-dom';
 
 // Animated Gradient Aurora Background
 const AuroraBackground = () => (
@@ -102,6 +103,7 @@ const MySubmissions = () => {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSubmissions();
@@ -165,6 +167,12 @@ const MySubmissions = () => {
       <AuroraBackground />
       <div className="max-w-5xl mx-auto">
         <Logo />
+        <button
+          className="mb-6 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00ff99] text-[#00ff99] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00cfff] transition-all"
+          onClick={() => navigate('/')}
+        >
+          <span className="mr-2 text-2xl">&#8592;</span> Back To Home
+        </button>
         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-8 tracking-tight">My Submissions</h1>
         <div className="mb-8 flex flex-wrap gap-4 items-end">
           <div className="relative w-full md:w-1/3">
@@ -248,7 +256,9 @@ const MySubmissions = () => {
             </table>
           </div>
         )}
-        <div className="flex justify-between items-center mt-4">
+        {/* Submissions Table/List rendering here */}
+        {/* Add pagination controls at the bottom */}
+        <div className="flex justify-center items-center mt-8">
           <button
             className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
             onClick={() => setPage(p => Math.max(1, p - 1))}

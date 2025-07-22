@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Clock, Code, CheckCircle } from 'lucide-react';
 import { getRecentActivity, socket } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ActivityFeed = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   
   useEffect(() => {
@@ -148,7 +152,15 @@ const ActivityFeed = () => {
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   solved
                 </span>
-                <span className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+                <span className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  onClick={() => {
+                    if (user) {
+                      navigate(`/problems/${activity.problem._id}`);
+                    } else {
+                      navigate('/login');
+                    }
+                  }}
+                >
                   {activity.problem.title}
                 </span>
               </div>
