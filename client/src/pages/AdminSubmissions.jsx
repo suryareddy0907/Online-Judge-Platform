@@ -262,47 +262,51 @@ const AdminSubmissions = () => {
           {/* View Modal */}
           {viewModal && (
             <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
-              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
+              <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00fff7] shadow-2xl font-mono overflow-y-auto max-h-[90vh] bg-[#232b3a]" style={{ boxShadow: '0 0 24px #00fff7, 0 0 0 4px #232b3a' }}>
                 <button
-                  className="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                  className="absolute top-4 left-4 text-[#00fff7] hover:text-[#00ff99] text-2xl font-bold"
                   onClick={handleCloseModal}
                   aria-label="Back"
                 >
                   &#8592;
                 </button>
                 <button
-                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                  className="absolute top-4 right-4 text-[#00fff7] hover:text-[#00ff99] text-2xl font-bold"
                   onClick={handleCloseModal}
                   aria-label="Close"
                 >
                   &times;
                 </button>
-                {!selectedSubmission ? (
-                  <div className="min-h-[200px] flex flex-col items-center justify-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent border-b-transparent border-l-[#00ff99] border-r-[#00cfff] shadow-lg"></div>
-                    <span className="mt-6 text-[#00ff99] font-mono text-base tracking-widest animate-pulse drop-shadow-lg">Loading Submission...</span>
-                  </div>
-                ) : selectedSubmission.error ? (
-                  <div className="text-center text-red-500">{selectedSubmission.error}</div>
-                ) : (
+                <h2 className="text-2xl font-extrabold text-center mb-6 tracking-tight text-[#00fff7]" style={{ fontFamily: 'Fira Mono, monospace' }}>Submission Details</h2>
+                {selectedSubmission && (
                   <>
-                    <h2 className="text-xl font-semibold mb-2 text-white">Submission Details</h2>
                     <div className="mb-4">
-                      <strong>User:</strong> {selectedSubmission.user?.username || selectedSubmission.user?.email || '-'}<br />
-                      <strong>Problem:</strong> {selectedSubmission.problem?.title || '-'}<br />
-                      <strong>Language:</strong> {selectedSubmission.language}<br />
-                      <strong>Submitted At:</strong> {new Date(selectedSubmission.submittedAt).toLocaleString()}<br />
-                    </div>
-                    <div className="mb-4">
-                      <strong>Code:</strong>
-                      <pre className="bg-gray-100 p-3 rounded mt-2 overflow-x-auto text-sm" style={{ maxHeight: 300 }}>{selectedSubmission.code}</pre>
+                      <span className="font-bold text-lg text-[#00fff7]">Problem:</span>
+                      <span className="ml-2 text-base text-[#00cfff] underline cursor-pointer">
+                        {selectedSubmission.problem?.title || '-'}
+                      </span>
                     </div>
                     <div className="mb-2">
-                      <strong>Verdict:</strong> <span className="font-semibold text-white">{selectedSubmission.verdict}</span>
+                      <span className="font-bold text-lg text-[#00fff7]">Language:</span>
+                      <span className="ml-2 text-base text-[#00cfff]">{selectedSubmission.language}</span>
+                    </div>
+                    <div className="mb-2">
+                      <span className="font-bold text-lg text-[#00fff7]">Submitted At:</span>
+                      <span className="ml-2 text-base text-[#00cfff]">{new Date(selectedSubmission.submittedAt).toLocaleString()}</span>
+                    </div>
+                    <div className="mb-4">
+                      <span className="font-bold text-lg text-[#00fff7]">Code:</span>
+                      <div className="mt-2 rounded-lg border-2 border-[#00fff7] bg-[#181c24] p-3 overflow-x-auto overflow-y-auto" style={{ maxHeight: 300, fontFamily: 'Fira Mono, monospace', color: '#baffea', boxShadow: '0 0 8px #00fff7' }}>
+                        <pre className="whitespace-pre-wrap text-base" style={{ background: 'transparent', color: '#baffea' }}>{selectedSubmission.code}</pre>
+                      </div>
+                    </div>
+                    <div className="mb-2">
+                      <span className="font-bold text-lg text-[#00fff7]">Verdict:</span>
+                      <span className={`ml-2 inline-block px-3 py-1 rounded-full text-base font-bold ${selectedSubmission.verdict === 'AC' ? 'bg-green-900 text-green-300' : selectedSubmission.verdict === 'WA' ? 'bg-red-900 text-red-300' : selectedSubmission.verdict === 'TLE' ? 'bg-yellow-900 text-yellow-300' : selectedSubmission.verdict === 'RE' ? 'bg-blue-900 text-blue-300' : selectedSubmission.verdict === 'CE' ? 'bg-pink-900 text-pink-300' : 'bg-gray-700 text-gray-300'}`}>{selectedSubmission.verdict}</span>
                     </div>
                     {selectedSubmission.errorMessage && (
-                      <div className="bg-red-50 border border-red-200 rounded-md p-2 mt-2 text-red-700 text-sm">
-                        <strong>Error:</strong> {selectedSubmission.errorMessage}
+                      <div className="bg-red-900/80 border border-red-400 rounded-md p-2 mt-2 text-red-200 text-sm font-mono">
+                        <span className="font-bold">Error:</span> {selectedSubmission.errorMessage}
                       </div>
                     )}
                   </>
