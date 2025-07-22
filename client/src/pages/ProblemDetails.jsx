@@ -92,11 +92,12 @@ const ProblemDetails = () => {
     }
   }, [problem, language]);
 
-  useEffect(() => {
-    if (output && allotmentRef.current) {
-      allotmentRef.current.resize([100, 400]);
-    }
-  }, [output]);
+  // Remove this useEffect to prevent resizing the bottom panel on output change
+  // useEffect(() => {
+  //   if (output && allotmentRef.current) {
+  //     allotmentRef.current.resize([100, 400]);
+  //   }
+  // }, [output]);
 
   useEffect(() => {
     // Inject classic white spinner CSS globally
@@ -353,17 +354,17 @@ const ProblemDetails = () => {
   return (
     <>
       <div className="h-screen bg-[#181c24] font-mono text-white">
-        {/* Back To Problems Button */}
-        <button
-          className="absolute top-6 left-6 z-20 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00cfff] text-[#00cfff] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00ff99] transition-all"
-          onClick={() => navigate('/problems')}
-        >
-          <span className="mr-2 text-2xl">&#8592;</span> Back To Problems
-        </button>
         <Allotment>
           <Allotment.Pane>
             {/* Left: Problem Details */}
             <div className="p-8 border-r-2 border-[#00cfff] overflow-y-auto h-full modal-scrollbar bg-[#181c24]" style={{ fontFamily: 'Fira Mono, monospace' }}>
+              {/* Back To Problems Button - now above the title */}
+              <button
+                className="mb-4 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00cfff] text-[#00cfff] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00ff99] transition-all"
+                onClick={() => navigate('/problems')}
+              >
+                <span className="mr-2 text-2xl">&#8592;</span> Back To Problems
+              </button>
               <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight drop-shadow-lg">{problem.title}</h1>
               {/* AI Feature Buttons */}
               <div className="flex flex-wrap gap-4 mb-6">
@@ -566,7 +567,7 @@ const ProblemDetails = () => {
                     <label className="block text-white text-sm font-semibold mb-2">Code Editor</label>
                     <div className="flex-1 min-h-0">
                       <MonacoEditor
-                        height="300px"
+                        height="500px"
                         width="100%"
                         theme="vs-dark"
                         language={
