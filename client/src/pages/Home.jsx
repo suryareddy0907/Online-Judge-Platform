@@ -538,12 +538,12 @@ const Home = () => {
                   >Next</button>
                 </div>
               </div>
-              <Leaderboard type="global" data={leaderboardData} currentPage={leaderboardPage} limit={leaderboardLimit} />
               {searchedUser && (
-                <div className="mt-4 p-3 bg-[#181c24] border-2 border-[#00ff99] rounded-lg text-[#baffea] font-mono">
+                <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#00ff99] rounded-lg text-[#baffea] font-mono">
                   <span className="font-bold">{searchedUser.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.problemsSolved}</span> solved problems.
                 </div>
               )}
+              <Leaderboard type="global" data={leaderboardData} currentPage={leaderboardPage} limit={leaderboardLimit} />
             </div>
           </div>
           <div className="md:col-span-1">
