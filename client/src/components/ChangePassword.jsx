@@ -128,10 +128,10 @@ const ChangePassword = ({ show, onClose }) => {
                 name="currentPassword"
                 value={formData.currentPassword}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm text-white placeholder-gray-500 shadow-inner pr-10"
+                className="w-full pl-10 pr-10 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition text-sm text-white placeholder-gray-500 shadow-inner"
                 placeholder="Enter current password"
               />
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility('current')}
@@ -154,10 +154,10 @@ const ChangePassword = ({ show, onClose }) => {
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm text-white placeholder-gray-500 shadow-inner pr-10"
+                className="w-full pl-10 pr-10 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm text-white placeholder-gray-500 shadow-inner"
                 placeholder="Enter new password"
               />
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility('new')}
@@ -180,10 +180,10 @@ const ChangePassword = ({ show, onClose }) => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm text-white placeholder-gray-500 shadow-inner pr-10"
+                className="w-full pl-10 pr-10 py-2 bg-[#181c24] border border-[#2d3748] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition text-sm text-white placeholder-gray-500 shadow-inner"
                 placeholder="Confirm new password"
               />
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility('confirm')}
