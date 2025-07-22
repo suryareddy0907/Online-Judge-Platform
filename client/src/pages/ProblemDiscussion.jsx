@@ -142,6 +142,8 @@ const ProblemDiscussion = () => {
     try {
       // Save to backend
       const comment = await postCommentAPI(id, newComment.trim(), replyTo);
+      // Optimistically add the comment to the UI
+      setComments(prev => [comment, ...prev]);
       socketRef.current.emit("postComment", { ...comment, problemId: id });
       setNewComment("");
       setReplyTo(null);
