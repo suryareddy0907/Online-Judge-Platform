@@ -274,7 +274,7 @@ export const submitProblem = async (req, res) => {
 export const getMySubmissions = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { problem = '', language = '', verdict = '' } = req.query;
+    const { problem = '', language = '', verdict = '', page = 1, limit = 10 } = req.query;
     const query = { user: userId };
     if (problem) {
       // Search for problems with matching title
@@ -283,15 +283,20 @@ export const getMySubmissions = async (req, res) => {
       if (problemIds.length > 0) {
         query.problem = { $in: problemIds };
       } else {
-        return res.json({ submissions: [] });
+        return res.json({ submissions: [], totalPages: 0, currentPage: page, total: 0 });
       }
     }
     if (language) query.language = language;
     if (verdict) query.verdict = verdict;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
     const submissions = await Submission.find(query)
       .populate('problem', 'title')
-      .sort({ submittedAt: -1 });
-    res.json({ submissions });
+      .sort({ submittedAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+    const total = await Submission.countDocuments(query);
+    const totalPages = Math.ceil(total / parseInt(limit));
+    res.json({ submissions, totalPages, currentPage: parseInt(page), total });
   } catch (error) {
     console.error('Get my submissions error:', error);
     res.status(500).json({ message: 'Server error' });
