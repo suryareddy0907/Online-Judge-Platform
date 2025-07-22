@@ -353,6 +353,13 @@ const ProblemDetails = () => {
   return (
     <>
       <div className="h-screen bg-[#181c24] font-mono text-white">
+        {/* Back To Problems Button */}
+        <button
+          className="absolute top-6 left-6 z-20 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00cfff] text-[#00cfff] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00ff99] transition-all"
+          onClick={() => navigate('/problems')}
+        >
+          <span className="mr-2 text-2xl">&#8592;</span> Back To Problems
+        </button>
         <Allotment>
           <Allotment.Pane>
             {/* Left: Problem Details */}
@@ -597,7 +604,7 @@ const ProblemDetails = () => {
                 <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 modal-scrollbar overflow-y-auto h-full" style={{ fontFamily: 'Fira Mono, monospace' }}>
                   <label className="block text-[#00ff99] text-base font-bold mb-2">Custom Test Case</label>
                   <textarea
-                    className="w-full border-2 border-[#00cfff] rounded-lg px-4 py-3 mb-4 bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99] placeholder-[#baffea] resize-y whitespace-pre overflow-x-auto"
+                    className="w-full border-2 border-[#00cfff] rounded-lg px-4 py-3 mb-4 bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00ff99] placeholder-[#baffea] resize-none whitespace-pre overflow-x-auto"
                     rows={3}
                     placeholder="Enter custom input..."
                     value={customInput}
@@ -658,11 +665,12 @@ const ProblemDetails = () => {
                         <pre
                           className="bg-[#181c24] border-l-4 border-[#00cfff] p-3 rounded font-mono text-base leading-relaxed text-[#baffea]"
                           style={{
-                            whiteSpace: "pre-wrap",
+                            whiteSpace: "pre",
                             overflowX: "auto",
                             overflowY: "auto",
                             maxHeight: "300px",
-                            wordBreak: "break-word",
+                            maxWidth: "100%",
+                            wordBreak: "break-all",
                             tabSize: 2
                           }}
                         >
