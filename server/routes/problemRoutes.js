@@ -1,7 +1,6 @@
 import express from "express";
 import { getPublicProblems, submitProblem, getMySubmissions, getProblemById } from "../controllers/problemController.js";
 import { protect } from "../middlewares/authMiddleware.js";
-import { getDiscussion, postComment, deleteComment, editComment } from '../controllers/discussionController.js';
 
 const router = express.Router();
 
@@ -16,11 +15,5 @@ router.get("/my-submissions", protect, getMySubmissions);
 
 // User: Get a problem by ID (including draft) if authenticated
 router.get('/:id', protect, getProblemById);
-
-// Discussion routes
-router.get('/:id/discussion', getDiscussion);
-router.post('/:id/discussion', protect, postComment);
-router.delete('/discussion/:commentId', protect, deleteComment);
-router.patch('/discussion/:commentId', protect, editComment);
 
 export default router; 

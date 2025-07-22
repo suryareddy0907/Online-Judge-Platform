@@ -18,7 +18,6 @@ import Contests from "./pages/Contests";
 import ContestDetails from "./pages/ContestDetails";
 import UserProfile from "./components/UserProfile";
 import Compiler from "./pages/Compiler";
-import ProblemDiscussion from "./pages/ProblemDiscussion";
 
 const App = () => {
   return (
@@ -89,7 +88,6 @@ const App = () => {
 
       <Route path="/problems" element={<BrowseProblems />} />
       <Route path="/problems/:id" element={<ProblemDetails />} />
-      <Route path="/problems/:id/discussion" element={<ProblemDiscussion />} />
       <Route path="/contests" element={<Contests />} />
       <Route
         path="/contests/:id"

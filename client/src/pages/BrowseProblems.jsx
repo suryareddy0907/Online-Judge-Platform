@@ -223,37 +223,28 @@ const BrowseProblems = () => {
             {filteredProblems.map((problem) => (
               <div
                 key={problem._id}
-                className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 cursor-pointer hover:border-[#00cfff] hover:shadow-2xl transition-all font-mono group relative"
+                    className="bg-[#232b3a] border-2 border-[#00ff99] rounded-xl shadow-lg p-6 cursor-pointer hover:border-[#00cfff] hover:shadow-2xl transition-all font-mono group relative"
                 onClick={() => navigate(`/problems/${problem._id}`)}
-              >
-                {/* Solved badge */}
-                {solvedProblems.has(problem._id) && (
-                  <span className="absolute top-3 right-3 flex items-center gap-1 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-3 py-1 rounded-full text-xs font-bold shadow-lg border-2 border-[#00ff99] z-10 animate-pulse">
-                    <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    Solved
-                  </span>
-                )}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text group-hover:from-[#00cfff] group-hover:to-[#00ff99] tracking-tight mb-1">{problem.title}</h2>
-                    <p className="text-[#baffea] text-sm mt-1 line-clamp-2 font-mono">{problem.statement?.slice(0, 120)}{problem.statement?.length > 120 ? "..." : ""}</p>
+                  >
+                    {/* Solved badge */}
+                    {solvedProblems.has(problem._id) && (
+                      <span className="absolute top-3 right-3 flex items-center gap-1 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] px-3 py-1 rounded-full text-xs font-bold shadow-lg border-2 border-[#00ff99] z-10 animate-pulse">
+                        <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Solved
+                      </span>
+                    )}
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text group-hover:from-[#00cfff] group-hover:to-[#00ff99] tracking-tight mb-1">{problem.title}</h2>
+                        <p className="text-[#baffea] text-sm mt-1 line-clamp-2 font-mono">{problem.statement?.slice(0, 120)}{problem.statement?.length > 120 ? "..." : ""}</p>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-1 tracking-widest ${problem.difficulty === "Easy" ? "bg-green-900 text-green-300" : problem.difficulty === "Medium" ? "bg-yellow-900 text-yellow-300" : "bg-red-900 text-red-300"}`}>{problem.difficulty}</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                  <div className="flex flex-col md:items-end mt-2 md:mt-0">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-1 tracking-widest ${problem.difficulty === "Easy" ? "bg-green-900 text-green-300" : problem.difficulty === "Medium" ? "bg-yellow-900 text-yellow-300" : "bg-red-900 text-red-300"}`}>{problem.difficulty}</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
                       {(problem.tags || []).map((tag) => (
-                        <span key={tag} className="inline-block bg-[#181c24] border border-[#00cfff] text-[#00cfff] px-2 py-0.5 rounded-full text-xs font-mono font-bold">{tag}</span>
+                            <span key={tag} className="inline-block bg-[#181c24] border border-[#00cfff] text-[#00cfff] px-2 py-0.5 rounded-full text-xs font-mono font-bold">{tag}</span>
                       ))}
                     </div>
-                    {/* Discussion button for public problems */}
-                    {problem.isPublished && (
-                      <button
-                        className="mt-2 px-4 py-1 rounded bg-[#00cfff] text-[#181c24] font-bold border-2 border-[#00cfff] hover:bg-[#181c24] hover:text-[#00cfff] transition-all"
-                        onClick={e => { e.stopPropagation(); navigate(`/problems/${problem._id}/discussion`); }}
-                      >
-                        Discussion
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
