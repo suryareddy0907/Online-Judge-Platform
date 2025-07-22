@@ -139,6 +139,7 @@ export const getRecentActivity = async (req, res) => {
           username: submission.user.username
         },
         problem: {
+          _id: submission.problem._id, // Add this line
           title: submission.problem.title,
           difficulty: submission.problem.difficulty
         },
