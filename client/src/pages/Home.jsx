@@ -498,6 +498,10 @@ const Home = () => {
               <FileText className="h-4 w-4 mr-2" />
               My Submissions
             </Link>
+            <Link to="/compiler" className="flex items-center justify-center px-3 sm:px-4 py-2 border-2 border-[#00cfff] rounded-md text-xs sm:text-sm font-bold text-[#00cfff] bg-[#181c24] hover:bg-[#232b3a] hover:border-[#00ff99] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00cfff] font-mono transition">
+              <Code className="h-4 w-4 mr-2" />
+              Compiler
+            </Link>
           </div>
         </div>
 

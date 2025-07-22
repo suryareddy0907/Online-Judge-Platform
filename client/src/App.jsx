@@ -17,6 +17,7 @@ import MySubmissions from "./pages/MySubmissions";
 import Contests from "./pages/Contests";
 import ContestDetails from "./pages/ContestDetails";
 import UserProfile from "./components/UserProfile";
+import Compiler from "./pages/Compiler";
 
 const App = () => {
   return (
@@ -112,6 +113,8 @@ const App = () => {
           </PrivateRoute>
         }
       />
+
+      <Route path="/compiler" element={<Compiler />} />
 
       {/* Redirect all unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
