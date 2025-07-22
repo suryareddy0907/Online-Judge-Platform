@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
+import { getProblemById } from "../services/authService";
 
 const SOCKET_URL = import.meta.env.VITE_API_URL?.replace(/\/api$/, '') || "http://localhost:5000";
 
@@ -61,10 +62,14 @@ const ProblemDiscussion = () => {
   const [editText, setEditText] = useState("");
 
   useEffect(() => {
-    // Fetch problem title (placeholder)
+    // Fetch problem title from API
     const fetchTitle = async () => {
-      // Replace with real API call
-      setProblemTitle(`Problem #${id}`);
+      try {
+        const data = await getProblemById(id);
+        setProblemTitle(data.problem?.title || `Problem #${id}`);
+      } catch {
+        setProblemTitle(`Problem #${id}`);
+      }
     };
     fetchTitle();
   }, [id]);
@@ -169,8 +174,8 @@ const ProblemDiscussion = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#181c24] text-white font-mono px-4 py-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">Discussion: {problemTitle}</h1>
+    <div className="min-h-screen w-full bg-[#181c24] text-white font-mono px-4 py-8">
+      <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight">Problem: {problemTitle}</h1>
       <div className="mb-8">
         <form onSubmit={handlePost} className="flex flex-col gap-2">
           <textarea
@@ -193,10 +198,10 @@ const ProblemDiscussion = () => {
       <div>
         {loading ? (
           <div className="text-[#baffea]">Loading discussion...</div>
-        ) : error ? (
-          <div className="text-red-400">{error}</div>
         ) : comments.length === 0 ? (
           <div className="text-[#baffea]">No comments yet. Be the first to discuss!</div>
+        ) : error ? (
+          <div className="text-red-400">{error}</div>
         ) : (
           <ul className="space-y-4">
             {comments.filter(c => !c.parentId).map((c) => (
