@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trophy, Medal } from 'lucide-react';
 
-const Leaderboard = ({ type, data, contestName, problems = [] }) => {
+const Leaderboard = ({ type, data, contestName, problems = [], currentPage = 1, limit = 10 }) => {
   const getRankIcon = (rank) => {
     switch (rank) {
       case 1:
@@ -88,7 +88,7 @@ const Leaderboard = ({ type, data, contestName, problems = [] }) => {
           <TableHeader />
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {data && data.map((entry, index) => (
-              <TableRow key={entry._id || index} entry={entry} rank={index + 1} />
+              <TableRow key={entry._id || index} entry={entry} rank={(currentPage - 1) * limit + index + 1} />
             ))}
           </tbody>
         </table>
