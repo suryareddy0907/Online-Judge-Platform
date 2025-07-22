@@ -31,6 +31,43 @@ app.set('io', io);
 io.on('connection', (socket) => {
   // Send a test event to verify connection
   socket.emit('test', { message: 'Socket connection working!' });
+
+  // Join a problem discussion room
+  socket.on('joinDiscussion', ({ problemId }) => {
+    if (problemId) {
+      socket.join(`discussion_${problemId}`);
+    }
+  });
+
+  // Leave a problem discussion room
+  socket.on('leaveDiscussion', ({ problemId }) => {
+    if (problemId) {
+      socket.leave(`discussion_${problemId}`);
+    }
+  });
+
+  // Handle posting a new comment
+  socket.on('postComment', (comment) => {
+    if (comment && comment.problemId) {
+      // Broadcast to all users in the same problem discussion room
+      io.to(`discussion_${comment.problemId}`).emit('newComment', comment);
+    }
+  });
+
+  // Handle deleting a comment
+  socket.on('deleteComment', ({ commentId, problemId }) => {
+    if (commentId && problemId) {
+      io.to(`discussion_${problemId}`).emit('deleteComment', { commentId });
+    }
+  });
+
+  // Handle editing a comment
+  socket.on('editComment', (comment) => {
+    if (comment && comment.problemId) {
+      io.to(`discussion_${comment.problemId}`).emit('editComment', comment);
+    }
+  });
+
   socket.on('disconnect', () => {
   });
 });
