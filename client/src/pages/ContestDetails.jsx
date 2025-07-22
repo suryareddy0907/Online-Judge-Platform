@@ -3,7 +3,7 @@ import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { getContestDetails, getContestLeaderboard, getMySubmissions } from '../services/authService';
 import Leaderboard from '../components/Leaderboard';
 import { useAuth } from '../context/AuthContext';
-import { Clock } from 'lucide-react';
+import { Clock, Search } from 'lucide-react';
 import { useWindowSize } from 'react-use';
 
 const ContestDetails = () => {
@@ -181,6 +181,7 @@ const ContestDetails = () => {
               className="flex items-center gap-2"
               onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); setSearchQuery(searchInput); }}
             >
+              <Search className="h-5 w-5 text-[#00cfff]" />
               <input
                 type="text"
                 placeholder="Search username"
@@ -207,6 +208,11 @@ const ContestDetails = () => {
           {searchQuery && searchedUser && (
             <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#00cfff] rounded-lg text-[#baffea] font-mono">
               <span className="font-bold">{searchedUser.user.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.score}</span> solved problems.
+            </div>
+          )}
+          {searchQuery && !searchedUser && (
+            <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#ff4d4f] rounded-lg text-[#ffbaba] font-mono">
+              <span className="font-bold">{searchQuery}</span> doesn't exist.
             </div>
           )}
           <Leaderboard 

@@ -14,14 +14,6 @@ const Leaderboard = ({ type, data, contestName, problems = [], currentPage = 1, 
         return <span className="text-lg font-bold text-gray-600 dark:text-gray-400">{rank}</span>;
     }
   };
-
-  const getRatingColor = (rating) => {
-    if (rating >= 2000) return 'text-red-600 dark:text-red-400';
-    if (rating >= 1600) return 'text-orange-600 dark:text-orange-400';
-    if (rating >= 1400) return 'text-purple-600 dark:text-purple-400';
-    if (rating >= 1200) return 'text-blue-600 dark:text-blue-400';
-    return 'text-gray-600 dark:text-gray-400';
-  };
   
   const TableHeader = () => {
     if (type === 'contest') {

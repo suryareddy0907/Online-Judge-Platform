@@ -124,7 +124,8 @@ const Home = () => {
   const dropdownRef = useRef(null);
   const [leaderboardPage, setLeaderboardPage] = useState(1);
   const [leaderboardLimit, setLeaderboardLimit] = useState(10);
-  const [leaderboardSearch, setLeaderboardSearch] = useState("");
+  const [leaderboardSearchInput, setLeaderboardSearchInput] = useState("");
+  const [leaderboardSearchQuery, setLeaderboardSearchQuery] = useState("");
   const [searchedUser, setSearchedUser] = useState(null);
 
   useEffect(() => {
@@ -149,7 +150,7 @@ const Home = () => {
         const response = await getLeaderboard({
           page: leaderboardPage,
           limit: leaderboardLimit,
-          search: leaderboardSearch.trim()
+          search: leaderboardSearchQuery.trim()
         });
         setLeaderboardData(response.data);
         setSearchedUser(response.searchedUser || null);
@@ -162,7 +163,7 @@ const Home = () => {
       }
     };
     fetchLeaderboard();
-  }, [leaderboardPage, leaderboardLimit, leaderboardSearch]);
+  }, [leaderboardPage, leaderboardLimit, leaderboardSearchQuery]);
 
   useEffect(() => {
     const fetchContests = async () => {
@@ -512,14 +513,14 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                 <form
                   className="flex items-center gap-2"
-                  onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); }}
+                  onSubmit={e => { e.preventDefault(); setLeaderboardPage(1); setLeaderboardSearchQuery(leaderboardSearchInput); }}
                 >
                   <Search className="h-5 w-5 text-[#00ff99]" />
                   <input
                     type="text"
                     placeholder="Search username"
-                    value={leaderboardSearch}
-                    onChange={e => setLeaderboardSearch(e.target.value)}
+                    value={leaderboardSearchInput}
+                    onChange={e => setLeaderboardSearchInput(e.target.value)}
                     className="px-3 py-1 rounded border-2 border-[#00ff99] bg-[#181c24] text-[#baffea] font-mono focus:outline-none focus:ring-2 focus:ring-[#00cfff]"
                   />
                   <button type="submit" className="px-3 py-1 rounded bg-[#00ff99] text-[#181c24] font-bold">Search</button>
@@ -538,9 +539,14 @@ const Home = () => {
                   >Next</button>
                 </div>
               </div>
-              {leaderboardSearch && searchedUser && (
+              {leaderboardSearchQuery && searchedUser && (
                 <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#00ff99] rounded-lg text-[#baffea] font-mono">
                   <span className="font-bold">{searchedUser.username}</span> is ranked <span className="font-bold">#{searchedUser.rank}</span> with <span className="font-bold">{searchedUser.problemsSolved}</span> solved problems.
+                </div>
+              )}
+              {leaderboardSearchQuery && !searchedUser && (
+                <div className="mb-4 p-3 bg-[#181c24] border-2 border-[#ff4d4f] rounded-lg text-[#ffbaba] font-mono">
+                  <span className="font-bold">{leaderboardSearchQuery}</span> doesn't exist.
                 </div>
               )}
               <Leaderboard type="global" data={leaderboardData} currentPage={leaderboardPage} limit={leaderboardLimit} />
