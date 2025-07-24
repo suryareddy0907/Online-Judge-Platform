@@ -60,13 +60,17 @@ const ProblemDetails = () => {
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [submissionsError, setSubmissionsError] = useState(null);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [submissionsFilters, setSubmissionsFilters] = useState({ language: '', verdict: '' });
+  const [submissionsPage, setSubmissionsPage] = useState(1);
+  const [submissionsTotalPages, setSubmissionsTotalPages] = useState(1);
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = async (filters = submissionsFilters, page = submissionsPage) => {
     setSubmissionsLoading(true);
     setSubmissionsError(null);
     try {
-      const data = await getMySubmissionsForProblem(id);
+      const data = await getMySubmissionsForProblem(id, { ...filters, page, limit: 10 });
       setSubmissions(data.submissions);
+      setSubmissionsTotalPages(data.totalPages || 1);
     } catch (err) {
       setSubmissionsError(err.message || 'Failed to fetch submissions');
     } finally {
@@ -74,13 +78,9 @@ const ProblemDetails = () => {
     }
   };
 
-  const handleViewSubmissions = () => {
-    setShowSubmissionsModal(true);
-    fetchSubmissions();
-  };
-  const handleCloseSubmissionsModal = () => {
-    setShowSubmissionsModal(false);
-    setSelectedSubmission(null);
+  const handleSubmissionsFilterChange = (key, value) => {
+    setSubmissionsFilters(prev => ({ ...prev, [key]: value }));
+    setSubmissionsPage(1);
   };
 
   useEffect(() => {
@@ -148,6 +148,23 @@ const ProblemDetails = () => {
     document.head.appendChild(style);
     return () => { document.head.removeChild(style); };
   }, []);
+
+  useEffect(() => {
+    if (showSubmissionsModal) {
+      fetchSubmissions(submissionsFilters, submissionsPage);
+    }
+    // eslint-disable-next-line
+  }, [submissionsFilters, submissionsPage, showSubmissionsModal]);
+
+  const handleViewSubmissions = () => {
+    setShowSubmissionsModal(true);
+    setSubmissionsPage(1);
+    fetchSubmissions({ language: '', verdict: '' }, 1);
+  };
+  const handleCloseSubmissionsModal = () => {
+    setShowSubmissionsModal(false);
+    setSelectedSubmission(null);
+  };
 
   const handleRun = async () => {
     setIsLoading(true);
@@ -769,6 +786,33 @@ const ProblemDetails = () => {
               &times;
             </button>
             <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 text-center tracking-tight">Your Submissions</h2>
+            {/* Filters */}
+            <div className="mb-6 flex flex-wrap gap-4 items-end">
+              <select
+                className="border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono"
+                value={submissionsFilters.language}
+                onChange={e => handleSubmissionsFilterChange('language', e.target.value)}
+              >
+                <option value="">All Languages</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+              </select>
+              <select
+                className="border-2 border-[#00cfff] rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ff99] bg-[#232b3a] text-white font-mono"
+                value={submissionsFilters.verdict}
+                onChange={e => handleSubmissionsFilterChange('verdict', e.target.value)}
+              >
+                <option value="">All Verdicts</option>
+                <option value="AC">Accepted</option>
+                <option value="WA">Wrong Answer</option>
+                <option value="TLE">Time Limit Exceeded</option>
+                <option value="RE">Runtime Error</option>
+                <option value="CE">Compilation Error</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
             {submissionsLoading ? (
               <div className="text-center py-10 text-[#baffea] font-mono animate-pulse">Loading submissions...</div>
             ) : submissionsError ? (
@@ -793,7 +837,7 @@ const ProblemDetails = () => {
                         className="hover:bg-[#181c24] cursor-pointer transition-all"
                         onClick={() => setSelectedSubmission(sub)}
                       >
-                        <td className="px-4 py-2 text-[#baffea]">{idx + 1}</td>
+                        <td className="px-4 py-2 text-[#baffea]">{(submissionsPage - 1) * 10 + idx + 1}</td>
                         <td className="px-4 py-2 text-[#baffea]">{sub.language}</td>
                         <td className={`px-4 py-2 font-bold ${sub.verdict === 'AC' ? 'text-[#00ff99]' : sub.verdict === 'WA' ? 'text-red-400' : 'text-yellow-300'}`}>{sub.verdict}</td>
                         <td className="px-4 py-2 text-[#baffea]">{new Date(sub.submittedAt).toLocaleString()}</td>
@@ -803,6 +847,24 @@ const ProblemDetails = () => {
                 </table>
               </div>
             )}
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-8">
+              <button
+                className="px-4 py-2 rounded bg-[#00cfff] text-[#181c24] font-bold mr-2 disabled:opacity-50"
+                onClick={() => setSubmissionsPage(p => Math.max(1, p - 1))}
+                disabled={submissionsPage === 1}
+              >
+                Previous
+              </button>
+              <span className="text-[#baffea] font-mono">Page {submissionsPage} of {submissionsTotalPages}</span>
+              <button
+                className="px-4 py-2 rounded bg-[#00ff99] text-[#181c24] font-bold ml-2 disabled:opacity-50"
+                onClick={() => setSubmissionsPage(p => Math.min(submissionsTotalPages, p + 1))}
+                disabled={submissionsPage === submissionsTotalPages}
+              >
+                Next
+              </button>
+            </div>
             {/* Submission Details Modal */}
             {selectedSubmission && (
               <div className="fixed inset-0 bg-[#181c24]/80 flex items-center justify-center z-60">
