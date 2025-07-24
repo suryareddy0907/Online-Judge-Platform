@@ -1,6 +1,8 @@
 # CodersToday: Online Judge Platform
 
-[Live Website](https://coders-today.vercel.app/)
+# Demo
+- [Live Website](https://coders-today.vercel.app/)
+- [Demo Video](https://www.loom.com/share/979b45c6ae474c6cb9b21cba1f5839b8?sid=7ff39677-ce0c-40bc-9123-6799aed65551)
 
 A modern online coding platform with admin panel, live judging, and a Dockerized compiler microservice.
 
@@ -106,9 +108,3 @@ Online Judge/
 ## API Reference & Compiler Service
 - See [API_REFERENCE.md](API_REFERENCE.md) for all backend API endpoints.
 - See [COMPILER_SERVICE.md](COMPILER_SERVICE.md) for compiler microservice usage, Docker, and security notes.
-
----
-
-## Demo
-- [Live Website](https://coders-today.vercel.app/)
-- [Demo Video](https://www.loom.com/share/979b45c6ae474c6cb9b21cba1f5839b8?sid=7ff39677-ce0c-40bc-9123-6799aed65551)
