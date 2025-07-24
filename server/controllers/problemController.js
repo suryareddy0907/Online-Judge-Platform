@@ -303,6 +303,30 @@ export const getMySubmissions = async (req, res) => {
   }
 };
 
+// Get all submissions for the current user for a specific problem
+export const getMySubmissionsForProblem = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { problemId } = req.params;
+    const { language = '', verdict = '', page = 1, limit = 10 } = req.query;
+    const query = { user: userId, problem: problemId };
+    if (language) query.language = language;
+    if (verdict) query.verdict = verdict;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const submissions = await Submission.find(query)
+      .populate('problem', 'title')
+      .sort({ submittedAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+    const total = await Submission.countDocuments(query);
+    const totalPages = Math.ceil(total / parseInt(limit));
+    res.json({ submissions, totalPages, currentPage: parseInt(page), total });
+  } catch (error) {
+    console.error('Get my submissions for problem error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // GET /api/problems/:id - get problem by ID (including draft) for authenticated users
 export const getProblemById = async (req, res) => {
   try {

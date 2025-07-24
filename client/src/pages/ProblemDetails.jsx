@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getProblemById } from "../services/authService";
+import { getProblemById, getMySubmissionsForProblem } from "../services/authService";
 import axios from "axios";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
@@ -55,6 +55,33 @@ const ProblemDetails = () => {
   const [showResizeHint, setShowResizeHint] = useState(true);
   const [complexity, setComplexity] = useState("");
   const [showComplexity, setShowComplexity] = useState(false);
+  const [showSubmissionsModal, setShowSubmissionsModal] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissionsError, setSubmissionsError] = useState(null);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
+
+  const fetchSubmissions = async () => {
+    setSubmissionsLoading(true);
+    setSubmissionsError(null);
+    try {
+      const data = await getMySubmissionsForProblem(id);
+      setSubmissions(data.submissions);
+    } catch (err) {
+      setSubmissionsError(err.message || 'Failed to fetch submissions');
+    } finally {
+      setSubmissionsLoading(false);
+    }
+  };
+
+  const handleViewSubmissions = () => {
+    setShowSubmissionsModal(true);
+    fetchSubmissions();
+  };
+  const handleCloseSubmissionsModal = () => {
+    setShowSubmissionsModal(false);
+    setSelectedSubmission(null);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -357,13 +384,20 @@ const ProblemDetails = () => {
         <Allotment>
           <Allotment.Pane>
             {/* Left: Problem Details */}
-            <div className="p-8 border-r-2 border-[#00cfff] overflow-y-auto h-full modal-scrollbar bg-[#181c24]" style={{ fontFamily: 'Fira Mono, monospace' }}>
+            <div className="p-8 border-r-2 border-[#00cfff] overflow-y-auto h-full modal-scrollbar bg-[#181c24] relative" style={{ fontFamily: 'Fira Mono, monospace' }}>
               {/* Back To Problems Button - now above the title */}
               <button
                 className="mb-4 flex items-center px-4 py-2 bg-[#232b3a] border-2 border-[#00cfff] text-[#00cfff] rounded-lg font-bold shadow hover:bg-[#181c24] hover:text-[#00ff99] transition-all"
                 onClick={() => navigate('/problems')}
               >
                 <span className="mr-2 text-2xl">&#8592;</span> Back To Problems
+              </button>
+              {/* View Submissions Button */}
+              <button
+                className="absolute top-8 right-8 px-4 py-2 bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-[#181c24] border-2 border-[#00ff99] rounded-lg font-bold shadow hover:from-[#00cfff] hover:to-[#00ff99] hover:text-[#00cfff] transition-all z-20"
+                onClick={handleViewSubmissions}
+              >
+                View Submissions
               </button>
               <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 tracking-tight drop-shadow-lg">{problem.title}</h1>
               {/* AI Feature Buttons */}
@@ -713,6 +747,86 @@ const ProblemDetails = () => {
             >
               OK
             </button>
+          </div>
+        </div>
+      )}
+      {/* Submissions Modal */}
+      {showSubmissionsModal && (
+        <div className="fixed inset-0 bg-[#181c24]/90 flex items-center justify-center z-50">
+          <div className="relative w-full max-w-2xl mx-4 mt-16 mb-10 p-8 rounded-2xl border-2 border-[#00ff99] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
+            <button
+              className="absolute top-2 left-2 text-[#00cfff] hover:text-[#00ff99] text-2xl font-bold"
+              onClick={handleCloseSubmissionsModal}
+              aria-label="Back"
+            >
+              &#8592;
+            </button>
+            <button
+              className="absolute top-2 right-2 text-[#00cfff] hover:text-[#00ff99] text-2xl font-bold"
+              onClick={handleCloseSubmissionsModal}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-6 text-center tracking-tight">Your Submissions</h2>
+            {submissionsLoading ? (
+              <div className="text-center py-10 text-[#baffea] font-mono animate-pulse">Loading submissions...</div>
+            ) : submissionsError ? (
+              <div className="text-center py-10 text-red-400 font-mono">{submissionsError}</div>
+            ) : submissions.length === 0 ? (
+              <div className="text-center py-10 text-[#baffea] font-mono">No submissions found for this problem.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-[#00cfff]">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-bold text-[#00cfff] uppercase">#</th>
+                      <th className="px-4 py-2 text-left text-xs font-bold text-[#00cfff] uppercase">Language</th>
+                      <th className="px-4 py-2 text-left text-xs font-bold text-[#00cfff] uppercase">Verdict</th>
+                      <th className="px-4 py-2 text-left text-xs font-bold text-[#00cfff] uppercase">Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {submissions.map((sub, idx) => (
+                      <tr
+                        key={sub._id}
+                        className="hover:bg-[#181c24] cursor-pointer transition-all"
+                        onClick={() => setSelectedSubmission(sub)}
+                      >
+                        <td className="px-4 py-2 text-[#baffea]">{idx + 1}</td>
+                        <td className="px-4 py-2 text-[#baffea]">{sub.language}</td>
+                        <td className={`px-4 py-2 font-bold ${sub.verdict === 'AC' ? 'text-[#00ff99]' : sub.verdict === 'WA' ? 'text-red-400' : 'text-yellow-300'}`}>{sub.verdict}</td>
+                        <td className="px-4 py-2 text-[#baffea]">{new Date(sub.submittedAt).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {/* Submission Details Modal */}
+            {selectedSubmission && (
+              <div className="fixed inset-0 bg-[#181c24]/80 flex items-center justify-center z-60">
+                <div className="relative w-full max-w-xl mx-4 p-8 rounded-2xl border-2 border-[#00cfff] bg-[#232b3a] shadow-2xl font-mono overflow-y-auto max-h-[90vh]">
+                  <button
+                    className="absolute top-2 right-2 text-[#00cfff] hover:text-[#00ff99] text-2xl font-bold"
+                    onClick={() => setSelectedSubmission(null)}
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+                  <h3 className="text-xl font-extrabold bg-gradient-to-r from-[#00ff99] to-[#00cfff] text-transparent bg-clip-text mb-4 text-center">Submission Details</h3>
+                  <div className="mb-2"><span className="font-bold text-[#00ff99]">Language:</span> <span className="text-white">{selectedSubmission.language}</span></div>
+                  <div className="mb-2"><span className="font-bold text-[#00cfff]">Verdict:</span> <span className="text-white">{selectedSubmission.verdict}</span></div>
+                  <div className="mb-2"><span className="font-bold text-[#00ff99]">Submitted At:</span> <span className="text-white">{new Date(selectedSubmission.submittedAt).toLocaleString()}</span></div>
+                  <div className="mb-2"><span className="font-bold text-[#00cfff]">Code:</span>
+                    <pre className="bg-[#181c24] border-2 border-[#00cfff] rounded p-2 text-[#baffea] whitespace-pre-wrap mt-2 max-h-60 overflow-y-auto">{selectedSubmission.code}</pre>
+                  </div>
+                  {selectedSubmission.message && (
+                    <div className="mb-2"><span className="font-bold text-[#00ff99]">Message:</span> <span className="text-white">{selectedSubmission.message}</span></div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -124,6 +124,22 @@ export const getMySubmissions = async (params = {}) => {
   return response.json();
 };
 
+export const getMySubmissionsForProblem = async (problemId, params = {}) => {
+  const token = localStorage.getItem('token');
+  const queryParams = new URLSearchParams(params);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${problemId}/my-submissions?${queryParams}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch submissions');
+  }
+  return response.json();
+};
+
 // Public: Get home page stats
 export const getPublicStats = async () => {
   const token = localStorage.getItem('token');
