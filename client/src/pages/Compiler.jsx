@@ -32,6 +32,7 @@ const Compiler = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showResizeHint, setShowResizeHint] = useState(true);
   const allotmentRef = useRef(null);
+  const [input, setInput] = useState("");
 
   useEffect(() => {
     setCode(getBoilerplate(language));
@@ -53,7 +54,7 @@ const Compiler = () => {
       const response = await axios.post(`${API_BASE_URL}/api/run`, {
         code,
         language,
-        input: "",
+        input, // use the input state here
       });
       setOutput(response.data.output || response.data.stderr || response.data.error || "");
     } catch (err) {
@@ -89,7 +90,7 @@ const Compiler = () => {
               >
                 {isLoading ? (
                   <span className="inline-flex items-center justify-center mr-2">
-                    <span className="neon-spinner"></span>
+                    <span className="spinner-circle"></span>
                   </span>
                 ) : null}
                 Run
@@ -122,15 +123,15 @@ const Compiler = () => {
           </div>
         </Allotment.Pane>
         <Allotment.Pane minSize={100} preferredSize={200}>
-          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 modal-scrollbar overflow-y-auto h-full" style={{ fontFamily: 'Fira Mono, monospace' }}>
+          <div className="bg-[#232b3a] border-2 border-[#00cfff] rounded-xl shadow-lg p-6 modal-scrollbar overflow-y-auto h-full flex flex-col" style={{ fontFamily: 'Fira Mono, monospace' }}>
             <h3 className="text-lg font-bold text-[#00cfff] mb-2">Output:</h3>
             <pre
-              className="bg-[#181c24] border-l-4 border-[#00cfff] p-3 rounded font-mono text-base leading-relaxed text-[#baffea]"
+              className="bg-[#181c24] border-l-4 border-[#00cfff] p-3 rounded font-mono text-base leading-relaxed text-[#baffea] mb-4"
               style={{
                 whiteSpace: "pre",
                 overflowX: "auto",
                 overflowY: "auto",
-                maxHeight: "300px",
+                maxHeight: "200px",
                 maxWidth: "100%",
                 wordBreak: "break-all",
                 tabSize: 2
@@ -138,6 +139,16 @@ const Compiler = () => {
             >
               {output}
             </pre>
+            <label className="block text-white text-sm font-semibold mb-1" htmlFor="compiler-input">Input:</label>
+            <textarea
+              id="compiler-input"
+              className="w-full bg-[#181c24] border border-[#00cfff] rounded-lg p-2 text-[#baffea] font-mono resize-y min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter input for your program here..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              disabled={isLoading}
+              style={{ marginBottom: '0.5rem' }}
+            />
           </div>
         </Allotment.Pane>
       </Allotment>
